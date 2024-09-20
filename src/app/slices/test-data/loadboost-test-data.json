@@ -1,0 +1,113 @@
+{
+    "dogTreats": [
+      {
+        "name": "Chewy Bones",
+        "flavor": "Beef",
+        "size": "Medium",
+        "calories": 45,
+        "brand": "HappyPaws",
+        "ingredients": ["Beef", "Oats", "Natural Flavors"],
+        "location": "Kitchen, Lower Cabinet"
+      },
+      {
+        "name": "Crunchy Bites",
+        "flavor": "Chicken",
+        "size": "Small",
+        "calories": 30,
+        "brand": "YumYum",
+        "ingredients": ["Chicken", "Brown Rice", "Peas"],
+        "location": "Living Room, Top of Bookshelf"
+      },
+      {
+        "name": "Dental Sticks",
+        "flavor": "Mint",
+        "size": "Large",
+        "calories": 60,
+        "brand": "FreshBreath",
+        "ingredients": ["Mint", "Parsley", "Sweet Potato"],
+        "location": "Bathroom, Medicine Cabinet"
+      },
+      {
+        "name": "Jerky Strips",
+        "flavor": "Turkey",
+        "size": "Medium",
+        "calories": 50,
+        "brand": "WildNature",
+        "ingredients": ["Turkey", "Potato", "Carrots"],
+        "location": "Backyard, Under the Oak Tree"
+      },
+      {
+        "name": "Soft Chews",
+        "flavor": "Peanut Butter",
+        "size": "Small",
+        "calories": 25,
+        "brand": "NuttyPup",
+        "ingredients": ["Peanut Butter", "Oats", "Honey"],
+        "location": "Bedroom, Nightstand Drawer"
+      },
+      {
+        "name": "Grain-Free Biscuits",
+        "flavor": "Salmon",
+        "size": "Large",
+        "calories": 70,
+        "brand": "PureBites",
+        "ingredients": ["Salmon", "Chickpeas", "Pumpkin"],
+        "location": "Garage, Next to the Toolbench"
+      },
+      {
+        "name": "Chewy Bones",
+        "flavor": "Beef",
+        "size": "Medium",
+        "calories": 45,
+        "brand": "HappyPaws",
+        "ingredients": ["Beef", "Oats", "Natural Flavors"],
+        "location": "Kitchen, Lower Cabinet"
+      },
+      {
+        "name": "Crunchy Bites",
+        "flavor": "Chicken",
+        "size": "Small",
+        "calories": 30,
+        "brand": "YumYum",
+        "ingredients": ["Chicken", "Brown Rice", "Peas"],
+        "location": "Living Room, Top of Bookshelf"
+      },
+      {
+        "name": "Dental Sticks",
+        "flavor": "Mint",
+        "size": "Large",
+        "calories": 60,
+        "brand": "FreshBreath",
+        "ingredients": ["Mint", "Parsley", "Sweet Potato"],
+        "location": "Bathroom, Medicine Cabinet"
+      },
+      {
+        "name": "Jerky Strips",
+        "flavor": "Turkey",
+        "size": "Medium",
+        "calories": 50,
+        "brand": "WildNature",
+        "ingredients": ["Turkey", "Potato", "Carrots"],
+        "location": "Backyard, Under the Oak Tree"
+      },
+      {
+        "name": "Soft Chews",
+        "flavor": "Peanut Butter",
+        "size": "Small",
+        "calories": 25,
+        "brand": "NuttyPup",
+        "ingredients": ["Peanut Butter", "Oats", "Honey"],
+        "location": "Bedroom, Nightstand Drawer"
+      },
+      {
+        "name": "Grain-Free Biscuits",
+        "flavor": "Salmon",
+        "size": "Large",
+        "calories": 70,
+        "brand": "PureBites",
+        "ingredients": ["Salmon", "Chickpeas", "Pumpkin"],
+        "location": "Garage, Next to the Toolbench"
+      }
+    ]
+  }
+  
