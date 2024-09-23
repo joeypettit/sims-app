@@ -80,7 +80,7 @@ function PanelTable<T extends object>({
           <tr
             key={rowIndex}
             onClick={() => onRowClick && onRowClick(rowData)}
-            className="cursor-pointer bg-gray-white odd:bg-blue-50 hover:bg-blue-100 active:shadow-inner"
+            className="cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
           >
             {columns.map((column, cellIndex) =>
               renderCellContents(column, rowData, cellIndex)

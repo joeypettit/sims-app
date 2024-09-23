@@ -3,54 +3,61 @@ import type { PanelTableColumn } from "../../components/panel-table";
 import PanelWindow from "../../components/panel-window";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
-import { Treat } from "../../app/types/treat.type";
+import testData from "./test-projects.json";
+import { Project } from "../../app/types/project";
 
 export default function ProjectsPanel() {
   const navigate = useNavigate();
   // Access the client
   const queryClient = useQueryClient();
 
+  function getTestProjectData() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(testData);
+      }, 2000); // Simulate a 2-second API delay
+    });
+  }
+
   // Queries
   const query = useQuery({
     queryKey: ["todos"],
     queryFn: async () => {
-      const response = await fetch("http://localhost:3000/");
-      return (await response.json()) as Treat[];
+      console.log("test data is", testData);
+      const response = await getTestProjectData();
+      return (await response) as Project[];
     },
   });
 
-  const handleRowClick = (treat: Treat) => {
+  const handleRowClick = (project: Project) => {
     // Navigate to the details page programmatically
-    console.log("TREATS");
+    navigate(`/project/${project.projectId}`);
+    console.log("ProjectS");
   };
 
-  const columns: PanelTableColumn<Treat>[] = [
+  const columns: PanelTableColumn<Project>[] = [
     {
-      columnName: "Calories",
-      dataObjectKey: "calories",
+      columnName: "Client",
+      dataObjectKey: "clientName",
       orderIndex: 1,
-      headerRenderer: () => "Cals",
-      // cellRenderer: (treat) => <span>{treat?.name}</span>,
+      headerRenderer: () => "Client",
+      // cellRenderer: (Project) => <span>{Project?.name}</span>,
     },
     {
-      columnName: "Flavor",
-      dataObjectKey: "flavor",
-      orderIndex: 1,
+      columnName: "Project",
+      dataObjectKey: "projectName",
+      orderIndex: 2,
       // headerRenderer: () => "THE POST",
-      // cellRenderer: (treat) => <span>{treat?.name}</span>,
+      // cellRenderer: (Project) => <span>{Project?.name}</span>,
     },
-    { columnName: "Another Thing", cellRenderer: (row) => "Blahblah" },
+    {
+      columnName: "Start Date",
+      dataObjectKey: "startDate",
+      orderIndex: 3,
+      // headerRenderer: () => "THE POST",
+      // cellRenderer: (Project) => <span>{Project?.name}</span>,
+    },
   ];
-
-  // Mutations
-  // const mutation = useMutation({
-  //   mutationFn: postTodo,
-  //   onSuccess: () => {
-  //     // Invalidate and refetch
-  //     queryClient.invalidateQueries({ queryKey: ["todos"] });
-  //   },
-  // });
-  console.log("data", query);
 
   return (
     <PanelWindow>

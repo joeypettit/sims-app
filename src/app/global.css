@@ -1,9 +1,7 @@
 /* global variables */
 :root {
-    --cota-darkblue: #254F9D;
-    --cota-lightblue: #C3D8F4;
-    --cota-lightgray: #E0E0E0;
-    --cota-darkgray: #5E5E5E;
+    --sims-green: rgba(53,114,138,1);
+    --sims-green-light: rgb(170, 219, 239);
 }
 
 /* components */

@@ -1,20 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import { Project } from "../../app/types/project";
+import testData from "./test-projects.json";
 
 export default function ProjectDetails() {
   const { id } = useParams();
 
+  function getTestProjectData() {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const thisProject = testData.find((p) => p.projectId == id);
+        console.log("this project", thisProject);
+        resolve(thisProject);
+      }, 2000); // Simulate a 2-second API delay
+    });
+  }
+
   // Fetch the details for the specific item using the ID from the route params
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["load", id],
+    queryKey: ["project", id],
     queryFn: async () => {
-      const response = await fetch(
-        `https://jsonplaceholder.typicode.com/posts/${id}`
-      );
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
+      const response = (await getTestProjectData()) as Project;
+      return response;
     },
   });
 
@@ -29,8 +36,8 @@ export default function ProjectDetails() {
   return (
     <div>
       <h1>Details for Item {id}</h1>
-      <h2>{data.title}</h2>
-      <p>{data.body}</p>
+      <h2>{data?.projectName}</h2>
+      <p>{data?.projectAddress.city}</p>
     </div>
   );
 }

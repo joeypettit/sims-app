@@ -1,0 +1,68 @@
+[
+    {
+      "projectId": "KBD001",
+      "clientName": "Smith Family",
+      "projectAddress": {
+        "street": "123 Maple St",
+        "city": "Moorhead",
+        "state": "MN",
+        "zipCode": "56560"
+      },
+      "projectName": "Custom Kitchen Remodel",
+      "startDate": "2024-10-01",
+      "endDate": "2024-11-15"
+    },
+    {
+      "projectId": "KBD002",
+      "clientName": "Johnson Residence",
+      "projectAddress": {
+        "street": "456 Birch Ln",
+        "city": "Fargo",
+        "state": "ND",
+        "zipCode": "58103"
+      },
+      "projectName": "Master Bath Renovation",
+      "startDate": "2024-09-20",
+      "endDate": "2024-10-30"
+    },
+    {
+      "projectId": "KBD003",
+      "clientName": "The Green Family",
+      "projectAddress": {
+        "street": "789 Oak Dr",
+        "city": "West Fargo",
+        "state": "ND",
+        "zipCode": "58078"
+      },
+      "projectName": "Kitchen Expansion & Redesign",
+      "startDate": "2024-10-15",
+      "endDate": "2024-12-01"
+    },
+    {
+      "projectId": "KBD004",
+      "clientName": "Anderson Family",
+      "projectAddress": {
+        "street": "321 Cedar Ave",
+        "city": "Grand Forks",
+        "state": "ND",
+        "zipCode": "58201"
+      },
+      "projectName": "Bathroom Upgrade",
+      "startDate": "2024-11-05",
+      "endDate": "2024-12-10"
+    },
+    {
+      "projectId": "KBD005",
+      "clientName": "Williams Residence",
+      "projectAddress": {
+        "street": "654 Spruce St",
+        "city": "Minneapolis",
+        "state": "MN",
+        "zipCode": "55402"
+      },
+      "projectName": "Complete Kitchen and Bath Remodel",
+      "startDate": "2024-09-25",
+      "endDate": "2024-12-20"
+    }
+  ]
+  

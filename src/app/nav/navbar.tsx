@@ -10,7 +10,7 @@ const iconSize = "1.8rem";
 
 const links = [
   {
-    to: "/projects",
+    to: "/project",
     label: "Projects",
     icon: <PiBlueprint size={iconSize} />,
   },
