@@ -1,6 +1,7 @@
-import { ProductLineItem } from "./product-line-item";
+import { LineItemGroup } from "./line-item-group";
+import { BudgetProposal } from "./budget-proposal";
 
 export type ProjectArea = {
-  title: string;
-  productLineItems: ProductLineItem[];
+  name: string; // eg. Master Bathroom, Outdoor Kitchen
+  lineItemGroups: LineItemGroup[];
 };

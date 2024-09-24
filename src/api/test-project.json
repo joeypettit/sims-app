@@ -1,0 +1,13 @@
+
+{
+    "id": "KBD001",
+    "client": "Smith Family",
+    "location": {
+    "name": "123 Maple St",
+    "startDate": "Moorhead",
+    "zipCode": "56560"
+    },
+    "projectName": "Custom Kitchen Remodel",
+    "startDate": "2024-10-01",
+    "endDate": "2024-11-15"
+}

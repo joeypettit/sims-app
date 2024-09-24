@@ -36,8 +36,8 @@ export default function ProjectDetails() {
   return (
     <div>
       <h1>Details for Item {id}</h1>
-      <h2>{data?.projectName}</h2>
-      <p>{data?.projectAddress.city}</p>
+      {/* <h2>{data?.}</h2>
+      <p>{data?.projectAddress.city}</p> */}
     </div>
   );
 }

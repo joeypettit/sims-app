@@ -31,21 +31,21 @@ export default function ProjectsPanel() {
 
   const handleRowClick = (project: Project) => {
     // Navigate to the details page programmatically
-    navigate(`/project/${project.projectId}`);
+    navigate(`/project/${project.id}`);
     console.log("ProjectS");
   };
 
   const columns: PanelTableColumn<Project>[] = [
     {
       columnName: "Client",
-      dataObjectKey: "clientName",
+      dataObjectKey: "name",
       orderIndex: 1,
       headerRenderer: () => "Client",
       // cellRenderer: (Project) => <span>{Project?.name}</span>,
     },
     {
       columnName: "Project",
-      dataObjectKey: "projectName",
+      dataObjectKey: "name",
       orderIndex: 2,
       // headerRenderer: () => "THE POST",
       // cellRenderer: (Project) => <span>{Project?.name}</span>,

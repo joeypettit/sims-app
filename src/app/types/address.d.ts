@@ -1,6 +1,8 @@
 export type Address = {
-  street: string;
+  addressLine1: string;
+  addressLine2: string;
   city: string;
   state: string;
   zipCode: string;
+  type: string; // billing, shipping, business
 };
