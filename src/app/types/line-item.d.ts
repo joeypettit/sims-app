@@ -5,6 +5,5 @@ export type LineItem = {
   name: string;
   quantity: number?;
   unit: string;
-  allowMultipleSelection: boolean;
   productOptions: ProductOption[];
 };
