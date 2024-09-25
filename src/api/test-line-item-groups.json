@@ -1,0 +1,355 @@
+{
+  "area1": [
+    {
+      "id": "group004",
+      "name": "Countertops",
+      "lineItems": [
+        {
+          "id": "item007",
+          "name": "Countertops",
+          "quantity": 1,
+          "unit": "slabs",
+          "productOptions": [
+            {
+              "id": "option019",
+              "priceRange": {
+                "lowPriceInDollars": 3000,
+                "highPriceInDollars": 6000
+              },
+              "description": "Luxury granite countertops with custom edges.",
+              "productTier": 3,
+              "isSelected": true
+            },
+            {
+              "id": "option020",
+              "priceRange": {
+                "lowPriceInDollars": 4500,
+                "highPriceInDollars": 7000
+              },
+              "description": "Premier quartz countertops with polished finish.",
+              "productTier": 1,
+              "isSelected": false
+            },
+            {
+              "id": "option021",
+              "priceRange": {
+                "lowPriceInDollars": 4000,
+                "highPriceInDollars": 6000
+              },
+              "description": "Designer marble countertops with custom patterns.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        },
+        {
+          "id": "item008",
+          "name": "Backsplash",
+          "quantity": 1,
+          "unit": "sheets",
+          "productOptions": [
+            {
+              "id": "option022",
+              "priceRange": {
+                "lowPriceInDollars": 1000,
+                "highPriceInDollars": 2000
+              },
+              "description": "Premier glass tile backsplash.",
+              "productTier": 1,
+              "isSelected": true
+            },
+            {
+              "id": "option023",
+              "priceRange": {
+                "lowPriceInDollars": 1500,
+                "highPriceInDollars": 2500
+              },
+              "description": "Luxury designer tile backsplash with custom grout.",
+              "productTier": 3,
+              "isSelected": false
+            },
+            {
+              "id": "option024",
+              "priceRange": {
+                "lowPriceInDollars": 1200,
+                "highPriceInDollars": 1800
+              },
+              "description": "Designer ceramic backsplash with custom designs.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "group001",
+      "name": "Cabinets",
+      "lineItems": [
+        {
+          "id": "item001",
+          "name": "Cabinets",
+          "quantity": 12,
+          "unit": "pieces",
+          "productOptions": [
+            {
+              "id": "option001",
+              "priceRange": {
+                "lowPriceInDollars": 3000,
+                "highPriceInDollars": 5000
+              },
+              "description": "Premier line of custom cabinets.",
+              "productTier": 1,
+              "isSelected": false
+            },
+            {
+              "id": "option002",
+              "priceRange": {
+                "lowPriceInDollars": 4000,
+                "highPriceInDollars": 6000
+              },
+              "description": "Luxury line with wood finish.",
+              "productTier": 3,
+              "isSelected": true
+            },
+            {
+              "id": "option003",
+              "priceRange": {
+                "lowPriceInDollars": 3500,
+                "highPriceInDollars": 4500
+              },
+              "description": "Designer cabinets with modern handles.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        },
+        {
+          "id": "item002",
+          "name": "Hardware",
+          "quantity": 24,
+          "unit": "pieces",
+          "productOptions": [
+            {
+              "id": "option004",
+              "priceRange": {
+                "lowPriceInDollars": 200,
+                "highPriceInDollars": 400
+              },
+              "description": "Premier cabinet hardware with modern finish.",
+              "productTier": 1,
+              "isSelected": true
+            },
+            {
+              "id": "option005",
+              "priceRange": {
+                "lowPriceInDollars": 400,
+                "highPriceInDollars": 600
+              },
+              "description": "Luxury designer hardware for cabinetry.",
+              "productTier": 3,
+              "isSelected": false
+            },
+            {
+              "id": "option006",
+              "priceRange": {
+                "lowPriceInDollars": 300,
+                "highPriceInDollars": 450
+              },
+              "description": "Designer hardware with chrome finish.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "area2": [
+    {
+      "id": "group003",
+      "name": "Windows",
+      "lineItems": [
+        {
+          "id": "item005",
+          "name": "Windows",
+          "quantity": 4,
+          "unit": "pieces",
+          "productOptions": [
+            {
+              "id": "option013",
+              "priceRange": {
+                "lowPriceInDollars": 2000,
+                "highPriceInDollars": 4000
+              },
+              "description": "Premier energy-efficient windows.",
+              "productTier": 1,
+              "isSelected": true
+            },
+            {
+              "id": "option014",
+              "priceRange": {
+                "lowPriceInDollars": 3500,
+                "highPriceInDollars": 5000
+              },
+              "description": "Luxury soundproof windows with UV protection.",
+              "productTier": 3,
+              "isSelected": false
+            },
+            {
+              "id": "option015",
+              "priceRange": {
+                "lowPriceInDollars": 3000,
+                "highPriceInDollars": 4500
+              },
+              "description": "Designer windows with frost protection.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        },
+        {
+          "id": "item006",
+          "name": "Curtains",
+          "quantity": 4,
+          "unit": "pieces",
+          "productOptions": [
+            {
+              "id": "option016",
+              "priceRange": {
+                "lowPriceInDollars": 500,
+                "highPriceInDollars": 800
+              },
+              "description": "Premier blackout curtains.",
+              "productTier": 1,
+              "isSelected": true
+            },
+            {
+              "id": "option017",
+              "priceRange": {
+                "lowPriceInDollars": 700,
+                "highPriceInDollars": 1000
+              },
+              "description": "Luxury designer curtains with velvet finish.",
+              "productTier": 3,
+              "isSelected": false
+            },
+            {
+              "id": "option018",
+              "priceRange": {
+                "lowPriceInDollars": 600,
+                "highPriceInDollars": 900
+              },
+              "description": "Designer linen curtains with custom prints.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "group002",
+      "name": "Flooring",
+      "lineItems": [
+        {
+          "id": "item003",
+          "name": "Tile Flooring",
+          "quantity": 80,
+          "unit": "sq ft",
+          "productOptions": [
+            {
+              "id": "option007",
+              "priceRange": {
+                "lowPriceInDollars": 3000,
+                "highPriceInDollars": 5000
+              },
+              "description": "Premier ceramic tiles with a polished finish.",
+              "productTier": 1,
+              "isSelected": false
+            },
+            {
+              "id": "option008",
+              "priceRange": {
+                "lowPriceInDollars": 5000,
+                "highPriceInDollars": 7000
+              },
+              "description": "Luxury ceramic tile flooring with marble pattern.",
+              "productTier": 3,
+              "isSelected": true
+            },
+            {
+              "id": "option009",
+              "priceRange": {
+                "lowPriceInDollars": 4500,
+                "highPriceInDollars": 5500
+              },
+              "description": "Designer tiles with matte finish.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        },
+        {
+          "id": "item004",
+          "name": "Subflooring",
+          "quantity": 100,
+          "unit": "sq ft",
+          "productOptions": [
+            {
+              "id": "option010",
+              "priceRange": {
+                "lowPriceInDollars": 1500,
+                "highPriceInDollars": 2500
+              },
+              "description": "Moisture-resistant subflooring with soundproofing.",
+              "productTier": 1,
+              "isSelected": true
+            },
+            {
+              "id": "option011",
+              "priceRange": {
+                "lowPriceInDollars": 2000,
+                "highPriceInDollars": 3000
+              },
+              "description": "Luxury subflooring for heated floors.",
+              "productTier": 3,
+              "isSelected": false
+            },
+            {
+              "id": "option012",
+              "priceRange": {
+                "lowPriceInDollars": 1800,
+                "highPriceInDollars": 2500
+              },
+              "description": "Designer-grade subflooring with easy installation.",
+              "productTier": 2,
+              "isSelected": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "group005",
+      "name": "Permit",
+      "lineItems": [
+        {
+          "id": "item009",
+          "name": "Building Permit",
+          "quantity": 1,
+          "unit": "permit",
+          "productOptions": [
+            {
+              "id": "option025",
+              "exactPriceInDollars": "500",
+              "description": "Required building permit for project approval.",
+              "productTier": 1,
+              "isSelected": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

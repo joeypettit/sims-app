@@ -3,7 +3,6 @@ import type { PanelTableColumn } from "../../components/panel-table";
 import PanelWindow from "../../components/panel-window";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
-import testData from "./test-projects.json";
 import { Project } from "../../app/types/project";
 
 export default function ProjectsPanel() {
