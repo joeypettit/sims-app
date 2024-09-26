@@ -2,14 +2,14 @@ import { ProductTier } from "./product-tier";
 
 export type ProductOption = {
   id: string;
-  priceRange: PriceRange?;
-  exactPriceInDollars: string?;
+  priceRangePerUnit: PriceRange?;
+  exactPriceInDollarsPerUnit: number?;
   description: string?;
   productTier: number;
   isSelected: boolean;
 };
 
-type PriceRange = {
-  lowPriceInDollars: number;
-  highPriceInDollars: number;
+export type PriceRange = {
+  lowPriceInDollars: number?;
+  highPriceInDollars: number?;
 };

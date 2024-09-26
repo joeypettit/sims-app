@@ -49,10 +49,7 @@ function LargeScreenNavBar() {
   };
 
   return (
-    <div
-      className="flex flex-row justify-start h-screen relative"
-      style={{ backgroundColor: "rgba(239,236,226,1)" }}
-    >
+    <div className="flex flex-row justify-start h-screen relative bg-sims-beige">
       <div className="py-2 px-4 absolute right-0 bg-white rounded shadow">
         <ProfileCircle />
       </div>
@@ -75,7 +72,7 @@ function LargeScreenNavBar() {
             </button>
             <div className={isOpen ? "p-3" : "p-1"}>
               <img
-                src="/assets/Sims_Logo_Brand_Full_Color.webp"
+                src="/assets/Sims_Logo_Brand_Green.png"
                 alt="Terrier Pro App Icon"
                 // style={{ height: "2.5rem", width: "2.5rem" }}
               />

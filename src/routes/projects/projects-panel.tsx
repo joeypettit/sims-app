@@ -4,26 +4,18 @@ import PanelWindow from "../../components/panel-window";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../app/types/project";
+import { getAllProjects } from "../../api/project-api";
 
 export default function ProjectsPanel() {
   const navigate = useNavigate();
   // Access the client
   const queryClient = useQueryClient();
 
-  function getTestProjectData() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(testData);
-      }, 2000); // Simulate a 2-second API delay
-    });
-  }
-
   // Queries
   const query = useQuery({
-    queryKey: ["todos"],
+    queryKey: ["projects"],
     queryFn: async () => {
-      console.log("test data is", testData);
-      const response = await getTestProjectData();
+      const response = await getAllProjects();
       return (await response) as Project[];
     },
   });
@@ -40,7 +32,9 @@ export default function ProjectsPanel() {
       dataObjectKey: "name",
       orderIndex: 1,
       headerRenderer: () => "Client",
-      // cellRenderer: (Project) => <span>{Project?.name}</span>,
+      cellRenderer: (Project) => (
+        <span>{`${Project?.client?.firstName} ${Project?.client?.lastName}`}</span>
+      ),
     },
     {
       columnName: "Project",
@@ -60,9 +54,6 @@ export default function ProjectsPanel() {
 
   return (
     <PanelWindow>
-      <button className="p-4" onClick={() => {}}>
-        +
-      </button>
       {query.data && (
         <PanelTable
           data={query.data}

@@ -14,6 +14,8 @@ module.exports = {
         "sims-green-700": "#547587",
         "sims-green-800": "#416173",
         "sims-green-900": "#35728A",
+        "sims-beige": "#EFECE2",
+        "sims-beige-light": "#F9F8F4",
       },
     },
   },

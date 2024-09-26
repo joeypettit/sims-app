@@ -1,4 +1,4 @@
-import { Option } from "./option";
+import { ProductOption } from "./product-option";
 
 export type LineItem = {
   id: string;
