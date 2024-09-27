@@ -268,7 +268,7 @@
               {
                 "id": "option007",
                 "priceRangePerUnit": {
-                  "lowPriceInDollars": 3000,
+                  "lowPriceInDollars": 0,
                   "highPriceInDollars": 5000
                 },
                 "description": "Premier ceramic tiles with a polished finish.",
@@ -349,7 +349,7 @@
             "productOptions": [
               {
                 "id": "option025",
-                "exactPriceInDollars": "500",
+                "exactPriceInDollarsPerUnit": "0",
                 "description": "Required building permit for project approval.",
                 "productTier": 1,
                 "isSelected": true
