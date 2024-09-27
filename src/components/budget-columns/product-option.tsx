@@ -16,8 +16,8 @@ export default function ProductOptionDisplay({
   return (
     <div
       onClick={() => props.onSelection(props.productOption.id)}
-      className={`relative text-center border-b rounded-sm p-3 ${
-        props.productOption.isSelected ? "bg-sims-green-50" : ""
+      className={`cursor-pointer hover:shadow-inner relative text-center rounded-sm p-3 ${
+        props.productOption.isSelected ? "bg-sims-green-50 shadow-inner" : ""
       }`}
     >
       <div className="absolute right-1">

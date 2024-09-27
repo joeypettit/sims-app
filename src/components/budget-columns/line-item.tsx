@@ -61,20 +61,20 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
     return "-";
   }
 
-  function getSelectedProductOption() {
+  function getSelectedOption() {
     return lineItem.productOptions.find((option) => option.isSelected);
   }
 
   function getSelectedOptionsPrice(): PriceRange | number | null {
-    const selectedOption = getSelectedProductOption();
+    const selectedOption = getSelectedOption();
     if (selectedOption == undefined) return null;
-    if (selectedOption.exactPriceInDollarsPerUnit)
+    if (selectedOption.exactPriceInDollarsPerUnit != null)
       return getTotalledExactPrice(selectedOption);
     return getTotalledPriceRange(selectedOption);
   }
 
   function getLineItemTotal() {
-    const selectedOption = getSelectedProductOption();
+    const selectedOption = getSelectedOption();
     if (selectedOption) {
       const selectedOptionPrice = getSelectedOptionsPrice();
 
@@ -82,18 +82,17 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
         return 0;
       } else if (typeof selectedOptionPrice === "number") {
         return selectedOptionPrice;
-      } else {
-        const selectedPriceRange: PriceRange = {
-          lowPriceInDollars: selectedOptionPrice.lowPriceInDollars,
-          highPriceInDollars: selectedOptionPrice.highPriceInDollars,
-        };
-        return selectedPriceRange;
       }
+      const selectedPriceRange: PriceRange = {
+        lowPriceInDollars: selectedOptionPrice.lowPriceInDollars,
+        highPriceInDollars: selectedOptionPrice.highPriceInDollars,
+      };
+      return selectedPriceRange;
     }
   }
 
   function getTotalledExactPrice(option: ProductOption) {
-    if (option.exactPriceInDollarsPerUnit) {
+    if (option.exactPriceInDollarsPerUnit != null) {
       return Math.ceil(lineItemQuanity * option.exactPriceInDollarsPerUnit);
     }
     return null;
@@ -101,7 +100,7 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
 
   function getTotalledPriceRange(option: ProductOption): PriceRange {
     if (
-      option.priceRangePerUnit?.lowPriceInDollars &&
+      option.priceRangePerUnit?.lowPriceInDollars != null &&
       option.priceRangePerUnit.highPriceInDollars
     ) {
       return {
@@ -121,15 +120,15 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
 
   function renderLineTotal() {
     const lineTotal = getLineItemTotal();
-    if (lineTotal === null) return "-";
+    if (lineTotal === null || lineTotal == 0) return "-";
     if (typeof lineTotal === "number") return `$${lineTotal}`;
     if (lineTotal?.highPriceInDollars == 0) return "-";
     return `$${lineTotal?.lowPriceInDollars} - $${lineTotal?.highPriceInDollars}`;
   }
 
   return (
-    <div className="grid grid-cols-5 gap-4">
-      <div className="text-center pr-4">
+    <div className="grid grid-cols-5 gap-4 py-2">
+      <div className="flex flex-col items-center pr-4">
         <h1>{lineItem.name}</h1>
         <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
       </div>

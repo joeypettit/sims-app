@@ -349,7 +349,7 @@
             "productOptions": [
               {
                 "id": "option025",
-                "exactPriceInDollarsPerUnit": "0",
+                "exactPriceInDollarsPerUnit": 0,
                 "description": "Required building permit for project approval.",
                 "productTier": 1,
                 "isSelected": true
