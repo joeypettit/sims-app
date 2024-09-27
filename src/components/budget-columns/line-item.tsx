@@ -7,12 +7,13 @@ import { PriceRange } from "../../app/types/product-option";
 
 export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
   const [lineItemQuanity, setLineItemQuanity] = useState(1);
+  const [productOptions, setProductOptions] = useState(lineItem.productOptions);
 
   function onQuanityChange(value: number) {
     setLineItemQuanity(value);
   }
 
-  function getPriceDisplayString(option: ProductOption) {
+  function getOptionsDisplayedPrice(option: ProductOption) {
     if (
       option.exactPriceInDollarsPerUnit ||
       option.exactPriceInDollarsPerUnit == 0
@@ -39,33 +40,6 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
       }
     }
     return "-";
-  }
-
-  function getTotalledPriceRange(option: ProductOption): PriceRange {
-    if (
-      option.priceRangePerUnit?.lowPriceInDollars &&
-      option.priceRangePerUnit.highPriceInDollars
-    ) {
-      return {
-        lowPriceInDollars: Math.ceil(
-          lineItemQuanity * option.priceRangePerUnit?.lowPriceInDollars
-        ),
-        highPriceInDollars: Math.ceil(
-          lineItemQuanity * option.priceRangePerUnit?.highPriceInDollars
-        ),
-      };
-    }
-    return {
-      lowPriceInDollars: null,
-      highPriceInDollars: null,
-    };
-  }
-
-  function getTotalledExactPrice(option: ProductOption) {
-    if (option.exactPriceInDollarsPerUnit) {
-      return Math.ceil(lineItemQuanity * option.exactPriceInDollarsPerUnit);
-    }
-    return null;
   }
 
   function getSelectedProductOption() {
@@ -99,6 +73,33 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
     }
   }
 
+  function getTotalledExactPrice(option: ProductOption) {
+    if (option.exactPriceInDollarsPerUnit) {
+      return Math.ceil(lineItemQuanity * option.exactPriceInDollarsPerUnit);
+    }
+    return null;
+  }
+
+  function getTotalledPriceRange(option: ProductOption): PriceRange {
+    if (
+      option.priceRangePerUnit?.lowPriceInDollars &&
+      option.priceRangePerUnit.highPriceInDollars
+    ) {
+      return {
+        lowPriceInDollars: Math.ceil(
+          lineItemQuanity * option.priceRangePerUnit?.lowPriceInDollars
+        ),
+        highPriceInDollars: Math.ceil(
+          lineItemQuanity * option.priceRangePerUnit?.highPriceInDollars
+        ),
+      };
+    }
+    return {
+      lowPriceInDollars: null,
+      highPriceInDollars: null,
+    };
+  }
+
   function renderLineTotal() {
     const lineTotal = getLineItemTotal();
     if (lineTotal === null) return "-";
@@ -108,24 +109,25 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
   }
 
   return (
-    <>
-      <div className="flex flex-row py-2">
-        <div className="flex-none w-24 pr-4">
-          <h1>{lineItem.name}</h1>
-          <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
-        </div>
-        <div className="flex-auto grid grid-cols-3 gap-4">
-          {lineItem.productOptions.map((option) => {
-            const priceDisplayString = getPriceDisplayString(option);
-            return (
-              <ProductOptionDisplay
-                props={{ priceDisplayString: priceDisplayString, ...option }}
-              />
-            );
-          })}
-        </div>
-        <div>{renderLineTotal()}</div>
+    <div className="grid grid-cols-5 gap-4">
+      <div className="text-center pr-4">
+        <h1>{lineItem.name}</h1>
+        <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
       </div>
-    </>
+      {productOptions.map((option) => {
+        const displayedPriceString = getOptionsDisplayedPrice(option);
+        return (
+          <ProductOptionDisplay
+            props={{
+              displayedPriceString: displayedPriceString,
+              productOption: option,
+            }}
+          />
+        );
+      })}
+      <div className="text-sm text-center font-bold pr-4 col-end-6">
+        {renderLineTotal()}
+      </div>
+    </div>
   );
 }
