@@ -24,6 +24,8 @@ export default function QuantityInput({
   };
 
   const decrement = () => {
+    console.log("input value", inputValue);
+    if (Number(inputValue) - 1 <= 0) return;
     const newValue = Math.floor(Number(inputValue)) - 1;
     setInputValue(newValue.toFixed(2));
     onChange(newValue); // Update parent state with decremented value

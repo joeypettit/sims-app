@@ -37,7 +37,9 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
       option.exactPriceInDollarsPerUnit ||
       option.exactPriceInDollarsPerUnit == 0
     ) {
-      return `$${option.exactPriceInDollarsPerUnit * lineItemQuanity}`;
+      return `$${Math.ceil(
+        option.exactPriceInDollarsPerUnit * lineItemQuanity
+      )}`;
     }
 
     if (
@@ -53,9 +55,11 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
         option.priceRangePerUnit?.lowPriceInDollars * lineItemQuanity ||
         option.priceRangePerUnit?.highPriceInDollars * lineItemQuanity
       ) {
-        return `$${
+        return `$${Math.ceil(
           option.priceRangePerUnit.lowPriceInDollars * lineItemQuanity
-        } - $${option.priceRangePerUnit.highPriceInDollars * lineItemQuanity}`;
+        )} - $${Math.ceil(
+          option.priceRangePerUnit.highPriceInDollars * lineItemQuanity
+        )}`;
       }
     }
     return "-";

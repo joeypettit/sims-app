@@ -7,9 +7,15 @@ import LineItemGroupContainer from "../../components/budget-columns/line-item-gr
 import { LineItemGroup } from "../../app/types/line-item-group";
 import { LineItem } from "../../app/types/line-item";
 import { ProductOption } from "../../app/types/product-option";
+import { PriceRange } from "../../app/types/product-option";
+import { useState } from "react";
 
 export default function ProjectAreaProposal() {
   const { areaId } = useParams();
+  const [projAreaTotal, setProjAreaTotal] = useState<PriceRange>({
+    lowPriceInDollars: 0,
+    highPriceInDollars: 0,
+  });
 
   // Fetch the details for the specific item using the ID from the route params
   const { data, isLoading, isError, error } = useQuery({
@@ -20,6 +26,8 @@ export default function ProjectAreaProposal() {
       return response;
     },
   });
+
+  function updateProjectAreaTotal() {}
 
   if (isLoading) {
     return <p>Loading...</p>;
