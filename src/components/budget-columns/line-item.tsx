@@ -7,10 +7,29 @@ import { PriceRange } from "../../app/types/product-option";
 
 export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
   const [lineItemQuanity, setLineItemQuanity] = useState(1);
-  const [productOptions, setProductOptions] = useState(lineItem.productOptions);
+  const [productOptions, setProductOptions] = useState(() =>
+    // sort by product tier
+    lineItem.productOptions.sort((a, b) => {
+      if (a.productTier > b.productTier) return 1;
+      if (a.productTier < b.productTier) return -1;
+      return 0;
+    })
+  );
 
   function onQuanityChange(value: number) {
     setLineItemQuanity(value);
+  }
+
+  function onOptionSelection(optionId: string) {
+    const updatedOptions = productOptions.map((option) => {
+      if (option.id == optionId) {
+        option.isSelected = true;
+        return option;
+      }
+      option.isSelected = false;
+      return option;
+    });
+    setProductOptions(updatedOptions);
   }
 
   function getOptionsDisplayedPrice(option: ProductOption) {
@@ -121,6 +140,7 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
             props={{
               displayedPriceString: displayedPriceString,
               productOption: option,
+              onSelection: onOptionSelection,
             }}
           />
         );

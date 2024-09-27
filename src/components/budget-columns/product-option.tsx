@@ -5,6 +5,7 @@ import IsCheckedIcon from "../is-checked-icon";
 export type ProductOptionDisplayProps = {
   displayedPriceString: string;
   productOption: ProductOption;
+  onSelection: (selectedOptionId: string) => void;
 };
 
 export default function ProductOptionDisplay({
@@ -14,6 +15,7 @@ export default function ProductOptionDisplay({
 }) {
   return (
     <div
+      onClick={() => props.onSelection(props.productOption.id)}
       className={`relative text-center border-b rounded-sm p-3 ${
         props.productOption.isSelected ? "bg-sims-green-50" : ""
       }`}
