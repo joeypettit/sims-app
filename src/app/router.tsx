@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import TerrierProNavBar from "./nav/navbar.tsx";
+import NavBar from "./nav/navbar.tsx";
 import ErrorPage from "./error-page.tsx";
 import ProjectsPanel from "../routes/projects/projects-panel.tsx";
 import ProjectDetails from "../routes/projects/project-details.tsx";
@@ -8,7 +8,7 @@ import ProjectAreaProposal from "../routes/projects/project-area-proposal.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <TerrierProNavBar />,
+    element: <NavBar />,
     errorElement: <ErrorPage />,
     children: [
       {

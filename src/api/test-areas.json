@@ -191,7 +191,7 @@
                 },
                 "description": "Premier energy-efficient windows.",
                 "productTier": 1,
-                "isSelected": true
+                "isSelected": false
               },
               {
                 "id": "option014",

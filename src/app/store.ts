@@ -1,9 +1,9 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import treatsReducer from "./slices/treats-slice";
+import projectAreaReducer from "./slices/project-area-slice";
 
 const rootReducer = combineReducers({
-  treats: treatsReducer,
+  projectArea: projectAreaReducer,
 });
 
 export const store = configureStore({

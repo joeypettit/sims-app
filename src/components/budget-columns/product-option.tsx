@@ -1,9 +1,9 @@
-import { ProductOption } from "../../app/types/product-option";
-import { PriceRange } from "../../app/types/product-option";
+import type { ProductOption } from "../../app/types/product-option";
+import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 
 export type ProductOptionDisplayProps = {
-  displayedPriceString: string;
+  lineItemQuantity: number;
   productOption: ProductOption;
   onSelection: (selectedOptionId: string) => void;
 };
@@ -13,6 +13,30 @@ export default function ProductOptionDisplay({
 }: {
   props: ProductOptionDisplayProps;
 }) {
+  function getDisplayedPrice(option: ProductOption) {
+    if (option.exactPriceInDollarsPerUnit != null) {
+      return `$${Math.ceil(
+        option.exactPriceInDollarsPerUnit * props.lineItemQuantity
+      )}`;
+    }
+
+    if (option.priceRangePerUnit) {
+      const lowPrice =
+        option.priceRangePerUnit.lowPriceInDollars * props.lineItemQuantity;
+      const highPrice =
+        option.priceRangePerUnit.highPriceInDollars * props.lineItemQuantity;
+
+      if (lowPrice === highPrice) {
+        return `$${Math.ceil(lowPrice)}`;
+      }
+
+      return `$${Math.ceil(lowPrice)} - $${Math.ceil(highPrice)}`;
+    }
+
+    // Default case if no price information is available
+    return "-";
+  }
+
   return (
     <div
       onClick={() => props.onSelection(props.productOption.id)}
@@ -31,7 +55,7 @@ export default function ProductOptionDisplay({
           props.productOption.isSelected ? "font-bold" : "font-normal"
         }`}
       >
-        {props.displayedPriceString}
+        {getDisplayedPrice(props.productOption)}
       </p>
       <p className="text-stone-600 text-xs">
         {props.productOption.description}

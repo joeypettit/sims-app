@@ -1,4 +1,5 @@
-import { ProductTier } from "./product-tier";
+import type { ProductTier } from "./product-tier";
+import type { PriceRange } from "./price-range";
 
 export type ProductOption = {
   id: string;
@@ -7,9 +8,4 @@ export type ProductOption = {
   description: string?;
   productTier: number;
   isSelected: boolean;
-};
-
-export type PriceRange = {
-  lowPriceInDollars: number?;
-  highPriceInDollars: number?;
 };

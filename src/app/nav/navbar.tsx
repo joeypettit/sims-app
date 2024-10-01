@@ -83,7 +83,7 @@ function LargeScreenNavBar() {
           <ul>
             {links.map((link, index) => {
               return (
-                <>
+                <div key={`nav-list-${index}`}>
                   <hr className="mx-2" />
                   <li key={index}>
                     <Link to={link.to}>
@@ -113,7 +113,7 @@ function LargeScreenNavBar() {
                       </div>
                     </Link>
                   </li>
-                </>
+                </div>
               );
             })}
           </ul>

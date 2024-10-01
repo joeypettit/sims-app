@@ -1,4 +1,3 @@
-import React from "react";
 import SideNavBar from "./nav/navbar";
 
 function App() {

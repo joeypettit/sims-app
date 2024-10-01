@@ -1,12 +1,18 @@
 import { ProductOption } from "../../app/types/product-option";
-import { useState } from "react";
-import { LineItem } from "../../app/types/line-item";
+import { useState, useEffect } from "react";
+import type { LineItem } from "../../app/types/line-item";
 import ProductOptionDisplay from "./product-option";
 import QuantityInput from "../quantity-input";
-import { PriceRange } from "../../app/types/product-option";
+import type { PriceRange } from "../../app/types/price-range";
+import { useDispatch, useSelector } from "react-redux";
+import { adjustTotalDollars } from "../../app/slices/project-area-slice";
+import { isPriceRange } from "../../app/types/type-guards/price-range-guard";
 
 export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
-  const [lineItemQuanity, setLineItemQuanity] = useState(1);
+  const dispatch = useDispatch();
+  const [lineItemQuanity, setLineItemQuanity] = useState(
+    () => lineItem.quantity ?? 1
+  );
   const [productOptions, setProductOptions] = useState(() =>
     // sort by product tier
     lineItem.productOptions.sort((a, b) => {
@@ -16,13 +22,23 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
     })
   );
 
+  useEffect(() => {
+    const selectedOption = getCurrentlySelectedOption();
+    if (selectedOption) {
+      updateProjectAreaTotal({ newOption: selectedOption });
+    }
+  }, []);
+
   function onQuanityChange(value: number) {
     setLineItemQuanity(value);
   }
 
-  function onOptionSelection(optionId: string) {
+  function onOptionSelection(newOptionId: string) {
+    const prevOption = getCurrentlySelectedOption();
+    let newOption = productOptions.find((option) => option.id == newOptionId);
+
     const updatedOptions = productOptions.map((option) => {
-      if (option.id == optionId) {
+      if (option.id == newOptionId) {
         option.isSelected = true;
         return option;
       }
@@ -30,104 +46,109 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
       return option;
     });
     setProductOptions(updatedOptions);
-  }
 
-  function getOptionsDisplayedPrice(option: ProductOption) {
-    if (
-      option.exactPriceInDollarsPerUnit ||
-      option.exactPriceInDollarsPerUnit == 0
-    ) {
-      return `$${Math.ceil(
-        option.exactPriceInDollarsPerUnit * lineItemQuanity
-      )}`;
-    }
-
-    if (
-      option.priceRangePerUnit?.lowPriceInDollars != null &&
-      option.priceRangePerUnit.highPriceInDollars
-    ) {
-      if (
-        option.priceRangePerUnit?.lowPriceInDollars * lineItemQuanity == 0 &&
-        option.priceRangePerUnit?.highPriceInDollars * lineItemQuanity == 0
-      ) {
-        return `-`;
-      } else if (
-        option.priceRangePerUnit?.lowPriceInDollars * lineItemQuanity ||
-        option.priceRangePerUnit?.highPriceInDollars * lineItemQuanity
-      ) {
-        return `$${Math.ceil(
-          option.priceRangePerUnit.lowPriceInDollars * lineItemQuanity
-        )} - $${Math.ceil(
-          option.priceRangePerUnit.highPriceInDollars * lineItemQuanity
-        )}`;
-      }
-    }
-    return "-";
-  }
-
-  function getSelectedOption() {
-    return lineItem.productOptions.find((option) => option.isSelected);
-  }
-
-  function getSelectedOptionsPrice(): PriceRange | number | null {
-    const selectedOption = getSelectedOption();
-    if (selectedOption == undefined) return null;
-    if (selectedOption.exactPriceInDollarsPerUnit != null)
-      return getTotalledExactPrice(selectedOption);
-    return getTotalledPriceRange(selectedOption);
-  }
-
-  function getLineItemTotal() {
-    const selectedOption = getSelectedOption();
-    if (selectedOption) {
-      const selectedOptionPrice = getSelectedOptionsPrice();
-
-      if (selectedOptionPrice === null) {
-        return 0;
-      } else if (typeof selectedOptionPrice === "number") {
-        return selectedOptionPrice;
-      }
-      const selectedPriceRange: PriceRange = {
-        lowPriceInDollars: selectedOptionPrice.lowPriceInDollars,
-        highPriceInDollars: selectedOptionPrice.highPriceInDollars,
-      };
-      return selectedPriceRange;
+    if (newOption) {
+      updateProjectAreaTotal({ newOption, prevOption });
     }
   }
 
-  function getTotalledExactPrice(option: ProductOption) {
-    if (option.exactPriceInDollarsPerUnit != null) {
-      return Math.ceil(lineItemQuanity * option.exactPriceInDollarsPerUnit);
-    }
-    return null;
+  function updateProjectAreaTotal({
+    newOption,
+    prevOption,
+  }: {
+    newOption: ProductOption;
+    prevOption?: ProductOption;
+  }) {
+    const prevOptionPrice = prevOption
+      ? calculateTotalOptionPrice(prevOption)
+      : 0;
+    const newOptionPrice = calculateTotalOptionPrice(newOption);
+    const totalAdjustment = calculateTotalAdjustment({
+      prevOptionPrice,
+      newOptionPrice,
+    });
+    console.log(totalAdjustment);
+    dispatch(adjustTotalDollars(totalAdjustment));
   }
 
-  function getTotalledPriceRange(option: ProductOption): PriceRange {
-    if (
-      option.priceRangePerUnit?.lowPriceInDollars != null &&
-      option.priceRangePerUnit.highPriceInDollars
-    ) {
+  function calculateTotalAdjustment({
+    newOptionPrice,
+    prevOptionPrice,
+  }: {
+    newOptionPrice: PriceRange | number;
+    prevOptionPrice?: PriceRange | number;
+  }): PriceRange {
+    if (isPriceRange(newOptionPrice) && isPriceRange(prevOptionPrice)) {
       return {
-        lowPriceInDollars: Math.ceil(
-          lineItemQuanity * option.priceRangePerUnit?.lowPriceInDollars
-        ),
-        highPriceInDollars: Math.ceil(
-          lineItemQuanity * option.priceRangePerUnit?.highPriceInDollars
-        ),
+        lowPriceInDollars:
+          newOptionPrice.lowPriceInDollars - prevOptionPrice.lowPriceInDollars,
+        highPriceInDollars:
+          newOptionPrice.highPriceInDollars -
+          prevOptionPrice.highPriceInDollars,
       };
+    }
+
+    if (isPriceRange(newOptionPrice) && !isPriceRange(prevOptionPrice)) {
+      const prevPrice = prevOptionPrice ?? 0; // Use 0 if prevOptionPrice is null
+      return {
+        lowPriceInDollars: newOptionPrice.lowPriceInDollars - prevPrice,
+        highPriceInDollars: newOptionPrice.highPriceInDollars - prevPrice,
+      };
+    }
+
+    if (isPriceRange(prevOptionPrice) && !isPriceRange(newOptionPrice)) {
+      const newPrice = newOptionPrice ?? 0; // Use 0 if newOptionPrice is null
+      return {
+        lowPriceInDollars: prevOptionPrice.lowPriceInDollars - newPrice,
+        highPriceInDollars: prevOptionPrice.highPriceInDollars - newPrice,
+      };
+    }
+    return { lowPriceInDollars: 0, highPriceInDollars: 0 };
+  }
+
+  function getCurrentlySelectedOption() {
+    return productOptions.find((option) => option.isSelected);
+  }
+
+  function getOptionsPerUnitPrice(option: ProductOption): PriceRange | number {
+    if (option.exactPriceInDollarsPerUnit != null) {
+      return option.exactPriceInDollarsPerUnit;
+    }
+
+    if (option.priceRangePerUnit) {
+      return {
+        lowPriceInDollars: option.priceRangePerUnit.lowPriceInDollars,
+        highPriceInDollars: option.priceRangePerUnit.highPriceInDollars,
+      } as PriceRange;
+    }
+    return 0;
+  }
+
+  function calculateTotalOptionPrice(option: ProductOption) {
+    const optionPrice = getOptionsPerUnitPrice(option);
+    if (typeof optionPrice === "number") {
+      return Math.ceil(optionPrice * lineItemQuanity);
     }
     return {
-      lowPriceInDollars: null,
-      highPriceInDollars: null,
-    };
+      lowPriceInDollars: Math.ceil(
+        optionPrice.lowPriceInDollars * lineItemQuanity
+      ),
+      highPriceInDollars: Math.ceil(
+        optionPrice.highPriceInDollars * lineItemQuanity
+      ),
+    } as PriceRange;
   }
 
-  function renderLineTotal() {
-    const lineTotal = getLineItemTotal();
-    if (lineTotal === null || lineTotal == 0) return "-";
-    if (typeof lineTotal === "number") return `$${lineTotal}`;
-    if (lineTotal?.highPriceInDollars == 0) return "-";
-    return `$${lineTotal?.lowPriceInDollars} - $${lineTotal?.highPriceInDollars}`;
+  function renderCurrentLineTotal() {
+    const selectedOption = getCurrentlySelectedOption();
+    if (selectedOption) {
+      const lineTotal = calculateTotalOptionPrice(selectedOption);
+      if (lineTotal == 0) return "-";
+      else if (typeof lineTotal === "number") return `$${lineTotal}`;
+      else if (lineTotal?.highPriceInDollars <= 0) return "-";
+      return `$${lineTotal?.lowPriceInDollars} - $${lineTotal?.highPriceInDollars}`;
+    }
+    return "-";
   }
 
   return (
@@ -136,12 +157,12 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
         <h1>{lineItem.name}</h1>
         <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
       </div>
-      {productOptions.map((option) => {
-        const displayedPriceString = getOptionsDisplayedPrice(option);
+      {productOptions.map((option, index) => {
         return (
           <ProductOptionDisplay
+            key={`product-option-${index}`}
             props={{
-              displayedPriceString: displayedPriceString,
+              lineItemQuantity: lineItemQuanity,
               productOption: option,
               onSelection: onOptionSelection,
             }}
@@ -149,7 +170,7 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
         );
       })}
       <div className="text-sm text-center font-bold pr-4 col-end-6">
-        {renderLineTotal()}
+        {renderCurrentLineTotal()}
       </div>
     </div>
   );
