@@ -8,7 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { adjustTotalDollars } from "../../app/slices/project-area-slice";
 import { isPriceRange } from "../../app/types/type-guards/price-range-guard";
 
-export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
+export default function LineItemDisplay({
+  lineItem,
+  onProductOptionSelection,
+}: {
+  lineItem: LineItem;
+  onProductOptionSelection: (selectedOptionId: string) => void;
+}) {
   const dispatch = useDispatch();
   const [lineItemQuanity, setLineItemQuanity] = useState(
     () => lineItem.quantity ?? 1
@@ -22,34 +28,8 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
     })
   );
 
-  useEffect(() => {
-    const selectedOption = getCurrentlySelectedOption();
-    if (selectedOption) {
-      updateProjectAreaTotal({ newOption: selectedOption });
-    }
-  }, []);
-
   function onQuanityChange(value: number) {
     setLineItemQuanity(value);
-  }
-
-  function onOptionSelection(newOptionId: string) {
-    const prevOption = getCurrentlySelectedOption();
-    let newOption = productOptions.find((option) => option.id == newOptionId);
-
-    const updatedOptions = productOptions.map((option) => {
-      if (option.id == newOptionId) {
-        option.isSelected = true;
-        return option;
-      }
-      option.isSelected = false;
-      return option;
-    });
-    setProductOptions(updatedOptions);
-
-    if (newOption) {
-      updateProjectAreaTotal({ newOption, prevOption });
-    }
   }
 
   function updateProjectAreaTotal({
@@ -164,7 +144,7 @@ export default function LineItemDisplay({ lineItem }: { lineItem: LineItem }) {
             props={{
               lineItemQuantity: lineItemQuanity,
               productOption: option,
-              onSelection: onOptionSelection,
+              onSelection: onProductOptionSelection,
             }}
           />
         );
