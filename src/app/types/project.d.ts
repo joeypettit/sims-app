@@ -3,9 +3,9 @@ import { ProjectArea } from "./project-area";
 
 export type Project = {
   id: string;
-  client: Client;
   name: string;
-  startDate: string;
-  endDate: string;
+  description: string;
+  clients: Client[];
+  users: User[];
   projectAreas: ProjectArea[];
 };

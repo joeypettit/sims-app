@@ -4,7 +4,7 @@ import PanelWindow from "../../components/panel-window";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../app/types/project";
-import { getAllProjects } from "../../api/project-api";
+import { getAllProjects } from "../../api/api";
 
 export default function ProjectsPanel() {
   const navigate = useNavigate();
@@ -13,17 +13,15 @@ export default function ProjectsPanel() {
 
   // Queries
   const query = useQuery({
-    queryKey: ["projects"],
+    queryKey: ["all-projects"],
     queryFn: async () => {
       const response = await getAllProjects();
-      return (await response) as Project[];
+      return response;
     },
   });
 
   const handleRowClick = (project: Project) => {
-    // Navigate to the details page programmatically
     navigate(`/project/${project.id}`);
-    console.log("ProjectS");
   };
 
   const columns: PanelTableColumn<Project>[] = [
@@ -31,10 +29,15 @@ export default function ProjectsPanel() {
       columnName: "Client",
       dataObjectKey: "name",
       orderIndex: 1,
-      headerRenderer: () => "Client",
-      cellRenderer: (Project) => (
-        <span>{`${Project?.client?.firstName} ${Project?.client?.lastName}`}</span>
-      ),
+      cellRenderer: (project) =>
+        project.clients.map((client, index) => {
+          const isLastElement = project.clients.length == index + 1;
+          return (
+            <span key={client.id}>{`${client.firstName} ${client.lastName}${
+              isLastElement ? "" : ", "
+            }`}</span>
+          );
+        }),
     },
     {
       columnName: "Project",
@@ -44,11 +47,19 @@ export default function ProjectsPanel() {
       // cellRenderer: (Project) => <span>{Project?.name}</span>,
     },
     {
-      columnName: "Start Date",
-      dataObjectKey: "startDate",
+      columnName: "Sales Team",
+      dataObjectKey: "users",
       orderIndex: 3,
       // headerRenderer: () => "THE POST",
-      // cellRenderer: (Project) => <span>{Project?.name}</span>,
+      cellRenderer: (project) =>
+        project.users.map((user, index) => {
+          const isLastElement = project.users.length == index + 1;
+          return (
+            <span key={user.id}>{`${user.firstName} ${user.lastName}${
+              isLastElement ? "" : ", "
+            }`}</span>
+          );
+        }),
     },
   ];
 

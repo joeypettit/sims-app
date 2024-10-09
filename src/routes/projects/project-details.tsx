@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Project } from "../../app/types/project";
-import { getProjectById } from "../../api/project-api";
+import { getProjectById } from "../../api/api";
 import { ProjectArea } from "../../app/types/project-area";
 import { useNavigate } from "react-router-dom";
 import PanelWindow from "../../components/panel-window";
+import { fetchAllProjects } from "../../api/api";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -31,6 +32,7 @@ export default function ProjectDetails() {
   return (
     <PanelWindow>
       <h1>Details for Item {id}</h1>
+      <button onClick={fetchAllProjects}>Fetch</button>
       <h2>{data?.name}</h2>
       <p>
         {data?.projectAreas?.map((el: ProjectArea) => (

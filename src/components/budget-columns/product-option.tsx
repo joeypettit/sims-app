@@ -1,4 +1,4 @@
-import type { ProductOption } from "../../app/types/product-option";
+import type { ProductOption } from "../../app/types/line-item-option";
 import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 

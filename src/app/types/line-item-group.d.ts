@@ -4,4 +4,5 @@ export type LineItemGroup = {
   id: string;
   name: string;
   lineItems: LineItem[];
+  groupCagegory: GroupCategory;
 };

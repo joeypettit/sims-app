@@ -1,9 +1,11 @@
-import { ProductOption } from "./product-option";
+import { ProductOption } from "./line-item-option";
+import { LineItemGroup } from "./line-item-group";
 
 export type LineItem = {
   id: string;
   name: string;
   quantity: number?;
   unit: string;
-  productOptions: ProductOption[];
+  lineItemGroup: LineItemGroup;
+  lineItemOptions: LineItemOption[];
 };

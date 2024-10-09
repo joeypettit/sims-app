@@ -1,4 +1,4 @@
-import { ProductOption } from "../../app/types/product-option";
+import { ProductOption } from "../../app/types/line-item-option";
 import { useState, useEffect } from "react";
 import type { LineItem } from "../../app/types/line-item";
 import ProductOptionDisplay from "./product-option";
