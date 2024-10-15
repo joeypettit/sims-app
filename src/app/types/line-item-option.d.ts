@@ -1,5 +1,4 @@
 import type { ProductTier } from "./product-tier";
-import type { PriceRange } from "./price-range";
 
 export type LineItemOption = {
   id: string;

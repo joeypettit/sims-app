@@ -1,30 +1,29 @@
-import type { ProductOption } from "../../app/types/line-item-option";
+import type { LineItemOption } from "../../app/types/line-item-option";
 import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 
-export type ProductOptionDisplayProps = {
+export type LineItemOptionDisplayProps = {
   lineItemQuantity: number;
-  productOption: ProductOption;
+  lineItemOption: LineItemOption;
   onSelection: (selectedOptionId: string) => void;
 };
 
-export default function ProductOptionDisplay({
+export default function LineItemOptionDisplay({
   props,
 }: {
-  props: ProductOptionDisplayProps;
+  props: LineItemOptionDisplayProps;
 }) {
-  function getDisplayedPrice(option: ProductOption) {
-    if (option.exactPriceInDollarsPerUnit != null) {
+  function getDisplayedPrice(option: LineItemOption) {
+    if (option.exactCostInDollarsPerUnit != null) {
       return `$${Math.ceil(
-        option.exactPriceInDollarsPerUnit * props.lineItemQuantity
+        option.exactCostInDollarsPerUnit * props.lineItemQuantity
       )}`;
     }
 
-    if (option.priceRangePerUnit) {
-      const lowPrice =
-        option.priceRangePerUnit.lowPriceInDollars * props.lineItemQuantity;
+    if (option.lowCostInDollarsPerUnit && option.highCostInDollarsPerUnit) {
+      const lowPrice = option.lowCostInDollarsPerUnit * props.lineItemQuantity;
       const highPrice =
-        option.priceRangePerUnit.highPriceInDollars * props.lineItemQuantity;
+        option.highCostInDollarsPerUnit * props.lineItemQuantity;
 
       if (lowPrice === highPrice) {
         return `$${Math.ceil(lowPrice)}`;
@@ -39,26 +38,26 @@ export default function ProductOptionDisplay({
 
   return (
     <div
-      onClick={() => props.onSelection(props.productOption.id)}
+      onClick={() => props.onSelection(props.lineItemOption.id)}
       className={`cursor-pointer hover:shadow-inner relative text-center rounded-sm p-3 ${
-        props.productOption.isSelected ? "bg-sims-green-50 shadow-inner" : ""
+        props.lineItemOption.isSelected ? "bg-sims-green-50 shadow-inner" : ""
       }`}
     >
       <div className="absolute right-1">
         <IsCheckedIcon
-          isChecked={props.productOption.isSelected}
+          isChecked={props.lineItemOption.isSelected}
           iconSize="1rem"
         />
       </div>
       <p
         className={`text-sm ${
-          props.productOption.isSelected ? "font-bold" : "font-normal"
+          props.lineItemOption.isSelected ? "font-bold" : "font-normal"
         }`}
       >
-        {getDisplayedPrice(props.productOption)}
+        {getDisplayedPrice(props.lineItemOption)}
       </p>
       <p className="text-stone-600 text-xs">
-        {props.productOption.description}
+        {props.lineItemOption.description}
       </p>
     </div>
   );

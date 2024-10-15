@@ -7,5 +7,5 @@ export type Project = {
   description: string;
   clients: Client[];
   users: User[];
-  projectAreas: ProjectArea[];
+  areas: ProjectArea[];
 };

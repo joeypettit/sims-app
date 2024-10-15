@@ -16,8 +16,8 @@ export async function getProjectById(id: string) {
   return response.data;
 }
 
-export async function getProjectAreaById(id: string) {
-  const response = await axios.get<ProjectArea>(`/api/projects/${id}`);
+export async function getProjectAreaById(areaId: string) {
+  const response = await axios.get<ProjectArea>(`/api/projects/area/${areaId}`);
   console.log("data", response.data);
   return response.data;
 }

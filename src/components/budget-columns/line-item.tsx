@@ -1,7 +1,7 @@
-import { ProductOption } from "../../app/types/line-item-option";
+import { LineItemOption } from "../../app/types/line-item-option";
 import { useState, useEffect } from "react";
 import type { LineItem } from "../../app/types/line-item";
-import ProductOptionDisplay from "./product-option";
+import LineItemOptionDisplay from "./product-option";
 import QuantityInput from "../quantity-input";
 import type { PriceRange } from "../../app/types/price-range";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,18 +10,17 @@ import { isPriceRange } from "../../app/types/type-guards/price-range-guard";
 
 export default function LineItemDisplay({
   lineItem,
-  onProductOptionSelection,
+  onLineItemOptionSelection,
 }: {
   lineItem: LineItem;
-  onProductOptionSelection: (selectedOptionId: string) => void;
+  onLineItemOptionSelection: (selectedOptionId: string) => void;
 }) {
-  const dispatch = useDispatch();
   const [lineItemQuanity, setLineItemQuanity] = useState(
     () => lineItem.quantity ?? 1
   );
-  const [productOptions, setProductOptions] = useState(() =>
+  const [lineItemOptions, setLineItemOptions] = useState(() =>
     // sort by product tier
-    lineItem.productOptions.sort((a, b) => {
+    lineItem.lineItemOptions.sort((a, b) => {
       if (a.productTier > b.productTier) return 1;
       if (a.productTier < b.productTier) return -1;
       return 0;
@@ -36,8 +35,8 @@ export default function LineItemDisplay({
     newOption,
     prevOption,
   }: {
-    newOption: ProductOption;
-    prevOption?: ProductOption;
+    newOption: LineItemOption;
+    prevOption?: LineItemOption;
   }) {
     const prevOptionPrice = prevOption
       ? calculateTotalOptionPrice(prevOption)
@@ -47,8 +46,6 @@ export default function LineItemDisplay({
       prevOptionPrice,
       newOptionPrice,
     });
-    console.log(totalAdjustment);
-    dispatch(adjustTotalDollars(totalAdjustment));
   }
 
   function calculateTotalAdjustment({
@@ -87,25 +84,25 @@ export default function LineItemDisplay({
   }
 
   function getCurrentlySelectedOption() {
-    return productOptions.find((option) => option.isSelected);
+    return lineItemOptions.find((option) => option.isSelected);
   }
 
-  function getOptionsPerUnitPrice(option: ProductOption): PriceRange | number {
-    if (option.exactPriceInDollarsPerUnit != null) {
-      return option.exactPriceInDollarsPerUnit;
+  function getOptionsPerUnitCost(option: LineItemOption): PriceRange | number {
+    if (option.exactCostInDollarsPerUnit != null) {
+      return option.exactCostInDollarsPerUnit;
     }
 
-    if (option.priceRangePerUnit) {
+    if (option.lowCostInDollarsPerUnit && option.highCostInDollarsPerUnit) {
       return {
-        lowPriceInDollars: option.priceRangePerUnit.lowPriceInDollars,
-        highPriceInDollars: option.priceRangePerUnit.highPriceInDollars,
+        lowPriceInDollars: option.lowCostInDollarsPerUnit,
+        highPriceInDollars: option.highCostInDollarsPerUnit,
       } as PriceRange;
     }
     return 0;
   }
 
-  function calculateTotalOptionPrice(option: ProductOption) {
-    const optionPrice = getOptionsPerUnitPrice(option);
+  function calculateTotalOptionPrice(option: LineItemOption) {
+    const optionPrice = getOptionsPerUnitCost(option);
     if (typeof optionPrice === "number") {
       return Math.ceil(optionPrice * lineItemQuanity);
     }
@@ -133,18 +130,19 @@ export default function LineItemDisplay({
 
   return (
     <div className="grid grid-cols-5 gap-4 py-2">
-      <div className="flex flex-col items-center pr-4">
+      <div className="flex flex-col text-center items-center pr-4">
         <h1>{lineItem.name}</h1>
         <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
+        <h6 className="text-gray-500">{lineItem.unit.name}</h6>
       </div>
-      {productOptions.map((option, index) => {
+      {lineItemOptions.map((option, index) => {
         return (
-          <ProductOptionDisplay
+          <LineItemOptionDisplay
             key={`product-option-${index}`}
             props={{
               lineItemQuantity: lineItemQuanity,
-              productOption: option,
-              onSelection: onProductOptionSelection,
+              lineItemOption: option,
+              onSelection: onLineItemOptionSelection,
             }}
           />
         );
