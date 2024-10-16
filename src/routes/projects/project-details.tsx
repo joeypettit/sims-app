@@ -31,7 +31,7 @@ export default function ProjectDetails() {
   return (
     <PanelWindow>
       <h1>{data?.name}</h1>
-      <p>
+      <div>
         {data?.areas.map((area: ProjectArea) => (
           <div
             className="cursor-pointer"
@@ -41,7 +41,7 @@ export default function ProjectDetails() {
             {area.name}
           </div>
         ))}
-      </p>
+      </div>
     </PanelWindow>
   );
 }

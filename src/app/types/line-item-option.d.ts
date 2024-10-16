@@ -1,4 +1,4 @@
-import type { ProductTier } from "./product-tier";
+import type { OptionTier } from "./option-tier";
 
 export type LineItemOption = {
   id: string;
@@ -7,6 +7,6 @@ export type LineItemOption = {
   exactCostInDollarsPerUnit?: number;
   priceAdjustmentPercentage: number;
   description: string?;
-  productTier: ProductTier;
+  tier: OptionTier;
   isSelected: boolean;
 };

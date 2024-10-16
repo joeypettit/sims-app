@@ -25,38 +25,44 @@ export async function getProjectAreaById(areaId: string) {
   return response.data;
 }
 
-export async function updateLineItemOptionSelection({
+export async function updateOptionSelection({
   optionToSelect,
   optionToUnselect,
   lineItem,
-  group,
 }: {
   optionToSelect: LineItemOption;
   optionToUnselect: LineItemOption;
   lineItem: LineItem;
-  group: LineItemGroup;
 }) {
   try {
-    const unselectResponse = await axios.put(
-      `/api/line-items/${lineItem.id}/unselect-option/${optionToUnselect.id}`
+    console.log("un", optionToUnselect, "select", optionToSelect);
+    let unselectResponse = undefined;
+    let selectResponse = undefined;
+
+    if (optionToUnselect) {
+      unselectResponse = await axios.put(
+        `/api/line-items/${lineItem.id}/unselect-option/${optionToUnselect.id}`
+      );
+    }
+    if (optionToSelect) {
+      selectResponse = await axios.put(
+        `/api/line-items/${lineItem.id}/select-option/${optionToSelect.id}`
+      );
+    }
+
+    const newOptions: LineItemOption[] = lineItem.lineItemOptions.map(
+      (option) => {
+        if (unselectResponse && option.id === unselectResponse.data.id) {
+          return unselectResponse.data;
+        }
+        if (selectResponse && option.id === selectResponse.data.id) {
+          return selectResponse.data;
+        }
+        return option;
+      }
     );
 
-    const selectResponse = await axios.put(
-      `/api/line-items/${lineItem.id}/select-option/${optionToSelect.id}`
-    );
-
-    lineItem.lineItemOptions = lineItem.lineItemOptions.map((option) => {
-      if (option.id === unselectResponse.data.id) {
-        return unselectResponse.data;
-      }
-      if (option.id === selectResponse.data.id) {
-        return selectResponse.data;
-      }
-      return option;
-    });
-
-    // Return the updated lineItem with its new options
-    return lineItem;
+    return newOptions;
   } catch (error) {
     console.error("Error updating line item option selection:", error);
     throw new Error("Failed to update line item option selection");

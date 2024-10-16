@@ -7,15 +7,15 @@ import type { LineItemGroup } from "../../app/types/line-item-group";
 import type { LineItem } from "../../app/types/line-item";
 import type { GroupCategory } from "../../app/types/group-category";
 import type { LineItemOption } from "../../app/types/line-item-option";
-import { updateLineItemOptionSelection } from "../../api/api";
 
 export default function ProjectAreaProposal() {
   const queryClient = useQueryClient();
   const { areaId } = useParams();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["area", areaId],
+    queryKey: ["area"],
     queryFn: async () => {
+      console.log("FETCHING AREA");
       if (areaId == undefined || areaId == null) throw Error;
       const response = await getProjectAreaById(areaId);
       return response;
@@ -23,10 +23,6 @@ export default function ProjectAreaProposal() {
   });
 
   const groupCategories = getGroupCategories();
-
-  const updateLineItemOptionMutation = useMutation({
-    mutationFn: updateLineItemOptionSelection,
-  });
 
   function getGroupCategories() {
     // ***** this should probably be tested later on!! ****
@@ -40,25 +36,6 @@ export default function ProjectAreaProposal() {
       }
     }
     return catArray;
-  }
-
-  async function onOptionSelection({
-    optionToSelect,
-    optionToUnselect,
-    lineItem,
-    group,
-  }: {
-    optionToSelect: LineItemOption;
-    optionToUnselect: LineItemOption;
-    lineItem: LineItem;
-    group: LineItemGroup;
-  }) {
-    updateLineItemOptionMutation.mutate({
-      optionToSelect: optionToSelect,
-      optionToUnselect: optionToUnselect,
-      lineItem: lineItem,
-      group: group,
-    });
   }
 
   if (isLoading) {
@@ -84,7 +61,6 @@ export default function ProjectAreaProposal() {
                   <LineItemGroupContainer
                     key={`line-item-group-${index}`}
                     group={group}
-                    onOptionSelection={onOptionSelection}
                   />
                 );
               }

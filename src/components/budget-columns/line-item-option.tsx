@@ -7,18 +7,10 @@ import type { LineItemGroup } from "../../app/types/line-item-group";
 export type LineItemOptionDisplayProps = {
   lineItemQuantity: number;
   lineItemOption: LineItemOption;
-  lineItem: LineItem;
-  group: LineItemGroup;
   onOptionSelection: ({
     optionToSelect,
-    optionToUnselect,
-    group,
-    lineItem,
   }: {
     optionToSelect: LineItemOption;
-    optionToUnselect: LineItemOption;
-    group: LineItemGroup;
-    lineItem: LineItem;
   }) => void;
 };
 
@@ -50,18 +42,11 @@ export default function LineItemOptionDisplay({
     return "-";
   }
 
-  function getCurrentlySelectedOption() {
-    return props.lineItem.lineItemOptions.find((option) => option.isSelected);
-  }
-
   return (
     <div
       onClick={() =>
         props.onOptionSelection({
           optionToSelect: props.lineItemOption,
-          optionToUnselect: getCurrentlySelectedOption(),
-          group: props.group,
-          lineItem: props.lineItem,
         })
       }
       className={`cursor-pointer hover:shadow-inner relative text-center rounded-sm p-3 ${

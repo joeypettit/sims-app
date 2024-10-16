@@ -6,22 +6,9 @@ import type { LineItem } from "../../app/types/line-item";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
-  onOptionSelection: ({
-    optionToSelect,
-    optionToUnselect,
-    group,
-    lineItem,
-  }: {
-    optionToSelect: LineItemOption;
-    optionToUnselect: LineItemOption;
-    lineItem: LineItem;
-    group: LineItemGroup;
-  }) => void;
 };
 
 export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
-  console.log("lineitemgrouprerender", props.group.name);
-
   return (
     <div className="py-2">
       <CollapsibleDiv title={props.group.name}>
@@ -31,7 +18,6 @@ export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
               key={`line-item-${index}`}
               lineItem={lineItem}
               group={props.group}
-              onOptionSelection={props.onOptionSelection}
             />
           );
         })}
