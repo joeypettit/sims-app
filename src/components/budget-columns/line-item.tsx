@@ -7,20 +7,31 @@ import type { PriceRange } from "../../app/types/price-range";
 import { useDispatch, useSelector } from "react-redux";
 import { adjustTotalDollars } from "../../app/slices/project-area-slice";
 import { isPriceRange } from "../../app/types/type-guards/price-range-guard";
+import type { LineItemGroup } from "../../app/types/line-item-group";
 
-export default function LineItemDisplay({
-  lineItem,
-  onLineItemOptionSelection,
-}: {
+export type LineItemDisplayProps = {
   lineItem: LineItem;
-  onLineItemOptionSelection: (selectedOptionId: string) => void;
-}) {
+  group: LineItemGroup;
+  onOptionSelection: ({
+    optionToSelect,
+    optionToUnselect,
+    group,
+    lineItem,
+  }: {
+    optionToSelect: LineItemOption;
+    optionToUnselect: LineItemOption;
+    lineItem: LineItem;
+    group: LineItemGroup;
+  }) => void;
+};
+
+export default function LineItemDisplay(props: LineItemDisplayProps) {
   const [lineItemQuanity, setLineItemQuanity] = useState(
-    () => lineItem.quantity ?? 1
+    () => props.lineItem.quantity ?? 1
   );
   const [lineItemOptions, setLineItemOptions] = useState(() =>
     // sort by product tier
-    lineItem.lineItemOptions.sort((a, b) => {
+    props.lineItem.lineItemOptions.sort((a, b) => {
       if (a.productTier > b.productTier) return 1;
       if (a.productTier < b.productTier) return -1;
       return 0;
@@ -131,9 +142,9 @@ export default function LineItemDisplay({
   return (
     <div className="grid grid-cols-5 gap-4 py-2">
       <div className="flex flex-col text-center items-center pr-4">
-        <h1>{lineItem.name}</h1>
+        <h1>{props.lineItem.name}</h1>
         <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
-        <h6 className="text-gray-500">{lineItem.unit.name}</h6>
+        <h6 className="text-gray-500">{props.lineItem.unit.name}</h6>
       </div>
       {lineItemOptions.map((option, index) => {
         return (
@@ -142,7 +153,9 @@ export default function LineItemDisplay({
             props={{
               lineItemQuantity: lineItemQuanity,
               lineItemOption: option,
-              onSelection: onLineItemOptionSelection,
+              group: props.group,
+              lineItem: props.lineItem,
+              onOptionSelection: props.onOptionSelection,
             }}
           />
         );

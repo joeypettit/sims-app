@@ -20,7 +20,7 @@ export default function CollapsibleDiv({
         className="flex justify-between items-center cursor-pointer"
         onClick={toggleCollapse}
       >
-        <h2 className="text-xl font-bold">{title}</h2>
+        <h2 className="text-md font-bold">{title}</h2>
         <button className="focus:outline-none">
           {isOpen ? (
             <span>

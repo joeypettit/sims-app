@@ -1,11 +1,25 @@
 import type { LineItemOption } from "../../app/types/line-item-option";
 import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
+import type { LineItem } from "../../app/types/line-item";
+import type { LineItemGroup } from "../../app/types/line-item-group";
 
 export type LineItemOptionDisplayProps = {
   lineItemQuantity: number;
   lineItemOption: LineItemOption;
-  onSelection: (selectedOptionId: string) => void;
+  lineItem: LineItem;
+  group: LineItemGroup;
+  onOptionSelection: ({
+    optionToSelect,
+    optionToUnselect,
+    group,
+    lineItem,
+  }: {
+    optionToSelect: LineItemOption;
+    optionToUnselect: LineItemOption;
+    group: LineItemGroup;
+    lineItem: LineItem;
+  }) => void;
 };
 
 export default function LineItemOptionDisplay({
@@ -36,9 +50,20 @@ export default function LineItemOptionDisplay({
     return "-";
   }
 
+  function getCurrentlySelectedOption() {
+    return props.lineItem.lineItemOptions.find((option) => option.isSelected);
+  }
+
   return (
     <div
-      onClick={() => props.onSelection(props.lineItemOption.id)}
+      onClick={() =>
+        props.onOptionSelection({
+          optionToSelect: props.lineItemOption,
+          optionToUnselect: getCurrentlySelectedOption(),
+          group: props.group,
+          lineItem: props.lineItem,
+        })
+      }
       className={`cursor-pointer hover:shadow-inner relative text-center rounded-sm p-3 ${
         props.lineItemOption.isSelected ? "bg-sims-green-50 shadow-inner" : ""
       }`}

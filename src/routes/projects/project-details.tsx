@@ -30,12 +30,14 @@ export default function ProjectDetails() {
 
   return (
     <PanelWindow>
-      <h1>Details for Item {id}</h1>
-      <button>Fetch</button>
-      <h2>{data?.name}</h2>
+      <h1>{data?.name}</h1>
       <p>
         {data?.areas.map((area: ProjectArea) => (
-          <div key={area.id} onClick={() => navigate(`area/${area.id}`)}>
+          <div
+            className="cursor-pointer"
+            key={area.id}
+            onClick={() => navigate(`area/${area.id}`)}
+          >
             {area.name}
           </div>
         ))}
