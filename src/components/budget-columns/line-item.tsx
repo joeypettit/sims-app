@@ -6,7 +6,7 @@ import QuantityInput from "../quantity-input";
 import type { PriceRange } from "../../app/types/price-range";
 import type { LineItemGroup } from "../../app/types/line-item-group";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateOptionSelection } from "../../api/api";
+import { updateOptionSelection, updateLineItemQuantity } from "../../api/api";
 import type { ProjectArea } from "../../app/types/project-area";
 
 export type LineItemDisplayProps = {
@@ -16,9 +16,7 @@ export type LineItemDisplayProps = {
 
 export default function LineItemDisplay(props: LineItemDisplayProps) {
   const queryClient = useQueryClient();
-  const [lineItemQuanity, setLineItemQuanity] = useState(
-    () => props.lineItem.quantity ?? 1
-  );
+  const quantity = props.lineItem.quantity ? props.lineItem.quantity : 0;
   const optionsSortedByTier = props.lineItem.lineItemOptions.sort((a, b) => {
     console.log("a,", a);
     if (a.optionTier.tierLevel > b.optionTier.tierLevel) return 1;
@@ -26,9 +24,46 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     return 0;
   });
 
-  function onQuanityChange(value: number) {
-    setLineItemQuanity(value);
-  }
+  function onQuanityChange(value: number) {}
+
+  const updateLineItemQuantityMutation = useMutation({
+    mutationFn: updateLineItemQuantity,
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+
+      const previousProjectArea = queryClient.getQueryData(["area"]);
+
+      queryClient.setQueryData(["area"], (oldData: ProjectArea | undefined) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          lineItemGroups: oldData.lineItemGroups.map((group) => {
+            if (group.id !== props.lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
+            return {
+              ...group,
+              lineItems: group.lineItems.map((lineItem: LineItem) => {
+                if (lineItem.id !== props.lineItem.id) return lineItem;
+                return {
+                  ...lineItem,
+                  quantity: variables.quantity,
+                };
+              }),
+            };
+          }),
+        };
+      });
+      return { previousProjectArea };
+    },
+    onError: (error, variables, context) => {
+      console.log("There was an ERROR:", error);
+      if (context?.previousProjectArea) {
+        queryClient.setQueryData(["area"], context.previousProjectArea);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["area"] });
+    },
+  });
 
   // function updateProjectAreaTotal({
   //   newOption,
@@ -103,15 +138,11 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   function calculateTotalOptionPrice(option: LineItemOption) {
     const optionPrice = getOptionsPerUnitCost(option);
     if (typeof optionPrice === "number") {
-      return Math.ceil(optionPrice * lineItemQuanity);
+      return Math.ceil(optionPrice * quantity);
     }
     return {
-      lowPriceInDollars: Math.ceil(
-        optionPrice.lowPriceInDollars * lineItemQuanity
-      ),
-      highPriceInDollars: Math.ceil(
-        optionPrice.highPriceInDollars * lineItemQuanity
-      ),
+      lowPriceInDollars: Math.ceil(optionPrice.lowPriceInDollars * quantity),
+      highPriceInDollars: Math.ceil(optionPrice.highPriceInDollars * quantity),
     } as PriceRange;
   }
 
@@ -192,7 +223,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     <div className="grid grid-cols-5 gap-4 py-2">
       <div className="flex flex-col text-center items-center pr-4">
         <h1>{props.lineItem.name}</h1>
-        <QuantityInput value={lineItemQuanity} onChange={onQuanityChange} />
+        <QuantityInput value={quantity} onChange={onQuanityChange} />
         <h6 className="text-gray-500">{props.lineItem.unit.name}</h6>
       </div>
       {optionsSortedByTier.map((option, index) => {
@@ -200,7 +231,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
           <LineItemOptionDisplay
             key={`product-option-${index}`}
             props={{
-              lineItemQuantity: lineItemQuanity,
+              lineItemQuantity: quantity,
               lineItemOption: option,
               onOptionSelection: onOptionSelection,
             }}

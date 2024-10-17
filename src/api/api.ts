@@ -69,12 +69,19 @@ export async function updateOptionSelection({
   }
 }
 
-// export async function getProjectAreaById(id: string) {
-//   return new Promise<ProjectArea>((resolve) => {
-//     setTimeout(() => {
-//       // const area = (testProjectAreas as { [key: string]: ProjectArea })[id];
-//       const area = null;
-//       resolve(area);
-//     }, 2000); // Simulate a 2-second API delay
-//   });
-// }
+export const updateLineItemQuantity = async ({
+  lineItemId,
+  quantity,
+}: {
+  lineItemId: string;
+  quantity: number;
+}) => {
+  const response = await axios.put(
+    `/api/line-items/${lineItemId}/update-quantity`,
+    {
+      quantity,
+    }
+  );
+
+  return response.data;
+};
