@@ -158,8 +158,6 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     return "-";
   }
 
-  ////
-
   const updateOptionSelectionMutation = useMutation({
     mutationFn: updateOptionSelection,
     onMutate: async (variables) => {
@@ -216,8 +214,6 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
       lineItem: props.lineItem,
     });
   }
-
-  ////
 
   return (
     <div className="grid grid-cols-5 gap-4 py-2">
