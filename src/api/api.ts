@@ -30,8 +30,8 @@ export async function updateOptionSelection({
   optionToUnselect,
   lineItem,
 }: {
-  optionToSelect: LineItemOption;
-  optionToUnselect: LineItemOption;
+  optionToSelect: LineItemOption | undefined;
+  optionToUnselect: LineItemOption | undefined;
   lineItem: LineItem;
 }) {
   try {

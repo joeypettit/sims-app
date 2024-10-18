@@ -8,6 +8,8 @@ import type { LineItemGroup } from "../../app/types/line-item-group";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateOptionSelection, updateLineItemQuantity } from "../../api/api";
 import type { ProjectArea } from "../../app/types/project-area";
+import { calculateSalesPricePerUnit } from "../../util/utils";
+import { getCurrentlySelectedOption } from "../../util/utils";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
@@ -17,14 +19,13 @@ export type LineItemDisplayProps = {
 export default function LineItemDisplay(props: LineItemDisplayProps) {
   const queryClient = useQueryClient();
   const quantity = props.lineItem.quantity ? props.lineItem.quantity : 0;
-  const optionsSortedByTier = props.lineItem.lineItemOptions.sort((a, b) => {
-    console.log("a,", a);
-    if (a.optionTier.tierLevel > b.optionTier.tierLevel) return 1;
-    if (a.optionTier.tierLevel < b.optionTier.tierLevel) return -1;
-    return 0;
-  });
 
-  function onQuanityChange(value: number) {}
+  function onQuanityChange(value: number) {
+    updateLineItemQuantityMutation.mutate({
+      lineItemId: props.lineItem.id,
+      quantity: value,
+    });
+  }
 
   const updateLineItemQuantityMutation = useMutation({
     mutationFn: updateLineItemQuantity,
@@ -65,62 +66,6 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     },
   });
 
-  // function updateProjectAreaTotal({
-  //   newOption,
-  //   prevOption,
-  // }: {
-  //   newOption: LineItemOption;
-  //   prevOption?: LineItemOption;
-  // }) {
-  //   const prevOptionPrice = prevOption
-  //     ? calculateTotalOptionPrice(prevOption)
-  //     : 0;
-  //   const newOptionPrice = calculateTotalOptionPrice(newOption);
-  //   const totalAdjustment = calculateTotalAdjustment({
-  //     prevOptionPrice,
-  //     newOptionPrice,
-  //   });
-  // }
-
-  // function calculateTotalAdjustment({
-  //   newOptionPrice,
-  //   prevOptionPrice,
-  // }: {
-  //   newOptionPrice: PriceRange | number;
-  //   prevOptionPrice?: PriceRange | number;
-  // }): PriceRange {
-  //   if (isPriceRange(newOptionPrice) && isPriceRange(prevOptionPrice)) {
-  //     return {
-  //       lowPriceInDollars:
-  //         newOptionPrice.lowPriceInDollars - prevOptionPrice.lowPriceInDollars,
-  //       highPriceInDollars:
-  //         newOptionPrice.highPriceInDollars -
-  //         prevOptionPrice.highPriceInDollars,
-  //     };
-  //   }
-
-  //   if (isPriceRange(newOptionPrice) && !isPriceRange(prevOptionPrice)) {
-  //     const prevPrice = prevOptionPrice ?? 0; // Use 0 if prevOptionPrice is null
-  //     return {
-  //       lowPriceInDollars: newOptionPrice.lowPriceInDollars - prevPrice,
-  //       highPriceInDollars: newOptionPrice.highPriceInDollars - prevPrice,
-  //     };
-  //   }
-
-  //   if (isPriceRange(prevOptionPrice) && !isPriceRange(newOptionPrice)) {
-  //     const newPrice = newOptionPrice ?? 0; // Use 0 if newOptionPrice is null
-  //     return {
-  //       lowPriceInDollars: prevOptionPrice.lowPriceInDollars - newPrice,
-  //       highPriceInDollars: prevOptionPrice.highPriceInDollars - newPrice,
-  //     };
-  //   }
-  //   return { lowPriceInDollars: 0, highPriceInDollars: 0 };
-  // }
-
-  function getCurrentlySelectedOption() {
-    return props.lineItem.lineItemOptions.find((option) => option.isSelected);
-  }
-
   function getOptionsPerUnitCost(option: LineItemOption): PriceRange | number {
     if (option.exactCostInDollarsPerUnit != null) {
       return option.exactCostInDollarsPerUnit;
@@ -135,21 +80,35 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     return 0;
   }
 
-  function calculateTotalOptionPrice(option: LineItemOption) {
-    const optionPrice = getOptionsPerUnitCost(option);
-    if (typeof optionPrice === "number") {
-      return Math.ceil(optionPrice * quantity);
+  function calculateOptionsTotalSalePrice(option: LineItemOption) {
+    const optionCost = getOptionsPerUnitCost(option);
+
+    if (typeof optionCost === "number") {
+      const salePricePerUnit = calculateSalesPricePerUnit({
+        marginDecimal: props.lineItem.marginDecimal,
+        costPerUnit: optionCost,
+      });
+      return Math.ceil(salePricePerUnit * quantity);
     }
+
+    const lowSalePricePerUnit = calculateSalesPricePerUnit({
+      marginDecimal: props.lineItem.marginDecimal,
+      costPerUnit: optionCost.lowPriceInDollars,
+    });
+    const highSalePricePerUnit = calculateSalesPricePerUnit({
+      marginDecimal: props.lineItem.marginDecimal,
+      costPerUnit: optionCost.highPriceInDollars,
+    });
     return {
-      lowPriceInDollars: Math.ceil(optionPrice.lowPriceInDollars * quantity),
-      highPriceInDollars: Math.ceil(optionPrice.highPriceInDollars * quantity),
+      lowPriceInDollars: Math.ceil(lowSalePricePerUnit * quantity),
+      highPriceInDollars: Math.ceil(highSalePricePerUnit * quantity),
     } as PriceRange;
   }
 
   function renderCurrentLineTotal() {
-    const selectedOption = getCurrentlySelectedOption();
+    const selectedOption = getCurrentlySelectedOption(props.lineItem);
     if (selectedOption) {
-      const lineTotal = calculateTotalOptionPrice(selectedOption);
+      const lineTotal = calculateOptionsTotalSalePrice(selectedOption);
       if (lineTotal == 0) return "-";
       else if (typeof lineTotal === "number") return `$${lineTotal}`;
       else if (lineTotal?.highPriceInDollars <= 0) return "-";
@@ -180,7 +139,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
                 return {
                   ...lineItem,
                   lineItemOptions: lineItem.lineItemOptions.map((option) =>
-                    option.id === optionToSelect.id
+                    option.id === optionToSelect?.id
                       ? { ...option, isSelected: true }
                       : { ...option, isSelected: false }
                   ),
@@ -210,7 +169,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   }) {
     updateOptionSelectionMutation.mutate({
       optionToSelect: optionToSelect,
-      optionToUnselect: getCurrentlySelectedOption(),
+      optionToUnselect: getCurrentlySelectedOption(props.lineItem),
       lineItem: props.lineItem,
     });
   }
@@ -222,13 +181,14 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
         <QuantityInput value={quantity} onChange={onQuanityChange} />
         <h6 className="text-gray-500">{props.lineItem.unit.name}</h6>
       </div>
-      {optionsSortedByTier.map((option, index) => {
+      {props.lineItem.lineItemOptions.map((option, index) => {
         return (
           <LineItemOptionDisplay
             key={`product-option-${index}`}
             props={{
               lineItemQuantity: quantity,
               lineItemOption: option,
+              lineItemMarginDecimal: props.lineItem.marginDecimal,
               onOptionSelection: onOptionSelection,
             }}
           />

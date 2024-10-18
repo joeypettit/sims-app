@@ -3,10 +3,12 @@ import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 import type { LineItem } from "../../app/types/line-item";
 import type { LineItemGroup } from "../../app/types/line-item-group";
+import { calculateSalesPricePerUnit } from "../../util/utils";
 
 export type LineItemOptionDisplayProps = {
   lineItemQuantity: number;
   lineItemOption: LineItemOption;
+  lineItemMarginDecimal: number;
   onOptionSelection: ({
     optionToSelect,
   }: {
@@ -19,23 +21,38 @@ export default function LineItemOptionDisplay({
 }: {
   props: LineItemOptionDisplayProps;
 }) {
-  function getDisplayedPrice(option: LineItemOption) {
-    if (option.exactCostInDollarsPerUnit != null) {
-      return `$${Math.ceil(
-        option.exactCostInDollarsPerUnit * props.lineItemQuantity
-      )}`;
+  function getDisplayedPrice() {
+    if (
+      props.lineItemOption.exactCostInDollarsPerUnit != null &&
+      props.lineItemOption.exactCostInDollarsPerUnit != undefined
+    ) {
+      const salePricePerUnit = calculateSalesPricePerUnit({
+        marginDecimal: props.lineItemMarginDecimal,
+        costPerUnit: props.lineItemOption.exactCostInDollarsPerUnit,
+      });
+      return `$${Math.ceil(salePricePerUnit * props.lineItemQuantity)}`;
     }
 
-    if (option.lowCostInDollarsPerUnit && option.highCostInDollarsPerUnit) {
-      const lowPrice = option.lowCostInDollarsPerUnit * props.lineItemQuantity;
-      const highPrice =
-        option.highCostInDollarsPerUnit * props.lineItemQuantity;
+    if (
+      props.lineItemOption.lowCostInDollarsPerUnit &&
+      props.lineItemOption.highCostInDollarsPerUnit
+    ) {
+      const lowSalePricePerUnit = calculateSalesPricePerUnit({
+        marginDecimal: props.lineItemMarginDecimal,
+        costPerUnit: props.lineItemOption.lowCostInDollarsPerUnit,
+      });
+      const highSalePricePerUnit = calculateSalesPricePerUnit({
+        marginDecimal: props.lineItemMarginDecimal,
+        costPerUnit: props.lineItemOption.highCostInDollarsPerUnit,
+      });
 
-      if (lowPrice === highPrice) {
-        return `$${Math.ceil(lowPrice)}`;
+      if (lowSalePricePerUnit === highSalePricePerUnit) {
+        return `$${Math.ceil(lowSalePricePerUnit)}`;
       }
 
-      return `$${Math.ceil(lowPrice)} - $${Math.ceil(highPrice)}`;
+      return `$${Math.ceil(lowSalePricePerUnit) * props.lineItemQuantity} - $${
+        Math.ceil(highSalePricePerUnit) * props.lineItemQuantity
+      }`;
     }
 
     // Default case if no price information is available
@@ -64,7 +81,7 @@ export default function LineItemOptionDisplay({
           props.lineItemOption.isSelected ? "font-bold" : "font-normal"
         }`}
       >
-        {getDisplayedPrice(props.lineItemOption)}
+        {getDisplayedPrice()}
       </p>
       <p className="text-stone-600 text-xs">
         {props.lineItemOption.description}
