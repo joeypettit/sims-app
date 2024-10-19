@@ -21,7 +21,6 @@ export async function getProjectById(id: string) {
 
 export async function getProjectAreaById(areaId: string) {
   const response = await axios.get<ProjectArea>(`/api/projects/area/${areaId}`);
-  console.log("data", response.data);
   return response.data;
 }
 
@@ -35,7 +34,6 @@ export async function updateOptionSelection({
   lineItem: LineItem;
 }) {
   try {
-    console.log("un", optionToUnselect, "select", optionToSelect);
     let unselectResponse = undefined;
     let selectResponse = undefined;
 

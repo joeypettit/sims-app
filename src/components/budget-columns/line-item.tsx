@@ -10,6 +10,7 @@ import { updateOptionSelection, updateLineItemQuantity } from "../../api/api";
 import type { ProjectArea } from "../../app/types/project-area";
 import { calculateSalesPricePerUnit } from "../../util/utils";
 import { getCurrentlySelectedOption } from "../../util/utils";
+import { calculateOptionsTotalSalePrice } from "../../util/utils";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
@@ -66,49 +67,13 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     },
   });
 
-  function getOptionsPerUnitCost(option: LineItemOption): PriceRange | number {
-    if (option.exactCostInDollarsPerUnit != null) {
-      return option.exactCostInDollarsPerUnit;
-    }
-
-    if (option.lowCostInDollarsPerUnit && option.highCostInDollarsPerUnit) {
-      return {
-        lowPriceInDollars: option.lowCostInDollarsPerUnit,
-        highPriceInDollars: option.highCostInDollarsPerUnit,
-      } as PriceRange;
-    }
-    return 0;
-  }
-
-  function calculateOptionsTotalSalePrice(option: LineItemOption) {
-    const optionCost = getOptionsPerUnitCost(option);
-
-    if (typeof optionCost === "number") {
-      const salePricePerUnit = calculateSalesPricePerUnit({
-        marginDecimal: props.lineItem.marginDecimal,
-        costPerUnit: optionCost,
-      });
-      return Math.ceil(salePricePerUnit * quantity);
-    }
-
-    const lowSalePricePerUnit = calculateSalesPricePerUnit({
-      marginDecimal: props.lineItem.marginDecimal,
-      costPerUnit: optionCost.lowPriceInDollars,
-    });
-    const highSalePricePerUnit = calculateSalesPricePerUnit({
-      marginDecimal: props.lineItem.marginDecimal,
-      costPerUnit: optionCost.highPriceInDollars,
-    });
-    return {
-      lowPriceInDollars: Math.ceil(lowSalePricePerUnit * quantity),
-      highPriceInDollars: Math.ceil(highSalePricePerUnit * quantity),
-    } as PriceRange;
-  }
-
   function renderCurrentLineTotal() {
     const selectedOption = getCurrentlySelectedOption(props.lineItem);
     if (selectedOption) {
-      const lineTotal = calculateOptionsTotalSalePrice(selectedOption);
+      const lineTotal = calculateOptionsTotalSalePrice({
+        option: selectedOption,
+        lineItem: props.lineItem,
+      });
       if (lineTotal == 0) return "-";
       else if (typeof lineTotal === "number") return `$${lineTotal}`;
       else if (lineTotal?.highPriceInDollars <= 0) return "-";

@@ -5,5 +5,6 @@ export type ProjectArea = {
   id: string;
   name: string;
   projectId: string;
+  totalPrice: number;
   lineItemGroups: LineItemGroup[];
 };

@@ -7,6 +7,7 @@ import type { LineItemGroup } from "../../app/types/line-item-group";
 import type { LineItem } from "../../app/types/line-item";
 import type { GroupCategory } from "../../app/types/group-category";
 import type { LineItemOption } from "../../app/types/line-item-option";
+import { getGroupsTotalSalePrice } from "../../util/utils";
 
 export default function ProjectAreaProposal() {
   const queryClient = useQueryClient();
@@ -15,10 +16,17 @@ export default function ProjectAreaProposal() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["area"],
     queryFn: async () => {
-      console.log("FETCHING AREA");
       if (areaId == undefined || areaId == null) throw Error;
       const response = await getProjectAreaById(areaId);
       return response;
+    },
+    select: (data) => {
+      const groups = data.lineItemGroups;
+      groups.map((group) => {
+        getGroupsTotalSalePrice(group);
+      });
+
+      return data;
     },
   });
 

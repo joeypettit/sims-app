@@ -1,4 +1,5 @@
 import type { OptionTier } from "./option-tier";
+import type { LineItem } from "./line-item";
 
 export type LineItemOption = {
   id: string;
@@ -9,4 +10,5 @@ export type LineItemOption = {
   description: string?;
   tier: OptionTier;
   isSelected: boolean;
+  lineItem: LineItem;
 };

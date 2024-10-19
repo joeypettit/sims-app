@@ -3,12 +3,10 @@ import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 import type { LineItem } from "../../app/types/line-item";
 import type { LineItemGroup } from "../../app/types/line-item-group";
-import { calculateSalesPricePerUnit } from "../../util/utils";
+import { calculateOptionsTotalSalePrice } from "../../util/utils";
 
 export type LineItemOptionDisplayProps = {
-  lineItemQuantity: number;
   lineItemOption: LineItemOption;
-  lineItemMarginDecimal: number;
   onOptionSelection: ({
     optionToSelect,
   }: {
@@ -22,41 +20,14 @@ export default function LineItemOptionDisplay({
   props: LineItemOptionDisplayProps;
 }) {
   function getDisplayedPrice() {
-    if (
-      props.lineItemOption.exactCostInDollarsPerUnit != null &&
-      props.lineItemOption.exactCostInDollarsPerUnit != undefined
-    ) {
-      const salePricePerUnit = calculateSalesPricePerUnit({
-        marginDecimal: props.lineItemMarginDecimal,
-        costPerUnit: props.lineItemOption.exactCostInDollarsPerUnit,
-      });
-      return `$${Math.ceil(salePricePerUnit * props.lineItemQuantity)}`;
+    const salePrice = calculateOptionsTotalSalePrice({
+      option: props.lineItemOption,
+      lineItem: props.lineItemOption.lineItem,
+    });
+    if (typeof salePrice == "number") {
+      return `$${salePrice}`;
     }
-
-    if (
-      props.lineItemOption.lowCostInDollarsPerUnit &&
-      props.lineItemOption.highCostInDollarsPerUnit
-    ) {
-      const lowSalePricePerUnit = calculateSalesPricePerUnit({
-        marginDecimal: props.lineItemMarginDecimal,
-        costPerUnit: props.lineItemOption.lowCostInDollarsPerUnit,
-      });
-      const highSalePricePerUnit = calculateSalesPricePerUnit({
-        marginDecimal: props.lineItemMarginDecimal,
-        costPerUnit: props.lineItemOption.highCostInDollarsPerUnit,
-      });
-
-      if (lowSalePricePerUnit === highSalePricePerUnit) {
-        return `$${Math.ceil(lowSalePricePerUnit)}`;
-      }
-
-      return `$${Math.ceil(lowSalePricePerUnit) * props.lineItemQuantity} - $${
-        Math.ceil(highSalePricePerUnit) * props.lineItemQuantity
-      }`;
-    }
-
-    // Default case if no price information is available
-    return "-";
+    return `$${salePrice.lowPriceInDollars} - $${salePrice.highPriceInDollars}`;
   }
 
   return (

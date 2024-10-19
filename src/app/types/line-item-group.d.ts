@@ -6,4 +6,5 @@ export type LineItemGroup = {
   name: string;
   lineItems: LineItem[];
   groupCategory: GroupCategory;
+  totalSalePrice: number;
 };
