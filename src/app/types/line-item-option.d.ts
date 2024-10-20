@@ -10,5 +10,4 @@ export type LineItemOption = {
   description: string?;
   tier: OptionTier;
   isSelected: boolean;
-  lineItem: LineItem;
 };

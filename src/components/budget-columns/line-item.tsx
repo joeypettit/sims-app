@@ -151,9 +151,8 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
           <LineItemOptionDisplay
             key={`product-option-${index}`}
             props={{
-              lineItemQuantity: quantity,
               lineItemOption: option,
-              lineItemMarginDecimal: props.lineItem.marginDecimal,
+              lineItem: props.lineItem,
               onOptionSelection: onOptionSelection,
             }}
           />

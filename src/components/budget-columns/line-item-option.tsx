@@ -7,6 +7,7 @@ import { calculateOptionsTotalSalePrice } from "../../util/utils";
 
 export type LineItemOptionDisplayProps = {
   lineItemOption: LineItemOption;
+  lineItem: LineItem;
   onOptionSelection: ({
     optionToSelect,
   }: {
@@ -22,7 +23,7 @@ export default function LineItemOptionDisplay({
   function getDisplayedPrice() {
     const salePrice = calculateOptionsTotalSalePrice({
       option: props.lineItemOption,
-      lineItem: props.lineItemOption.lineItem,
+      lineItem: props.lineItem,
     });
     if (typeof salePrice == "number") {
       return `$${salePrice}`;
