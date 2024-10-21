@@ -3,7 +3,10 @@ import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 import type { LineItem } from "../../app/types/line-item";
 import type { LineItemGroup } from "../../app/types/line-item-group";
-import { calculateOptionsTotalSalePrice } from "../../util/utils";
+import {
+  calculateOptionsTotalSalePrice,
+  formatNumberWithCommas,
+} from "../../util/utils";
 
 export type LineItemOptionDisplayProps = {
   lineItemOption: LineItemOption;
@@ -28,7 +31,9 @@ export default function LineItemOptionDisplay({
     if (typeof salePrice == "number") {
       return `$${salePrice}`;
     }
-    return `$${salePrice.lowPriceInDollars} - $${salePrice.highPriceInDollars}`;
+    const lowPrice = formatNumberWithCommas(salePrice.lowPriceInDollars);
+    const highPrice = formatNumberWithCommas(salePrice.highPriceInDollars);
+    return `$${lowPrice} - $${highPrice}`;
   }
 
   return (

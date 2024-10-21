@@ -120,3 +120,11 @@ export function getOptionsPerUnitCost(
   }
   return 0;
 }
+
+export function formatNumberWithCommas(num: number | string): string {
+  // Convert to string in case a number is passed
+  const numStr = num.toString();
+
+  // Use regex to add commas every three digits from the right
+  return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

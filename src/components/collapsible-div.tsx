@@ -3,9 +3,11 @@ import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
 
 export default function CollapsibleDiv({
   title,
+  price,
   children,
 }: {
   title: string;
+  price: string;
   children: ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,17 +25,20 @@ export default function CollapsibleDiv({
         <div>
           <h2 className="text-md font-bold">{title}</h2>
         </div>
-        <button className="focus:outline-none">
-          {isOpen ? (
-            <span>
-              <MdKeyboardArrowUp />
-            </span>
-          ) : (
-            <span>
-              <MdKeyboardArrowDown />
-            </span>
-          )}
-        </button>
+        <div className="flex flex-row">
+          {!isOpen && <h2 className="text-sm font-bold">{price}</h2>}
+          <button className="focus:outline-none">
+            {isOpen ? (
+              <span>
+                <MdKeyboardArrowUp />
+              </span>
+            ) : (
+              <span>
+                <MdKeyboardArrowDown />
+              </span>
+            )}
+          </button>
+        </div>
       </div>
       <div
         className={`transition-all duration-300 ease-in-out ${

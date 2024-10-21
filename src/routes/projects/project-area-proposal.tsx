@@ -8,6 +8,8 @@ import type { LineItem } from "../../app/types/line-item";
 import type { GroupCategory } from "../../app/types/group-category";
 import type { LineItemOption } from "../../app/types/line-item-option";
 import { getGroupsTotalSalePrice } from "../../util/utils";
+import type { PriceRange } from "../../app/types/price-range";
+import { formatNumberWithCommas } from "../../util/utils";
 
 export default function ProjectAreaProposal() {
   const queryClient = useQueryClient();
@@ -16,17 +18,38 @@ export default function ProjectAreaProposal() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["area"],
     queryFn: async () => {
-      if (areaId == undefined || areaId == null) throw Error;
+      if (!areaId) {
+        throw new Error("Area ID is required");
+      }
       const response = await getProjectAreaById(areaId);
       return response;
     },
     select: (data) => {
-      const groups = data.lineItemGroups;
-      groups.map((group) => {
-        getGroupsTotalSalePrice(group);
-      });
+      const updatedGroups: LineItemGroup[] = data.lineItemGroups.map(
+        (group) => {
+          const salePrice = getGroupsTotalSalePrice(group);
+          return { ...group, totalSalePrice: salePrice };
+        }
+      );
+      const totalAreaPrice: PriceRange = updatedGroups.reduce(
+        (acc: PriceRange, currentGroup: LineItemGroup) => {
+          return {
+            lowPriceInDollars:
+              acc.lowPriceInDollars +
+              currentGroup.totalSalePrice.lowPriceInDollars,
+            highPriceInDollars:
+              acc.highPriceInDollars +
+              currentGroup.totalSalePrice.highPriceInDollars,
+          };
+        },
+        { lowPriceInDollars: 0, highPriceInDollars: 0 } as PriceRange
+      );
 
-      return data;
+      return {
+        ...data,
+        lineItemGroups: updatedGroups,
+        totalSalePrice: totalAreaPrice,
+      };
     },
   });
 
@@ -44,6 +67,24 @@ export default function ProjectAreaProposal() {
       }
     }
     return catArray;
+  }
+
+  function getAreasTotalSalePrice() {
+    if (data?.totalSalePrice) {
+      if (
+        data.totalSalePrice?.lowPriceInDollars <= 0 &&
+        data.totalSalePrice?.highPriceInDollars <= 0
+      )
+        return "-";
+      const lowPrice = formatNumberWithCommas(
+        data.totalSalePrice?.lowPriceInDollars
+      );
+      const highPrice = formatNumberWithCommas(
+        data.totalSalePrice?.highPriceInDollars
+      );
+      return `$${lowPrice} - $${highPrice}`;
+    }
+    return "-";
   }
 
   if (isLoading) {
@@ -76,8 +117,7 @@ export default function ProjectAreaProposal() {
           </div>
         );
       })}
-
-      {/* <div>{totalInDollars}</div> */}
+      <div>Project Total: {getAreasTotalSalePrice()}</div>
     </PanelWindow>
   );
 }

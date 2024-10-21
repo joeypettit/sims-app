@@ -158,7 +158,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
           />
         );
       })}
-      <div className="text-sm text-center font-bold pr-4 col-end-6">
+      <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6">
         {renderCurrentLineTotal()}
       </div>
     </div>
