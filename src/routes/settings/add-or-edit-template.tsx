@@ -9,7 +9,7 @@ import Button from "../../components/button";
 import { getAllGroupCategories } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 
-export default function AddOrEditTemplate() {
+export default function CreateAreaTemplate() {
   const navigate = useNavigate();
 
   const { data, isLoading, isError, error } = useQuery({

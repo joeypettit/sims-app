@@ -26,7 +26,7 @@ export default function Button({
       case "primary":
         return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-800";
       case "secondary":
-        return "bg-gray-600 hover:bg-gray-700 active:bg-gray-900";
+        return "bg-gray-400 hover:bg-gray-600 active:bg-gray-700";
       case "success":
         return "bg-green-600 hover:bg-green-700 active:bg-green-900";
       case "danger":
