@@ -3,8 +3,8 @@ import ProfileCircle from "./profile-circle";
 import { Link, Outlet } from "react-router-dom";
 import { BsChevronDoubleLeft } from "react-icons/bs";
 import { BsChevronDoubleRight } from "react-icons/bs";
-
-import { PiBlueprint } from "react-icons/pi";
+import { IoMdSettings } from "react-icons/io";
+import { BsHousesFill } from "react-icons/bs";
 
 const iconSize = "1.8rem";
 
@@ -12,7 +12,12 @@ const links = [
   {
     to: "/project",
     label: "Projects",
-    icon: <PiBlueprint size={iconSize} />,
+    icon: <BsHousesFill size={iconSize} />,
+  },
+  {
+    to: "/settings",
+    label: "Settings",
+    icon: <IoMdSettings size={iconSize} />,
   },
 ];
 
@@ -59,21 +64,11 @@ function LargeScreenNavBar() {
             pt-3
             ${isOpen ? "w-32" : "w-12"} transition-all duration-300`}
         >
-          <div className="flex flex-start flex-col items-center relative">
-            <button
-              className="p-1 absolute border bg-gray-100 rounded-full -bottom-4 -right-2 shadow-lg"
-              onClick={toggleSidebar}
-            >
-              {isOpen ? (
-                <BsChevronDoubleLeft size=".6rem" />
-              ) : (
-                <BsChevronDoubleRight size=".6rem" />
-              )}
-            </button>
+          <div className="flex flex-start flex-col items-center">
             <div className={isOpen ? "p-3" : "p-1"}>
               <img
-                src="/assets/Sims_Logo_Brand_Green.png"
-                alt="Terrier Pro App Icon"
+                src="/assets/sims-logo-w-name-vertical.png"
+                alt="Sims Logo"
                 // style={{ height: "2.5rem", width: "2.5rem" }}
               />
             </div>
@@ -116,6 +111,29 @@ function LargeScreenNavBar() {
                 </div>
               );
             })}
+            <div>
+              <hr className="mx-2" />
+              <li onClick={toggleSidebar}>
+                <div
+                  className={`
+                      pl-1 pr-2 py-3
+                      flex flex-row 
+                      group
+                      hover:bg-slate-200 justify-center
+                      `}
+                >
+                  <div
+                    className={`flex flex-row justify-center items-center transition-all duration-300 group-hover:text-gray-700`}
+                  >
+                    {isOpen ? (
+                      <BsChevronDoubleLeft />
+                    ) : (
+                      <BsChevronDoubleRight />
+                    )}
+                  </div>
+                </div>
+              </li>
+            </div>
           </ul>
         </nav>
       </div>

@@ -1,8 +1,6 @@
 import type { LineItemOption } from "../../app/types/line-item-option";
-import type { PriceRange } from "../../app/types/price-range";
 import IsCheckedIcon from "../is-checked-icon";
 import type { LineItem } from "../../app/types/line-item";
-import type { LineItemGroup } from "../../app/types/line-item-group";
 import {
   calculateOptionsTotalSalePrice,
   formatNumberWithCommas,

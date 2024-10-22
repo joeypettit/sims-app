@@ -6,6 +6,7 @@ import axios from "axios";
 import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItem } from "../app/types/line-item";
 import type { LineItemGroup } from "../app/types/line-item-group";
+import type { GroupCategory } from "../app/types/group-category";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
@@ -83,3 +84,26 @@ export const updateLineItemQuantity = async ({
 
   return response.data;
 };
+
+export const getAllGroupCategories = async () => {
+  try {
+    const response = await axios.get<GroupCategory[]>(
+      `/api/groups/all-categories`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error getting all group categories:", error);
+    throw new Error("Error getting all group categories");
+  }
+};
+
+// export async function upsertTemplate(templateId: string){
+//   try{
+//     const response = await axios.put(
+//       `/api/template/upsert/${templateId}`,
+//       {
+//         quantity,
+//       }
+//     );
+//   }
+// }

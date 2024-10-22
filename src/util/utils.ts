@@ -128,3 +128,11 @@ export function formatNumberWithCommas(num: number | string): string {
   // Use regex to add commas every three digits from the right
   return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+export function simulateNetworkLatency(delay = 2000) {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, delay);
+  });
+}

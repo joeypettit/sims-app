@@ -10,6 +10,8 @@ import type { LineItemOption } from "../../app/types/line-item-option";
 import { getGroupsTotalSalePrice } from "../../util/utils";
 import type { PriceRange } from "../../app/types/price-range";
 import { formatNumberWithCommas } from "../../util/utils";
+import SimsSpinner from "../../components/sims-spinner/sims-spinner";
+import { simulateNetworkLatency } from "../../util/utils";
 
 export default function ProjectAreaProposal() {
   const queryClient = useQueryClient();
@@ -88,7 +90,13 @@ export default function ProjectAreaProposal() {
   }
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return (
+      <PanelWindow>
+        <div className="flex justify-center items-center w-full h-full">
+          <SimsSpinner />
+        </div>
+      </PanelWindow>
+    );
   }
 
   if (isError) {

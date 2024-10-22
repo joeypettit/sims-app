@@ -11,6 +11,7 @@ import type { ProjectArea } from "../../app/types/project-area";
 import { calculateSalesPricePerUnit } from "../../util/utils";
 import { getCurrentlySelectedOption } from "../../util/utils";
 import { calculateOptionsTotalSalePrice } from "../../util/utils";
+import { formatNumberWithCommas } from "../../util/utils";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
@@ -67,7 +68,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     },
   });
 
-  function renderCurrentLineTotal() {
+  function getCurrentLineTotal() {
     const selectedOption = getCurrentlySelectedOption(props.lineItem);
     if (selectedOption) {
       const lineTotal = calculateOptionsTotalSalePrice({
@@ -75,9 +76,12 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
         lineItem: props.lineItem,
       });
       if (lineTotal == 0) return "-";
-      else if (typeof lineTotal === "number") return `$${lineTotal}`;
+      else if (typeof lineTotal === "number")
+        return `$${formatNumberWithCommas(lineTotal)}`;
       else if (lineTotal?.highPriceInDollars <= 0) return "-";
-      return `$${lineTotal?.lowPriceInDollars} - $${lineTotal?.highPriceInDollars}`;
+      const lowPrice = formatNumberWithCommas(lineTotal.lowPriceInDollars);
+      const highPrice = formatNumberWithCommas(lineTotal.highPriceInDollars);
+      return `$${lowPrice} - $${highPrice}`;
     }
     return "-";
   }
@@ -159,7 +163,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
         );
       })}
       <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6">
-        {renderCurrentLineTotal()}
+        {getCurrentLineTotal()}
       </div>
     </div>
   );
