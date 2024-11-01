@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import Button from "./button";
 
-type ConfirmCancelModalProps = {
+type ModalProps = {
   isOpen: boolean;
   title?: string;
   onConfirm?: () => void;
@@ -10,13 +10,13 @@ type ConfirmCancelModalProps = {
   children: React.ReactNode;
 };
 
-export default function ConfirmCancelModal({
+export default function Modal({
   isOpen,
   title = "Are you sure?",
   onConfirm,
   onCancel,
   children,
-}: ConfirmCancelModalProps) {
+}: ModalProps) {
   // Only render the modal if it's open
   if (!isOpen) return null;
 
@@ -27,7 +27,7 @@ export default function ConfirmCancelModal({
 
         <div className="mb-4">{children}</div>
 
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-center gap-2">
           {onCancel && (
             <Button variant="secondary" onClick={onCancel}>
               Cancel

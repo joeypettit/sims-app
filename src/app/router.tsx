@@ -5,7 +5,7 @@ import ProjectsPanel from "../routes/projects/projects-panel.tsx";
 import ProjectDetails from "../routes/projects/project-details.tsx";
 import ProjectAreaProposal from "../routes/projects/project-area-proposal.tsx";
 import SettingsPanel from "../routes/settings/settings.tsx";
-import AddOrEditTemplate from "../routes/settings/add-or-edit-template.tsx";
+import EditAreaTemplate from "../routes/settings/edit-area-template.tsx";
 
 const router = createBrowserRouter([
   {
@@ -34,8 +34,8 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
-        path: "/settings/add-template",
-        element: <AddOrEditTemplate />,
+        path: "/settings/edit-template/:templateId",
+        element: <EditAreaTemplate />,
         errorElement: <ErrorPage />,
       },
     ],

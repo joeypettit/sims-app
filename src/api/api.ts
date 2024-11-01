@@ -7,6 +7,7 @@ import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItem } from "../app/types/line-item";
 import type { LineItemGroup } from "../app/types/line-item-group";
 import type { GroupCategory } from "../app/types/group-category";
+import type { Template } from "../app/types/template";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
@@ -97,13 +98,15 @@ export const getAllGroupCategories = async () => {
   }
 };
 
-// export async function upsertTemplate(templateId: string){
-//   try{
-//     const response = await axios.put(
-//       `/api/template/upsert/${templateId}`,
-//       {
-//         quantity,
-//       }
-//     );
-//   }
-// }
+export async function createAreaTemplate(templateName: string) {
+  try {
+    const response = await axios.post<Template>(`/api/templates/area/create`, {
+      name: templateName,
+    });
+    console.log("response", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error Creating New Area Template:", error);
+    throw new Error("Error Creating New Area Template");
+  }
+}

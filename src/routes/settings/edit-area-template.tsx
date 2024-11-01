@@ -9,12 +9,22 @@ import Button from "../../components/button";
 import { getAllGroupCategories } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 
-export default function CreateAreaTemplate() {
+export default function EditAreaTemplate() {
   const navigate = useNavigate();
+  const { templateId } = useParams();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const categoriesQuery = useQuery({
     queryKey: ["all-categories"],
     queryFn: async () => {
+      const result = await getAllGroupCategories();
+      return result;
+    },
+  });
+
+  const areaTemplateQuery = useQuery({
+    queryKey: ["area-template", templateId],
+    queryFn: async () => {
+      console.log("templateid is", templateId);
       const result = await getAllGroupCategories();
       return result;
     },
@@ -40,7 +50,7 @@ export default function CreateAreaTemplate() {
   //   },
   // });
 
-  if (isLoading) {
+  if (categoriesQuery.isLoading) {
     return (
       <PanelWindow>
         <div className="flex justify-center items-center w-full h-full">
@@ -50,8 +60,8 @@ export default function CreateAreaTemplate() {
     );
   }
 
-  if (isError) {
-    return <p>Error: {error.message}</p>;
+  if (categoriesQuery.isError) {
+    return <p>Error: {categoriesQuery.error.message}</p>;
   }
   return (
     <PanelWindow>
@@ -59,7 +69,7 @@ export default function CreateAreaTemplate() {
         <label htmlFor="name">Template Name:</label>
         <input type="text" id="name" name="name" required />
       </form>
-      {data?.map((category) => {
+      {/* {data?.map((category) => {
         return (
           <div key={category.id}>
             <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">
@@ -70,7 +80,7 @@ export default function CreateAreaTemplate() {
             </Button>
           </div>
         );
-      })}
+      })} */}
     </PanelWindow>
   );
 }
