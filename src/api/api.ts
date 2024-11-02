@@ -7,7 +7,7 @@ import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItem } from "../app/types/line-item";
 import type { LineItemGroup } from "../app/types/line-item-group";
 import type { GroupCategory } from "../app/types/group-category";
-import type { Template } from "../app/types/template";
+import type { AreaTemplate } from "../app/types/area-template";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
@@ -100,13 +100,44 @@ export const getAllGroupCategories = async () => {
 
 export async function createAreaTemplate(templateName: string) {
   try {
-    const response = await axios.post<Template>(`/api/templates/area/create`, {
-      name: templateName,
-    });
+    const response = await axios.post<AreaTemplate>(
+      `/api/templates/area/create`,
+      {
+        name: templateName,
+      }
+    );
     console.log("response", response.data);
     return response.data;
   } catch (error) {
-    console.error("Error Creating New Area Template:", error);
-    throw new Error("Error Creating New Area Template");
+    throw new Error(
+      `Error Creating New Area Template wiht name ${templateName}: ${error}`
+    );
+  }
+}
+
+export async function getAreaTemplate(templateId: string) {
+  try {
+    const response = await axios.get<AreaTemplate>(
+      `/api/templates/area/${templateId}`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Error getting area template is ID ${templateId}: ${error}`
+    );
+  }
+}
+
+export async function createNewGroup(categoryId: string, groupName: string) {
+  try {
+    const response = await axios.post(`/api/groups`, {
+      categoryId,
+      name: groupName,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      `Error creating new group in category with ID ${categoryId}: ${error}`
+    );
   }
 }

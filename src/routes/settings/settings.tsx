@@ -1,8 +1,4 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
-import { Project } from "../../app/types/project";
-import { getProjectById } from "../../api/api";
-import { ProjectArea } from "../../app/types/project-area";
 import { useNavigate } from "react-router-dom";
 import PanelWindow from "../../components/panel-window";
 import Button from "../../components/button";
@@ -44,6 +40,7 @@ export default function SettingsPanel() {
       );
     },
     onSuccess: (data, variables, context) => {
+      console.log("template Created with id", data.id);
       setTemplateNameInput("");
       setIsCreateTemplateModalOpen(false);
       navigate(`/settings/edit-template/${data.id}`);
@@ -80,22 +77,8 @@ export default function SettingsPanel() {
     return <p>Error: {error.message}</p>;
   }
 
-  return (
-    <PanelWindow>
-      <h1>Settings</h1>
-      <div>
-        <div className="flex flex-row bg-sims-green-100">
-          <h2>Templates</h2>
-          <Button
-            size="xs"
-            variant="primary"
-            // onClick={() => navigate("/settings/add-template")}
-            onClick={() => setIsCreateTemplateModalOpen(true)}
-          >
-            +
-          </Button>
-        </div>
-      </div>
+  function renderTemplateModal() {
+    return (
       <Modal
         isOpen={isCreateTemplateModalOpen}
         title="Please give your template a name."
@@ -125,6 +108,26 @@ export default function SettingsPanel() {
           )}
         </div>
       </Modal>
+    );
+  }
+
+  return (
+    <PanelWindow>
+      <h1>Settings</h1>
+      <div>
+        <div className="flex flex-row bg-sims-green-100">
+          <h2>Templates</h2>
+          <Button
+            size="xs"
+            variant="primary"
+            // onClick={() => navigate("/settings/add-template")}
+            onClick={() => setIsCreateTemplateModalOpen(true)}
+          >
+            +
+          </Button>
+        </div>
+      </div>
+      {renderTemplateModal()}
     </PanelWindow>
   );
 }
