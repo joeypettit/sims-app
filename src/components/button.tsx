@@ -3,6 +3,7 @@ import React from "react";
 // Define types for button variants and sizes
 type ButtonVariant = "primary" | "secondary" | "success" | "danger" | "warning";
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
+type ButtonTypes = "submit" | "reset" | "button" | undefined;
 
 // Define the props type
 type ButtonProps = {
@@ -11,6 +12,7 @@ type ButtonProps = {
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
+  type?: ButtonTypes;
 };
 
 export default function Button({
@@ -19,6 +21,7 @@ export default function Button({
   disabled = false,
   variant = "primary",
   size = "md",
+  type,
 }: ButtonProps) {
   // Set button color based on the variant prop
   const getButtonClasses = () => {
@@ -59,6 +62,7 @@ export default function Button({
   return (
     <button
       onClick={onClick}
+      type={type}
       disabled={disabled}
       className={`text-white rounded-md font-semibold transition-all duration-200 
                   disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 

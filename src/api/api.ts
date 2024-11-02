@@ -128,11 +128,20 @@ export async function getAreaTemplate(templateId: string) {
   }
 }
 
-export async function createNewGroup(categoryId: string, groupName: string) {
+export async function createGroup({
+  categoryId,
+  groupName,
+  projectAreaId,
+}: {
+  categoryId: string;
+  groupName: string;
+  projectAreaId: string;
+}) {
   try {
     const response = await axios.post(`/api/groups`, {
       categoryId,
-      name: groupName,
+      groupName,
+      projectAreaId,
     });
     return response.data;
   } catch (error) {

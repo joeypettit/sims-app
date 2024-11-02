@@ -6,10 +6,25 @@ import Button from "../../components/button";
 import { getAllGroupCategories } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getAreaTemplate } from "../../api/api";
+import { createGroup } from "../../api/api";
+import Modal from "../../components/modal";
+import { useState } from "react";
 
 export default function EditAreaTemplate() {
   const navigate = useNavigate();
   const { templateId } = useParams();
+  const [groupNameInput, setGroupNameInput] = useState("");
+  const [newGroupCategoryId, setNewGroupCategoryId] = useState<string>("");
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+
+  function handleOpenCreateGroupModal(categoryId: string) {
+    setNewGroupCategoryId(categoryId);
+    setIsCreateGroupModalOpen(true);
+  }
+  function handleCloseCreateGroupModal() {
+    setGroupNameInput("");
+    setIsCreateGroupModalOpen(false);
+  }
 
   const categoriesQuery = useQuery({
     queryKey: ["all-group-categories"],
@@ -29,8 +44,8 @@ export default function EditAreaTemplate() {
     },
   });
 
-  const addGroupMutation = useMutation({
-    //   mutationFn: addTodo,
+  const createGroupMutation = useMutation({
+    mutationFn: createGroup,
     onMutate: (variables) => {
       // A mutation is about to happen!
 
@@ -49,13 +64,14 @@ export default function EditAreaTemplate() {
     },
   });
 
-  // function handleAddGroup(categoryId: string){
-  //   addGroupMutation.mutate({
-  //     optionToSelect: optionToSelect,
-  //     optionToUnselect: getCurrentlySelectedOption(props.lineItem),
-  //     lineItem: props.lineItem,
-  //   });)
-  // }
+  function handleCreateGroup() {
+    // createGroupMutation.mutate({
+    //   categoryId,
+    //   groupName,
+    //   projectAreaId
+    // });)
+    handleCloseCreateGroupModal();
+  }
 
   if (categoriesQuery.isLoading || areaTemplateQuery.isLoading) {
     return (
@@ -72,6 +88,32 @@ export default function EditAreaTemplate() {
     return <p>Error: {error?.message}</p>;
   }
 
+  function renderCreateGroupModal() {
+    return (
+      <Modal
+        isOpen={isCreateGroupModalOpen}
+        onConfirm={handleCreateGroup}
+        onCancel={handleCloseCreateGroupModal}
+      >
+        <label
+          htmlFor="group-name"
+          className="block text-left mb-2 font-medium"
+        >
+          Group Name
+        </label>
+        <input
+          type="text"
+          id="group-name"
+          value={groupNameInput}
+          onChange={(e) => setGroupNameInput(e.target.value)}
+          className="w-full px-3 py-2 mb-4 border rounded"
+          placeholder="Enter group name"
+          required
+        />
+      </Modal>
+    );
+  }
+
   return (
     <PanelWindow>
       <h1>{areaTemplateQuery.data?.name}</h1>
@@ -81,12 +123,17 @@ export default function EditAreaTemplate() {
             <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">
               {category.name}
             </h2>
-            <Button size="sm" variant="primary" onClick={() => {}}>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => handleOpenCreateGroupModal(category.id)}
+            >
               + Add Group
             </Button>
           </div>
         );
       })}
+      {renderCreateGroupModal()}
     </PanelWindow>
   );
 }
