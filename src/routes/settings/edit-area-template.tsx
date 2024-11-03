@@ -53,7 +53,7 @@ export default function EditAreaTemplate() {
 
   const createGroupMutation = useMutation({
     mutationFn: createGroup,
-    onMutate: async (variables) => {
+    onMutate: async () => {
       await queryClient.cancelQueries({
         queryKey: ["area-template", templateId],
       });
@@ -61,22 +61,15 @@ export default function EditAreaTemplate() {
         "area-template",
         templateId,
       ]);
-      // queryClient.setQueryData(
-      //   ["area-template", templateId],
-      //   (oldData: AreaTemplate | undefined) => {
-      //     if (!oldData) return oldData;
-      //     return {...oldData} as AreaTemplate
-      //   }
-      // );
-
       return previousTemplate;
     },
-    onError: (error, variables, context) => {
+    onError: (error) => {
+      console.log("Error in createGroupMutation", error);
       setCreateGroupErrorMessage(
         "There has been an error creating new group. Please try again."
       );
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       setGroupNameInput("");
       setIsCreateGroupModalOpen(false);
       queryClient.invalidateQueries({
@@ -118,26 +111,30 @@ export default function EditAreaTemplate() {
         onConfirm={handleCreateGroup}
         onCancel={handleCloseCreateGroupModal}
       >
-        <div className="flex flex-col justify-center items-center">
-          <label
-            htmlFor="group-name"
-            className="block text-left mb-2 font-medium"
-          >
-            Group Name
-          </label>
-          <input
-            type="text"
-            id="group-name"
-            value={groupNameInput}
-            onChange={(e) => setGroupNameInput(e.target.value)}
-            className="w-full px-3 py-2 mb-4 border rounded"
-            placeholder="Enter group name"
-            required
-          />
-          {createGroupErrorMessage && (
-            <div className="text-rose-700">{createGroupErrorMessage}</div>
-          )}
-        </div>
+        {createGroupMutation.isPending ? (
+          <SimsSpinner centered />
+        ) : (
+          <div className="flex flex-col justify-center items-center">
+            <label
+              htmlFor="group-name"
+              className="block text-left mb-2 font-medium"
+            >
+              Group Name
+            </label>
+            <input
+              type="text"
+              id="group-name"
+              value={groupNameInput}
+              onChange={(e) => setGroupNameInput(e.target.value)}
+              className="w-full px-3 py-2 mb-4 border rounded"
+              placeholder="Enter group name"
+              required
+            />
+            {createGroupErrorMessage && (
+              <div className="text-rose-700">{createGroupErrorMessage}</div>
+            )}
+          </div>
+        )}
       </Modal>
     );
   }

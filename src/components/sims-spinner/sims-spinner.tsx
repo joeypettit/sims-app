@@ -1,8 +1,13 @@
-import "./sims-spinner.css"; // Make sure to create this CSS file
+import "./sims-spinner.css";
 
-const SimsSpinner = () => {
+type SimsSpinnerProps = {
+  centered?: boolean;
+};
+
+const SimsSpinner = ({ centered = false }: SimsSpinnerProps) => {
   const size = 100;
-  return (
+
+  const spinnerElement = (
     <div className="spinner-container" style={{ width: size, height: size }}>
       <div className="spinner"></div>
       <img
@@ -12,6 +17,14 @@ const SimsSpinner = () => {
         style={{ width: size, height: size }}
       />
     </div>
+  );
+
+  return centered ? (
+    <div className="flex items-center justify-center w-full h-full">
+      {spinnerElement}
+    </div>
+  ) : (
+    spinnerElement
   );
 };
 
