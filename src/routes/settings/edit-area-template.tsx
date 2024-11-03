@@ -11,6 +11,8 @@ import Modal from "../../components/modal";
 import { useState } from "react";
 import type { AreaTemplate } from "../../app/types/area-template";
 import { validateGroupName } from "../../util/form-validation";
+import LineItemGroupContainer from "../../components/budget-columns/line-item-group";
+import type { LineItemGroup } from "../../app/types/line-item-group";
 
 export default function EditAreaTemplate() {
   const queryClient = useQueryClient();
@@ -153,6 +155,7 @@ export default function EditAreaTemplate() {
     const error = categoriesQuery.error || areaTemplateQuery.error;
     return <p>Error: {error?.message}</p>;
   }
+  console.log("template", areaTemplateQuery.data);
   return (
     <PanelWindow>
       <h1>{areaTemplateQuery.data?.name}</h1>
@@ -162,6 +165,12 @@ export default function EditAreaTemplate() {
             <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">
               {category.name}
             </h2>
+            {areaTemplateQuery.data?.projectArea.lineItemGroups.map(
+              (group: LineItemGroup) => {
+                if (category.id == group.groupCategory.id)
+                  return <LineItemGroupContainer group={group} />;
+              }
+            )}
             <Button
               size="sm"
               variant="primary"
