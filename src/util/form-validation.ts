@@ -21,3 +21,27 @@ export function validateTemplateName(templateName: string) {
   // All checks passed
   return null;
 }
+
+export function validateGroupName(groupName: string) {
+  // Trim input
+  groupName = groupName.trim();
+
+  // Check if empty
+  if (!groupName) {
+    return "Group name is required.";
+  }
+
+  // Length check
+  if (groupName.length < 3 || groupName.length > 50) {
+    return "Group name must be between 3 and 50 characters.";
+  }
+
+  // Character restriction check
+  const namePattern = /^[a-zA-Z0-9-_ ]+$/;
+  if (!namePattern.test(groupName)) {
+    return "Group name can only contain letters, numbers, spaces, dashes, and underscores.";
+  }
+
+  // All checks passed
+  return null;
+}

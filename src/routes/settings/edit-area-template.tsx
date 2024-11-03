@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import PanelWindow from "../../components/panel-window";
@@ -9,13 +9,18 @@ import { getAreaTemplate } from "../../api/api";
 import { createGroup } from "../../api/api";
 import Modal from "../../components/modal";
 import { useState } from "react";
+import type { AreaTemplate } from "../../app/types/area-template";
+import { validateGroupName } from "../../util/form-validation";
 
 export default function EditAreaTemplate() {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { templateId } = useParams();
   const [groupNameInput, setGroupNameInput] = useState("");
   const [newGroupCategoryId, setNewGroupCategoryId] = useState<string>("");
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+  const [createGroupErrorMessage, setCreateGroupErrorMessage] =
+    useState<string>("");
 
   function handleOpenCreateGroupModal(categoryId: string) {
     setNewGroupCategoryId(categoryId);
@@ -46,31 +51,93 @@ export default function EditAreaTemplate() {
 
   const createGroupMutation = useMutation({
     mutationFn: createGroup,
-    onMutate: (variables) => {
-      // A mutation is about to happen!
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({
+        queryKey: ["area-template", templateId],
+      });
+      const previousTemplate = queryClient.getQueryData([
+        "area-template",
+        templateId,
+      ]);
+      // queryClient.setQueryData(
+      //   ["area-template", templateId],
+      //   (oldData: AreaTemplate | undefined) => {
+      //     if (!oldData) return oldData;
+      //     return {...oldData} as AreaTemplate
+      //   }
+      // );
 
-      // Optionally return a context containing data to use when for example rolling back
-      return { id: 1 };
+      return previousTemplate;
     },
     onError: (error, variables, context) => {
-      // An error happened!
-      console.log(`rolling back optimistic update with id ${context?.id}`);
+      setCreateGroupErrorMessage(
+        "There has been an error creating new group. Please try again."
+      );
     },
     onSuccess: (data, variables, context) => {
-      // Boom baby!
-    },
-    onSettled: (data, error, variables, context) => {
-      // Error or success... doesn't matter!
+      setGroupNameInput("");
+      setIsCreateGroupModalOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["area-template", templateId],
+      });
     },
   });
 
-  function handleCreateGroup() {
-    // createGroupMutation.mutate({
-    //   categoryId,
-    //   groupName,
-    //   projectAreaId
-    // });)
-    handleCloseCreateGroupModal();
+  async function handleCreateGroup() {
+    setCreateGroupErrorMessage("");
+    const errorMessage = validateGroupName(groupNameInput);
+
+    if (errorMessage) {
+      setCreateGroupErrorMessage(errorMessage);
+      return;
+    }
+
+    if (!areaTemplateQuery.data?.projectAreaId) {
+      throw Error("Area Template Does Not Have a Project Area Id");
+    }
+
+    if (!newGroupCategoryId) {
+      throw Error("Area Template Does Not Have a Group Category Id");
+    }
+
+    const trimmedName = groupNameInput.trim();
+
+    createGroupMutation.mutate({
+      categoryId: newGroupCategoryId,
+      groupName: trimmedName,
+      projectAreaId: areaTemplateQuery.data?.projectAreaId,
+    });
+  }
+
+  function renderCreateGroupModal() {
+    return (
+      <Modal
+        isOpen={isCreateGroupModalOpen}
+        onConfirm={handleCreateGroup}
+        onCancel={handleCloseCreateGroupModal}
+      >
+        <div className="flex flex-col justify-center items-center">
+          <label
+            htmlFor="group-name"
+            className="block text-left mb-2 font-medium"
+          >
+            Group Name
+          </label>
+          <input
+            type="text"
+            id="group-name"
+            value={groupNameInput}
+            onChange={(e) => setGroupNameInput(e.target.value)}
+            className="w-full px-3 py-2 mb-4 border rounded"
+            placeholder="Enter group name"
+            required
+          />
+          {createGroupErrorMessage && (
+            <div className="text-rose-700">{createGroupErrorMessage}</div>
+          )}
+        </div>
+      </Modal>
+    );
   }
 
   if (categoriesQuery.isLoading || areaTemplateQuery.isLoading) {
@@ -82,38 +149,10 @@ export default function EditAreaTemplate() {
       </PanelWindow>
     );
   }
-
   if (categoriesQuery.isError || areaTemplateQuery.isError) {
     const error = categoriesQuery.error || areaTemplateQuery.error;
     return <p>Error: {error?.message}</p>;
   }
-
-  function renderCreateGroupModal() {
-    return (
-      <Modal
-        isOpen={isCreateGroupModalOpen}
-        onConfirm={handleCreateGroup}
-        onCancel={handleCloseCreateGroupModal}
-      >
-        <label
-          htmlFor="group-name"
-          className="block text-left mb-2 font-medium"
-        >
-          Group Name
-        </label>
-        <input
-          type="text"
-          id="group-name"
-          value={groupNameInput}
-          onChange={(e) => setGroupNameInput(e.target.value)}
-          className="w-full px-3 py-2 mb-4 border rounded"
-          placeholder="Enter group name"
-          required
-        />
-      </Modal>
-    );
-  }
-
   return (
     <PanelWindow>
       <h1>{areaTemplateQuery.data?.name}</h1>
