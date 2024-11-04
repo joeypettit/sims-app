@@ -2,12 +2,18 @@ import { LineItemGroup } from "../../app/types/line-item-group";
 import LineItemDisplay from "./line-item";
 import CollapsibleDiv from "../collapsible-div";
 import { formatNumberWithCommas } from "../../util/utils";
+import Button from "../button";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
 };
 
 export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   function getGroupsTotalSalePrice() {
     if (props.group.totalSalePrice) {
       if (
@@ -27,6 +33,12 @@ export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
     return "-";
   }
 
+  function handleAddLine() {
+    navigate(`${currentPath}/create-line-item`, {
+      state: { group: props.group },
+    });
+  }
+
   return (
     <div className="py-2">
       <CollapsibleDiv
@@ -42,6 +54,14 @@ export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
             />
           );
         })}
+        <Button
+          size={"xs"}
+          variant="secondary"
+          className="m-1"
+          onClick={handleAddLine}
+        >
+          + Add Line
+        </Button>
       </CollapsibleDiv>
       <hr />
     </div>

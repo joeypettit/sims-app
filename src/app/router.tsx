@@ -6,6 +6,7 @@ import ProjectDetails from "../routes/projects/project-details.tsx";
 import ProjectAreaProposal from "../routes/projects/project-area-proposal.tsx";
 import SettingsPanel from "../routes/settings/settings.tsx";
 import EditAreaTemplate from "../routes/settings/edit-area-template.tsx";
+import CreateLineItem from "../routes/settings/create-line-item.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,11 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
+        path: "/project/:id/area/:areaId/create-line-item",
+        element: <ProjectAreaProposal />,
+        errorElement: <ErrorPage />,
+      },
+      {
         path: "/settings",
         element: <SettingsPanel />,
         errorElement: <ErrorPage />,
@@ -36,6 +42,11 @@ const router = createBrowserRouter([
       {
         path: "/settings/edit-template/:templateId",
         element: <EditAreaTemplate />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "/settings/edit-template/:templateId/create-line-item",
+        element: <CreateLineItem />,
         errorElement: <ErrorPage />,
       },
     ],

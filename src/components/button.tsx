@@ -9,6 +9,7 @@ type ButtonTypes = "submit" | "reset" | "button" | undefined;
 type ButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
+  className?: string;
   disabled?: boolean;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -18,6 +19,7 @@ type ButtonProps = {
 export default function Button({
   children,
   onClick,
+  className,
   disabled = false,
   variant = "primary",
   size = "md",
@@ -66,7 +68,7 @@ export default function Button({
       disabled={disabled}
       className={`text-white rounded-md font-semibold transition-all duration-200 
                   disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 
-                  ${getButtonClasses()} ${getSizeClasses()}`}
+                  ${getButtonClasses()} ${getSizeClasses()} ${className}`}
     >
       {children}
     </button>

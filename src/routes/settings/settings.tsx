@@ -60,6 +60,7 @@ export default function SettingsPanel() {
 
   function handleTemplateModalCancel() {
     setIsCreateTemplateModalOpen(false);
+    setTemplateNameInput("");
     setTemplateModalErrorMessage("");
   }
 

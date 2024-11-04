@@ -45,3 +45,32 @@ export function validateGroupName(groupName: string) {
   // All checks passed
   return null;
 }
+
+export function validateUnitName(unitName: string): string | null {
+  // Trim input
+  unitName = unitName.trim();
+
+  // Check if empty
+  if (!unitName) {
+    return "Unit name is required.";
+  }
+
+  // Length check
+  if (unitName.length < 1 || unitName.length > 20) {
+    return "Unit name must be between 1 and 20 characters.";
+  }
+
+  // Disallow consecutive spaces
+  if (/\s{2,}/.test(unitName)) {
+    return "Unit name cannot contain consecutive spaces.";
+  }
+
+  // Character restriction check (allows letters, numbers, spaces, dashes, underscores, and periods)
+  const namePattern = /^[a-zA-Z0-9-_. ]+$/;
+  if (!namePattern.test(unitName)) {
+    return "Unit name can only contain letters, numbers, spaces, dashes, underscores, and periods.";
+  }
+
+  // All checks passed
+  return null;
+}

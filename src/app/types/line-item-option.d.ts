@@ -6,7 +6,7 @@ export type LineItemOption = {
   lowCostInDollarsPerUnit: number;
   highCostInDollarsPerUnit: number;
   exactCostInDollarsPerUnit?: number;
-  priceAdjustmentPercentage: number;
+  priceAdjustmentDecimal: number;
   description: string?;
   tier: OptionTier;
   isSelected: boolean;
