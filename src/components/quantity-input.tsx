@@ -24,8 +24,7 @@ export default function QuantityInput({
   };
 
   const decrement = () => {
-    console.log("input value", inputValue);
-    if (Number(inputValue) - 1 <= 0) return;
+    if (Number(inputValue) - 1 < 0) return;
     const newValue = Math.floor(Number(inputValue)) - 1;
     setInputValue(newValue.toFixed(2));
     onChange(newValue); // Update parent state with decremented value
@@ -34,6 +33,7 @@ export default function QuantityInput({
   return (
     <div className="flex items-center w-18 bg-gray-100 rounded-md shadow-sm overflow-hidden">
       <button
+        type="button"
         className="flex-shrink-0 text-sims-green-900 hover:text-sims-green-600 hover:shadow-inner focus:outline-none px-1 flex justify-center items-center"
         onClick={decrement}
       >
@@ -42,10 +42,13 @@ export default function QuantityInput({
       <input
         type="text"
         value={inputValue}
+        id="quantity"
+        name="quantity"
         onChange={handleInputChange}
         className="w-full text-center bg-transparent focus:outline-none border-none text-sm"
       />
       <button
+        type="button"
         className="flex-shrink-0 text-sims-green-900 hover:text-sims-green-600 hover:shadow-inner focus:outline-none px-1 flex justify-center items-center"
         onClick={increment}
       >

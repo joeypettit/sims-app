@@ -6,16 +6,11 @@ import { useState } from "react";
 import AddUnitModal from "./add-unit-modal";
 
 type UnitSelectorProps = {
-  name: string;
   value: string;
   onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export default function UnitSelector({
-  name,
-  value,
-  onChange,
-}: UnitSelectorProps) {
+export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
   const [isAddUnitModalOpen, setIsAddUnitModalOpen] = useState(false);
 
   const {
@@ -30,9 +25,6 @@ export default function UnitSelector({
 
   return (
     <div className="select-component">
-      <label htmlFor={name} className="block mb-1 font-medium">
-        Unit:
-      </label>
       {isLoading ? (
         <p>Loading options...</p>
       ) : isError ? (
@@ -40,8 +32,8 @@ export default function UnitSelector({
       ) : (
         <div className="flex flex-row">
           <select
-            id={name}
-            name={name}
+            id={"unit"}
+            name={"unit"}
             value={value}
             onChange={onChange}
             className="border border-gray-300 p-1 rounded w-full"
