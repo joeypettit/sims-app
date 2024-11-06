@@ -109,16 +109,15 @@ export default function EditLineItem() {
       </PanelWindow>
     );
   }
+  console.log("line item", formData);
   return (
     <PanelWindow>
-      <h1 className="text-lg">Create New Line Item</h1>
+      <h1 className="font-bold">Line Item Data: </h1>
       <form onSubmit={handleSubmit} className="p-2">
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="name" className="block mb-1">
-                Name
-              </label>
+            <div className="p-2 rounded bg-slate-50">
+              <label htmlFor="name">Name</label>
               <input
                 type="text"
                 id="name"
@@ -130,10 +129,8 @@ export default function EditLineItem() {
                 className="border border-gray-300 p-1 rounded w-full"
               />
             </div>
-            <div>
-              <label htmlFor="marginDecimal" className="block f mb-1">
-                Margin (Decimal)
-              </label>
+            <div className="p-2 rounded bg-slate-50">
+              <label htmlFor="marginDecimal">Margin (Decimal)</label>
               <input
                 type="number"
                 id="marginDecimal"
@@ -150,7 +147,7 @@ export default function EditLineItem() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <div>
+            <div className="p-2 rounded bg-slate-50">
               <label htmlFor="quantity" className="block mb-1">
                 Quantity
               </label>
@@ -159,7 +156,7 @@ export default function EditLineItem() {
                 onChange={onQuantityChange}
               />
             </div>
-            <div>
+            <div className="p-2 rounded bg-slate-50">
               <label htmlFor={"unit"} className="block mb-1">
                 Unit
               </label>
@@ -170,18 +167,21 @@ export default function EditLineItem() {
             </div>
           </div>
         </div>
-        <div>
-          <h1>Options:</h1>
-          <hr />
+        <div className="py-6">
+          <h1 className="font-bold">Options:</h1>
           {formData.lineItemOptions.map((option, index) => {
             return (
-              <OptionForm
-                key={option.id}
-                option={option}
-                onChange={onOptionChange}
-              />
+              <div>
+                <hr />
+                <OptionForm
+                  key={option.id}
+                  option={option}
+                  onChange={onOptionChange}
+                />
+              </div>
             );
           })}
+          <hr />
         </div>
         <div>
           <button

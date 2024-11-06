@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { LineItemOption } from "../app/types/line-item-option";
-import OptionTierBadge from "./option-tier-badge";
+import { NumericFormat } from "react-number-format";
 
 type OptionCostInputProps = {
   option: LineItemOption;
@@ -42,9 +42,10 @@ export default function OptionCostInput({
     onChange(newOption);
   }
 
-  function onExactCostChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target;
+  function onExactCostChange(value: number | undefined) {
+    if (!value) return;
     const trimmedValue = trimLeadingZeros(value);
+    console.log("value", value);
     if (Number(value) < 0) return;
     const newOption = structuredClone(option);
     newOption.exactCostInDollarsPerUnit = Number(trimmedValue);
@@ -59,52 +60,64 @@ export default function OptionCostInput({
     return value;
   }
 
-  console.log("option", option);
   return (
-    <div className="p-4">
-      <div>Cost:</div>
-      <div className="flex flex-row justify-around">
-        <div className="flex justify-center items-center mb-4">
-          <label className="mr-2">Range</label>
-          <input
-            type="checkbox"
-            checked={!useExactCost}
-            onChange={() => handleToggle(false)}
-            className="cursor-pointer bg-sims-green-900"
-          />
+    <div className="pr-2">
+      <div></div>
+      <div className="flex flex-row justify-between">
+        <div>
+          Cost <span className="text-slate-500">(per unit)</span>:
         </div>
-        <div className="flex justify-center items-center mb-4">
-          <label className="mr-2">Exact</label>
-          <input
-            type="checkbox"
-            checked={useExactCost}
-            onChange={() => handleToggle(true)}
-            className="cursor-pointer sims-green-900"
-          />
+        <div className="flex flex-row gap-2">
+          <div className="flex flex-row justify-center items-center">
+            <label>Range </label>
+            <input
+              type="checkbox"
+              checked={!useExactCost}
+              onChange={() => handleToggle(false)}
+              className="cursor-pointer bg-sims-green-900"
+            />
+          </div>
+          <div className="flex flex-row justify-center items-center">
+            <label>Exact </label>
+            <input
+              type="checkbox"
+              checked={useExactCost}
+              onChange={() => handleToggle(true)}
+              className="cursor-pointer sims-green-900 "
+            />
+          </div>
         </div>
       </div>
 
       {useExactCost ? (
-        <div className="mb-4">
+        <div>
           <label htmlFor="exactCostInDollarsPerUnit" className="hidden mb-1">
             Exact Cost (Per Unit)
           </label>
           <div className="flex flex-row justify-center items-center">
             <span className="p-1">$</span>
-            <input
+            <NumericFormat
+              value={option.exactCostInDollarsPerUnit}
+              prefix="$"
+              onValueChange={(values, sourceInfo) => {
+                onExactCostChange(values.floatValue);
+                console.log(values, sourceInfo);
+              }}
+            />
+            {/* <input
               type="number"
               id="exactCostInDollarsPerUnit"
               name="exactCostInDollarsPerUnit"
-              placeholder="Exact Cost (per unit)"
+              placeholder="Exact Cost"
               value={option.exactCostInDollarsPerUnit}
               onChange={onExactCostChange}
               disabled={!useExactCost}
               className="border border-gray-300 p-1 rounded w-full"
-            />
+            /> */}
           </div>
         </div>
       ) : (
-        <div className="mb-4">
+        <div>
           <label className="mb-1 hidden">Cost Range (Per Unit):</label>
           <div className="flex space-x-2">
             <div className="flex flex-row justify-center items-center">
@@ -112,7 +125,7 @@ export default function OptionCostInput({
               <input
                 type="number"
                 name="lowCostInDollarsPerUnit"
-                placeholder="Low Cost (per unit)"
+                placeholder="Low"
                 value={option.lowCostInDollarsPerUnit?.toString()}
                 onChange={onLowCostChange}
                 disabled={useExactCost}
@@ -123,7 +136,7 @@ export default function OptionCostInput({
               <input
                 type="number"
                 name="highCostInDollarsPerUnit"
-                placeholder="High Cost (per unit)"
+                placeholder="High"
                 value={option.highCostInDollarsPerUnit?.toString()}
                 onChange={onHighCostChange}
                 disabled={useExactCost}

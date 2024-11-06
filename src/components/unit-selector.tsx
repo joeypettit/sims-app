@@ -32,7 +32,7 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
   }
 
   return (
-    <div className="select-component">
+    <div>
       {isLoading ? (
         <p>Loading options...</p>
       ) : isError ? (

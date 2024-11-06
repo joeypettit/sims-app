@@ -31,7 +31,7 @@ export default function QuantityInput({
   };
 
   return (
-    <div className="flex items-center w-18 bg-gray-100 rounded-md shadow-sm overflow-hidden">
+    <div className="flex p-1 items-center w-18 bg-white border border-gray-300 rounded overflow-hidden">
       <button
         type="button"
         className="flex-shrink-0 text-sims-green-900 hover:text-sims-green-600 hover:shadow-inner focus:outline-none px-1 flex justify-center items-center"
@@ -45,7 +45,7 @@ export default function QuantityInput({
         id="quantity"
         name="quantity"
         onChange={handleInputChange}
-        className="w-full text-center bg-transparent focus:outline-none border-none text-sm"
+        className="w-full text-center bg-transparent focus:outline-none border-none"
       />
       <button
         type="button"
