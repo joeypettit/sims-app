@@ -7,7 +7,7 @@ import AddUnitModal from "./add-unit-modal";
 
 type UnitSelectorProps = {
   value: string;
-  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  onChange: (selectedUnit: LineItemUnit) => void;
 };
 
 export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
@@ -23,6 +23,14 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
     queryFn: getUnits,
   });
 
+  function handleUnitSelection(e: React.ChangeEvent<HTMLSelectElement>) {
+    const selectedUnitId = e.target.value;
+    const selectedUnit = units?.find((unit) => unit.id == selectedUnitId);
+    if (selectedUnit) {
+      onChange(selectedUnit);
+    }
+  }
+
   return (
     <div className="select-component">
       {isLoading ? (
@@ -35,7 +43,7 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
             id={"unit"}
             name={"unit"}
             value={value}
-            onChange={onChange}
+            onChange={handleUnitSelection}
             className="border border-gray-300 p-1 rounded w-full"
             required
           >
