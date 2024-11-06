@@ -7,6 +7,7 @@ export type LineItem = {
   name: string;
   quantity: number?;
   unit: LineItemUnit;
+  unitId: string;
   marginDecimal: number;
   indexInGroup: number;
   lineItemGroup: LineItemGroup;

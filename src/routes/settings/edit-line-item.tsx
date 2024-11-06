@@ -1,107 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { LineItemOption } from "../../app/types/line-item-option";
 import PanelWindow from "../../components/panel-window";
-import { useLocation, useNavigation } from "react-router-dom";
+import { useLocation, useNavigation, useParams } from "react-router-dom";
 import type { LineItemUnit } from "../../app/types/line-item-unit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getUnits } from "../../api/api";
 import UnitSelector from "../../components/unit-selector";
-import { createLineItem } from "../../api/api";
+import { createBlankLineItem } from "../../api/api";
 import type { LineItemGroup } from "../../app/types/line-item-group";
 import QuantityInput from "../../components/quantity-input";
+import type { LineItem } from "../../app/types/line-item";
+import SimsSpinner from "../../components/sims-spinner/sims-spinner";
+import { getLineItem } from "../../api/api";
 
-const optionTierOptions = [
-  { id: "1", name: "Premium" },
-  { id: "2", name: "Designer" },
-  { id: "3", name: "Luxury" },
-];
+// type LineItemFormData = {
+//   name: string;
+//   quantity: number;
+//   unitId: string;
+//   marginDecimal: number;
+//   lineItemOptions: OptionFormData[];
+// };
 
-type LineItemFormData = {
-  name: string;
-  quantity: number;
-  unitId: string;
-  marginDecimal: number;
-  lineItemOptions: OptionFormData[];
-};
+// export type OptionFormData = {
+//   description: string;
+//   highCostInDollarsPerUnit: number;
+//   lowCostInDollarsPerUnit: number;
+//   exactCostInDollarsPerUnit: number;
+//   priceAdjustmentDecimal: number;
+//   tier: { name: string; tierLevel: number };
+// };
 
-export type OptionFormData = {
-  description: string;
-  highCostInDollarsPerUnit: number;
-  lowCostInDollarsPerUnit: number;
-  exactCostInDollarsPerUnit: number;
-  priceAdjustmentDecimal: number;
-  tier: { name: string; tierLevel: number };
-};
-
-export default function CreateLineItem() {
+export default function EditLineItem() {
   const queryClient = useQueryClient();
   const location = useLocation();
-  const group: LineItemGroup = location.state.group;
-  const navigate = useNavigation();
-  const [formData, setFormData] = useState<LineItemFormData>(() => {
-    return {
-      name: "",
-      quantity: 0,
-      unitId: "",
-      marginDecimal: 0.1,
-      lineItemOptions: [
-        {
-          description: "",
-          highCostInDollarsPerUnit: 0,
-          lowCostInDollarsPerUnit: 0,
-          exactCostInDollarsPerUnit: 0,
-          priceAdjustmentDecimal: 0,
-          tier: { name: "Premium", tierLevel: 0 },
-        },
-        {
-          description: "",
-          highCostInDollarsPerUnit: 0,
-          lowCostInDollarsPerUnit: 0,
-          exactCostInDollarsPerUnit: 0,
-          priceAdjustmentDecimal: 0,
-          tier: { name: "Designer", tierLevel: 1 },
-        },
-        {
-          description: "",
-          highCostInDollarsPerUnit: 0,
-          lowCostInDollarsPerUnit: 0,
-          exactCostInDollarsPerUnit: 0,
-          priceAdjustmentDecimal: 0,
-          tier: { name: "Luxury", tierLevel: 2 },
-        },
-      ],
-    };
+  const { lineItemId } = useParams();
+  const [formData, setFormData] = useState<LineItem | undefined>(undefined);
+
+  const lineItemQuery = useQuery({
+    queryKey: ["line-item", lineItemId],
+    queryFn: async () => {
+      if (!lineItemId) {
+        throw Error("Line Item Id is required.");
+      }
+      const result = await getLineItem(lineItemId);
+      return result;
+    },
+    staleTime: Infinity,
+    refetchOnMount: "always",
   });
 
   // Handle input changes
-  function handleLineItemChangeEvent(e: React.ChangeEvent<HTMLInputElement>) {
-    const { name, value } = e.target;
-    if (name == "marginDecimal" || name == "quantity") {
-      setFormData({ ...formData, [name]: parseFloat(value) });
-      return;
+  function onNameInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    if (formData) {
+      setFormData({ ...formData, name: value });
     }
-    setFormData({ ...formData, [name]: value });
+  }
+
+  function onMarginInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    if (formData) {
+      setFormData({ ...formData, marginDecimal: Number(value) });
+    }
   }
 
   function onQuantityChange(newValue: number) {
-    setFormData({ ...formData, quantity: newValue });
+    if (formData) {
+      setFormData({ ...formData, quantity: newValue });
+    }
   }
 
-  function handleUnitSelection(e: React.ChangeEvent<HTMLSelectElement>) {
-    const selectedUnitId = e.target.value;
-    setFormData({ ...formData, unitId: selectedUnitId });
+  function handleUnitSelection(selectedUnit: LineItemUnit) {
+    if (formData) {
+      setFormData({ ...formData, unit: { ...selectedUnit } });
+    }
   }
-
-  const createLineItemMutation = useMutation({
-    mutationFn: createLineItem,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["area-template"] });
-      //   window.history.back();
-    },
-    onError: (error) => {
-      console.error("Error creating line item:", error);
-    },
-  });
 
   //   function handleOptionChangeEvent(
   //     e: React.ChangeEvent<HTMLInputElement>,
@@ -129,13 +102,23 @@ export default function CreateLineItem() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    createLineItemMutation.mutate({
-      groupId: group.id,
-      marginDecimal: formData.marginDecimal,
-      name: formData.name,
-      quantity: formData.quantity,
-      unitId: formData.unitId,
-    });
+  }
+
+  useEffect(() => {
+    // prepopulate local state for form
+    if (lineItemQuery.data && !formData) {
+      setFormData(lineItemQuery.data);
+    }
+  }, [lineItemQuery.data, formData]);
+
+  if (!formData) {
+    return (
+      <PanelWindow>
+        <div className="flex justify-center items-center w-full h-full">
+          <SimsSpinner centered />
+        </div>
+      </PanelWindow>
+    );
   }
 
   return (
@@ -154,7 +137,7 @@ export default function CreateLineItem() {
                 name="name"
                 autoComplete="off"
                 value={formData.name}
-                onChange={handleLineItemChangeEvent}
+                onChange={onNameInputChange}
                 required
                 className="border border-gray-300 p-1 rounded w-full"
               />
@@ -169,7 +152,7 @@ export default function CreateLineItem() {
                 name="marginDecimal"
                 autoComplete="off"
                 value={formData.marginDecimal}
-                onChange={handleLineItemChangeEvent}
+                onChange={onMarginInputChange}
                 step="0.01"
                 max={"0.99"}
                 min={"0"}
@@ -184,7 +167,7 @@ export default function CreateLineItem() {
                 Quantity
               </label>
               <QuantityInput
-                value={formData.quantity}
+                value={formData.quantity || 0}
                 onChange={onQuantityChange}
               />
             </div>
@@ -193,17 +176,12 @@ export default function CreateLineItem() {
                 Unit
               </label>
               <UnitSelector
-                value={formData.unitId}
+                value={formData?.unit?.id || ""}
                 onChange={handleUnitSelection}
               />
             </div>
           </div>
         </div>
-        {/* {formData.lineItemOptions.map((option, index) => {
-          return (
-
-          );
-        })} */}
         <div>
           <button
             type="submit"

@@ -16,6 +16,7 @@ import type { LineItemGroup } from "../../app/types/line-item-group";
 
 export default function EditAreaTemplate() {
   const queryClient = useQueryClient();
+  const [panelIsLoading, setPanelIsLoading] = useState(false);
   const navigate = useNavigate();
   const { templateId } = useParams();
   const [groupNameInput, setGroupNameInput] = useState("");
@@ -139,7 +140,11 @@ export default function EditAreaTemplate() {
     );
   }
 
-  if (categoriesQuery.isLoading || areaTemplateQuery.isLoading) {
+  if (
+    panelIsLoading ||
+    categoriesQuery.isLoading ||
+    areaTemplateQuery.isLoading
+  ) {
     return (
       <PanelWindow>
         <div className="flex justify-center items-center w-full h-full">
@@ -165,7 +170,12 @@ export default function EditAreaTemplate() {
             {areaTemplateQuery.data?.projectArea.lineItemGroups.map(
               (group: LineItemGroup) => {
                 if (category.id == group.groupCategory.id)
-                  return <LineItemGroupContainer group={group} />;
+                  return (
+                    <LineItemGroupContainer
+                      group={group}
+                      setPanelIsLoading={setPanelIsLoading}
+                    />
+                  );
               }
             )}
             <Button

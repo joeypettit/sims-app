@@ -13,21 +13,21 @@ export default function QuantityInput({
     const newValue = e.target.value;
     if (/^\d*\.?\d{0,2}$/.test(newValue)) {
       setInputValue(newValue);
-      onChange(parseFloat(newValue) || 0); // Propagate the value to the parent
+      onChange(parseFloat(newValue) || 0);
     }
   };
 
   const increment = () => {
     const newValue = Math.floor(Number(inputValue)) + 1;
     setInputValue(newValue.toFixed(2));
-    onChange(newValue); // Update parent state with incremented value
+    onChange(newValue);
   };
 
   const decrement = () => {
     if (Number(inputValue) - 1 < 0) return;
     const newValue = Math.floor(Number(inputValue)) - 1;
     setInputValue(newValue.toFixed(2));
-    onChange(newValue); // Update parent state with decremented value
+    onChange(newValue);
   };
 
   return (

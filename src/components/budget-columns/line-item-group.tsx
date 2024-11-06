@@ -4,53 +4,68 @@ import CollapsibleDiv from "../collapsible-div";
 import { formatNumberWithCommas } from "../../util/utils";
 import Button from "../button";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { createBlankLineItem } from "../../api/api";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
+  setPanelIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
+export default function LineItemGroupDisplay({
+  group,
+  setPanelIsLoading,
+}: LineItemGroupDisplayProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const currentPath = location.pathname;
 
   function getGroupsTotalSalePrice() {
-    if (props.group.totalSalePrice) {
+    if (group.totalSalePrice) {
       if (
-        props.group.totalSalePrice?.lowPriceInDollars <= 0 &&
-        props.group.totalSalePrice?.highPriceInDollars <= 0
+        group.totalSalePrice?.lowPriceInDollars <= 0 &&
+        group.totalSalePrice?.highPriceInDollars <= 0
       ) {
         return "-";
       }
       const lowPrice = formatNumberWithCommas(
-        props.group.totalSalePrice?.lowPriceInDollars
+        group.totalSalePrice?.lowPriceInDollars
       );
       const highPrice = formatNumberWithCommas(
-        props.group.totalSalePrice?.highPriceInDollars
+        group.totalSalePrice?.highPriceInDollars
       );
       return `$${lowPrice} - $${highPrice}`;
     }
     return "-";
   }
 
-  function handleAddLine() {
-    navigate(`${currentPath}/create-line-item`, {
-      state: { group: props.group },
-    });
+  const createLineItemMutation = useMutation({
+    mutationFn: async ({ groupId }: { groupId: string }) => {
+      setPanelIsLoading(true);
+      const result = await createBlankLineItem({ groupId });
+      return result;
+    },
+    onSuccess: (data) => {
+      setPanelIsLoading(false);
+      navigate(`/edit-line-item/${data.id}`);
+    },
+    onError: (error) => {
+      console.error("Error creating line item:", error);
+    },
+  });
+
+  function handleCreateLineItem() {
+    createLineItemMutation.mutate({ groupId: group.id });
   }
 
   return (
     <div className="py-2">
-      <CollapsibleDiv
-        title={props.group.name}
-        price={getGroupsTotalSalePrice()}
-      >
-        {props.group.lineItems.map((lineItem) => {
+      <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()}>
+        {group.lineItems.map((lineItem) => {
           return (
             <LineItemDisplay
               key={lineItem.id}
               lineItem={lineItem}
-              group={props.group}
+              group={group}
             />
           );
         })}
@@ -58,7 +73,7 @@ export default function LineItemGroupDisplay(props: LineItemGroupDisplayProps) {
           size={"xs"}
           variant="secondary"
           className="m-1"
-          onClick={handleAddLine}
+          onClick={handleCreateLineItem}
         >
           + Add Line
         </Button>

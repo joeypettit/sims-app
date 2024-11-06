@@ -8,6 +8,7 @@ import type { LineItem } from "../app/types/line-item";
 import type { LineItemGroup } from "../app/types/line-item-group";
 import type { GroupCategory } from "../app/types/group-category";
 import type { AreaTemplate } from "../app/types/area-template";
+import { simulateNetworkLatency } from "../util/utils";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 
 export async function getAllProjects(): Promise<Project[]> {
@@ -170,5 +171,25 @@ export async function createUnit({ unitName }: { unitName: string }) {
     return response.data;
   } catch (error) {
     throw new Error(`Error creating new unit: ${error}`);
+  }
+}
+
+export async function createBlankLineItem({ groupId }: { groupId: string }) {
+  try {
+    const response = await axios.post(`/api/line-items/create-blank`, {
+      groupId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error creating new line Item: ${error}`);
+  }
+}
+
+export async function getLineItem(lineItemId: string): Promise<LineItem> {
+  try {
+    const response = await axios.get<LineItem>(`/api/line-items/${lineItemId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error fetching line item with ID ${lineItemId}: ${error}`);
   }
 }

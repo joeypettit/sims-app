@@ -148,7 +148,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
       <div className="flex flex-col text-center items-center pr-4">
         <h1>{props.lineItem.name}</h1>
         <QuantityInput value={quantity} onChange={onQuanityChange} />
-        <h6 className="text-gray-500">{props.lineItem.unit.name}</h6>
+        <h6 className="text-gray-500">{props.lineItem?.unit?.name}</h6>
       </div>
       {props.lineItem.lineItemOptions.map((option, index) => {
         return (
