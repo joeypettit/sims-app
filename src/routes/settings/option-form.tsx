@@ -1,34 +1,66 @@
-// import { OptionFormData } from "./create-line-item";
+import type { LineItemOption } from "../../app/types/line-item-option";
+import { isValidNumber } from "../../util/form-validation";
 
-// type OptionFormProps = {
-//   option: OptionFormData;
-//   update
-// };
+type OptionFormProps = {
+  option: LineItemOption;
+  onChange: (updatedOption: LineItemOption) => void;
+};
 
-// export default function OptionForm({ option }: OptionFormProps) {
-//     function handleChangeEvent(e: React.ChangeEvent<HTMLInputElement>) {
-//         const { name, value } = e.target;
-//         setFormData({ ...formData, [name]: value });
-//       }
+export default function OptionForm({ option, onChange }: OptionFormProps) {
+  function onDescriptionChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    const { value } = e.target;
+    const newOption = structuredClone(option);
+    newOption.description = value;
+    onChange(newOption);
+  }
 
-//   return (
-//     <div>
-//       <h1>{option.tier.name}</h1>
-//       <label htmlFor="marginDecimal" className="block mb-1">
-//         Price Adjustment
-//       </label>
-//       <input
-//         type="number"
-//         id="priceAdjustmentDecimal"
-//         name="priceAdjustmentDecimal"
-//         value={option.priceAdjustmentDecimal}
-//         onChange={(e) => }
-//         step="0.01"
-//         max={"0.99"}
-//         min={"0"}
-//         required
-//         className="border border-gray-300 p-1 rounded w-full"
-//       />
-//     </div>
-//   );
-// }
+  function onPriceAdjustmentChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value } = e.target;
+    if (isNaN(Number(value))) return;
+    if (Number(value) < 0) return;
+    const valueAsDecimal = Number(value) / 100;
+    const newOption = structuredClone(option);
+    newOption.priceAdjustmentDecimal = valueAsDecimal;
+    onChange(newOption);
+  }
+
+  return (
+    <div>
+      <h1>{option.tier && option.tier.name}</h1>
+      <div>
+        <label htmlFor="marginDecimal" className="block mb-1">
+          Price Adjustment
+        </label>
+        <div className="flex flex-row justify-center items-center">
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*\.?[0-9]*"
+            id="priceAdjustmentDecimal"
+            name="priceAdjustmentDecimal"
+            value={option.priceAdjustmentDecimal * 100}
+            onChange={onPriceAdjustmentChange}
+            required
+            className="border border-gray-300 p-1 rounded w-full"
+          />
+          <span>%</span>
+        </div>
+        <div>
+          <label htmlFor="description" className="block mb-1">
+            Description
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            value={option.description || ""}
+            onChange={onDescriptionChange}
+            required
+            className="border border-gray-300 p-1 rounded w-full"
+            rows={4}
+            style={{ resize: "none" }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

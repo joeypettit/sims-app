@@ -12,6 +12,7 @@ import QuantityInput from "../../components/quantity-input";
 import type { LineItem } from "../../app/types/line-item";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getLineItem } from "../../api/api";
+import OptionForm from "./option-form";
 
 // type LineItemFormData = {
 //   name: string;
@@ -70,35 +71,24 @@ export default function EditLineItem() {
     }
   }
 
-  function handleUnitSelection(selectedUnit: LineItemUnit) {
+  function onUnitSelection(selectedUnit: LineItemUnit) {
     if (formData) {
       setFormData({ ...formData, unit: { ...selectedUnit } });
     }
   }
 
-  //   function handleOptionChangeEvent(
-  //     e: React.ChangeEvent<HTMLInputElement>,
-  //     optionIndex: number
-  //   ) {
-  //     const { name, value } = e.target;
-  //     console.log("formData before update:", formData);
-
-  //     // Create a deep copy to ensure immutability
-  //     const updatedData = {
-  //       ...formData,
-  //       lineItemOptions: [...formData.lineItemOptions],
-  //     };
-
-  //     // Update the specific field in the specific option
-  //     updatedData.lineItemOptions[optionIndex] = {
-  //       ...updatedData.lineItemOptions[optionIndex],
-  //       [name]: value,
-  //     };
-
-  //     console.log("updatedData after update:", updatedData);
-
-  //     setFormData(updatedData);
-  //   }
+  function onOptionChange(updatedOption: LineItemOption) {
+    const updatedFormData = structuredClone(formData);
+    const index = updatedFormData?.lineItemOptions.findIndex((o) => {
+      return o.id === updatedOption.id;
+    });
+    console.log("finding", updatedFormData, index);
+    if (index == -1 || index == undefined || !updatedFormData) {
+      throw Error("Cannot identify option to update");
+    }
+    updatedFormData.lineItemOptions[index] = updatedOption;
+    setFormData(updatedFormData);
+  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -120,7 +110,6 @@ export default function EditLineItem() {
       </PanelWindow>
     );
   }
-
   return (
     <PanelWindow>
       <h1 className="text-lg">Create New Line Item</h1>
@@ -177,10 +166,24 @@ export default function EditLineItem() {
               </label>
               <UnitSelector
                 value={formData?.unit?.id || ""}
-                onChange={handleUnitSelection}
+                onChange={onUnitSelection}
               />
             </div>
           </div>
+        </div>
+        <div>
+          <h1>Options:</h1>
+          <hr />
+          {formData.lineItemOptions.map((option) => {
+            console.log("option map");
+            return (
+              <OptionForm
+                key={option.id}
+                option={option}
+                onChange={onOptionChange}
+              />
+            );
+          })}
         </div>
         <div>
           <button

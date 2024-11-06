@@ -74,3 +74,18 @@ export function validateUnitName(unitName: string): string | null {
   // All checks passed
   return null;
 }
+
+export function isValidNumber(input: string) {
+  // Allow empty input
+  if (input === "") return true;
+
+  // Regular expression to allow only valid numeric values
+  const regex = /^-?\d*\.?\d*$/;
+
+  // Check for multiple decimal points or invalid characters
+  if (!regex.test(input)) {
+    return false;
+  }
+
+  return true;
+}

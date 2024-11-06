@@ -1,14 +1,10 @@
-import testProjects from "./test-project.json";
-import testProjectAreas from "./test-areas.json";
 import { ProjectArea } from "../app/types/project-area";
 import { Project } from "../app/types/project";
 import axios from "axios";
 import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItem } from "../app/types/line-item";
-import type { LineItemGroup } from "../app/types/line-item-group";
 import type { GroupCategory } from "../app/types/group-category";
 import type { AreaTemplate } from "../app/types/area-template";
-import { simulateNetworkLatency } from "../util/utils";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 
 export async function getAllProjects(): Promise<Project[]> {
