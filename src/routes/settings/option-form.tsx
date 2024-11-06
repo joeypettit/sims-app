@@ -1,5 +1,6 @@
 import type { LineItemOption } from "../../app/types/line-item-option";
-import { isValidNumber } from "../../util/form-validation";
+import OptionCostInput from "../../components/option-cost-input";
+import OptionTierBadge from "../../components/option-tier-badge";
 
 type OptionFormProps = {
   option: LineItemOption;
@@ -26,8 +27,11 @@ export default function OptionForm({ option, onChange }: OptionFormProps) {
 
   return (
     <div>
-      <h1>{option.tier && option.tier.name}</h1>
       <div>
+        <OptionTierBadge tier={option.optionTier}></OptionTierBadge>
+      </div>{" "}
+      <div>
+        <OptionCostInput option={option} onChange={onChange} />
         <label htmlFor="marginDecimal" className="block mb-1">
           Price Adjustment
         </label>

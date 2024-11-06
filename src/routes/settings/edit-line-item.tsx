@@ -82,7 +82,6 @@ export default function EditLineItem() {
     const index = updatedFormData?.lineItemOptions.findIndex((o) => {
       return o.id === updatedOption.id;
     });
-    console.log("finding", updatedFormData, index);
     if (index == -1 || index == undefined || !updatedFormData) {
       throw Error("Cannot identify option to update");
     }
@@ -174,8 +173,7 @@ export default function EditLineItem() {
         <div>
           <h1>Options:</h1>
           <hr />
-          {formData.lineItemOptions.map((option) => {
-            console.log("option map");
+          {formData.lineItemOptions.map((option, index) => {
             return (
               <OptionForm
                 key={option.id}
