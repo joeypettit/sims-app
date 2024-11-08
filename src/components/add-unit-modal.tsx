@@ -71,6 +71,7 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
           type="text"
           id="unit-name"
           name="unit-name"
+          autoComplete="off"
           ref={inputRef}
           value={unitNameInput}
           onChange={(e) => setUnitNameInput(e.target.value)}

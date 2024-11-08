@@ -189,3 +189,82 @@ export async function getLineItem(lineItemId: string): Promise<LineItem> {
     throw new Error(`Error fetching line item with ID ${lineItemId}: ${error}`);
   }
 }
+
+export const updateLineItem = async ({
+  name,
+  lineItemId,
+  groupId,
+  quantity,
+  unitId,
+  marginDecimal,
+  lineItemOptions,
+}: {
+  name?: string;
+  lineItemId: string;
+  groupId?: string;
+  quantity?: number;
+  unitId?: string;
+  marginDecimal?: number;
+  lineItemOptions?: LineItemOption[];
+}) => {
+  try {
+    const response = await axios.put(`/api/line-items/${lineItemId}`, {
+      name,
+      quantity,
+      groupId,
+      unitId,
+      marginDecimal,
+      lineItemOptions,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error updating line item with ID ${lineItemId}: ${error}`);
+  }
+  try {
+    const response = await axios.put("/api/line-item");
+  } catch (error) {}
+};
+
+// export const updateLineItemOption = async ({
+//   optionId,
+//   description,
+//   priceAdjustmentDecimal,
+//   exactCostInDollarsPerUnit,
+//   highCostInDollarsPerUnit,
+//   lowCostInDollarsPerUnit,
+//   isSelected,
+//   optionTierId,
+// }: {
+//   optionId: string;
+//   description?: string;
+//   priceAdjustmentDecimal?: number;
+//   exactCostInDollarsPerUnit?: number;
+//   highCostInDollarsPerUnit?: number;
+//   lowCostInDollarsPerUnit?: number;
+//   isSelected?: boolean;
+//   optionTierId?: string;
+// }) => {
+//   try {
+//     // Construct the request data object
+//     let dataObj: any = {
+//       description,
+//       priceAdjustmentDecimal,
+//       exactCostInDollarsPerUnit,
+//       highCostInDollarsPerUnit,
+//       lowCostInDollarsPerUnit,
+//       isSelected,
+//       optionTierId,
+//     };
+
+//     const response = await axios.put(
+//       `/api/line-item-options/${optionId}`,
+//       dataObj
+//     );
+
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(
+//       `Error updating line item option with ID ${optionId}: ${error}`
+//     );
+//   }
+// };

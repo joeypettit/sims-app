@@ -5,11 +5,12 @@ import { LineItemUnit } from "./line-item-unit";
 export type LineItem = {
   id: string;
   name: string;
-  quantity: number?;
+  quantity: number;
   unit: LineItemUnit;
   unitId: string;
   marginDecimal: number;
   indexInGroup: number;
   lineItemGroup: LineItemGroup;
+  lineItemGroupId: string;
   lineItemOptions: LineItemOption[];
 };

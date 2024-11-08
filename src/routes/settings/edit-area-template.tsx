@@ -124,6 +124,7 @@ export default function EditAreaTemplate() {
             </label>
             <input
               type="text"
+              autoComplete="off"
               id="group-name"
               value={groupNameInput}
               onChange={(e) => setGroupNameInput(e.target.value)}
@@ -172,6 +173,7 @@ export default function EditAreaTemplate() {
                 if (category.id == group.groupCategory.id)
                   return (
                     <LineItemGroupContainer
+                      key={category.id}
                       group={group}
                       setPanelIsLoading={setPanelIsLoading}
                     />

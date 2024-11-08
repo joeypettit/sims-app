@@ -40,7 +40,6 @@ export default function SettingsPanel() {
       );
     },
     onSuccess: (data, variables, context) => {
-      console.log("template Created with id", data.id);
       setTemplateNameInput("");
       setIsCreateTemplateModalOpen(false);
       navigate(`/settings/edit-template/${data.id}`);
@@ -96,6 +95,7 @@ export default function SettingsPanel() {
           </label>
           <input
             type="text"
+            autoComplete="off"
             id="template-name"
             name="template-name"
             ref={inputRef}

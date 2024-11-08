@@ -1,3 +1,4 @@
+import { NumericFormat } from "react-number-format";
 import type { LineItemOption } from "../../app/types/line-item-option";
 import OptionCostInput from "../../components/option-cost-input";
 import OptionTierBadge from "../../components/option-tier-badge";
@@ -15,17 +16,17 @@ export default function OptionForm({ option, onChange }: OptionFormProps) {
     onChange(newOption);
   }
 
-  function onPriceAdjustmentChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target;
-    console.log("value", value);
-    if (isNaN(Number(value))) return;
-    if (Number(value) < 0) return;
-    let valueAsDecimal = Number(value) / 100;
-    console.log("valueasdecimal", valueAsDecimal);
-    console.log("valueasdecimal", valueAsDecimal * 100);
+  function onPriceAdjustmentChange(value: number | undefined) {
+    if (!value) return;
+    let valueAsDecimal = value / 100;
     const newOption = structuredClone(option);
     newOption.priceAdjustmentDecimal = valueAsDecimal;
     onChange(newOption);
+  }
+
+  function getPriceAdjustmentPercentage() {
+    console.log(option.priceAdjustmentDecimal * 100);
+    return option.priceAdjustmentDecimal * 100;
   }
 
   return (
@@ -40,17 +41,20 @@ export default function OptionForm({ option, onChange }: OptionFormProps) {
         <div className="p-2 rounded bg-slate-50">
           <label htmlFor="marginDecimal">Price Adjustment</label>
           <div className="flex flex-row justify-center items-center">
-            <input
-              type="number"
-              id="priceAdjustmentDecimal"
-              name="priceAdjustmentDecimal"
-              value={14}
-              onChange={onPriceAdjustmentChange}
-              maxLength={1}
-              required
+            <NumericFormat
               className="border border-gray-300 p-1 rounded w-full"
+              autoComplete="off"
+              id="exactCostInDollarsPerUnit"
+              name="exactCostInDollarsPerUnit"
+              value={getPriceAdjustmentPercentage()}
+              suffix="%"
+              allowNegative={false}
+              decimalScale={2}
+              placeholder="Exact Cost"
+              onValueChange={(values) => {
+                onPriceAdjustmentChange(values.floatValue);
+              }}
             />
-            <span>%</span>
           </div>
         </div>
       </div>
@@ -59,9 +63,9 @@ export default function OptionForm({ option, onChange }: OptionFormProps) {
         <textarea
           id="description"
           name="description"
+          autoComplete="off"
           value={option.description || ""}
           onChange={onDescriptionChange}
-          required
           className="border border-gray-300 p-1 rounded w-full"
           rows={4}
           style={{ resize: "none" }}

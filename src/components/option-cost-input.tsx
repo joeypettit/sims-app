@@ -15,49 +15,42 @@ export default function OptionCostInput({
 
   const handleToggle = (isExact: boolean) => {
     const newOption = structuredClone(option);
-    newOption.highCostInDollarsPerUnit = undefined;
-    newOption.lowCostInDollarsPerUnit = undefined;
-    newOption.exactCostInDollarsPerUnit = undefined;
-    console.log("new options", newOption);
+    if (isExact) {
+      newOption.highCostInDollarsPerUnit = null;
+      newOption.lowCostInDollarsPerUnit = null;
+      newOption.exactCostInDollarsPerUnit = 0;
+    }
+    if (!isExact) {
+      newOption.highCostInDollarsPerUnit = 0;
+      newOption.lowCostInDollarsPerUnit = 0;
+      newOption.exactCostInDollarsPerUnit = null;
+    }
     onChange(newOption);
     setUseExactCost(isExact);
   };
 
-  function onLowCostChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target;
-    const trimmedValue = trimLeadingZeros(value);
-    if (Number(value) < 0) return;
+  function onLowCostChange(value: number | undefined) {
+    if (!value) return;
     const newOption = structuredClone(option);
-    newOption.lowCostInDollarsPerUnit = Number(trimmedValue);
-    newOption.exactCostInDollarsPerUnit = undefined;
+    newOption.exactCostInDollarsPerUnit = null;
+    newOption.lowCostInDollarsPerUnit = value;
     onChange(newOption);
   }
-  function onHighCostChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target;
-    const trimmedValue = trimLeadingZeros(value);
-    if (Number(value) < 0) return;
+  function onHighCostChange(value: number | undefined) {
+    if (!value) return;
     const newOption = structuredClone(option);
-    newOption.highCostInDollarsPerUnit = Number(trimmedValue);
-    newOption.exactCostInDollarsPerUnit = undefined;
+    newOption.exactCostInDollarsPerUnit = null;
+    newOption.highCostInDollarsPerUnit = value;
     onChange(newOption);
   }
 
   function onExactCostChange(value: number | undefined) {
     if (!value) return;
-    const trimmedValue = trimLeadingZeros(value);
-    console.log("value", value);
-    if (Number(value) < 0) return;
     const newOption = structuredClone(option);
-    newOption.exactCostInDollarsPerUnit = Number(trimmedValue);
-    newOption.highCostInDollarsPerUnit = undefined;
-    newOption.lowCostInDollarsPerUnit = undefined;
+    newOption.exactCostInDollarsPerUnit = value;
+    newOption.highCostInDollarsPerUnit = null;
+    newOption.lowCostInDollarsPerUnit = null;
     onChange(newOption);
-  }
-
-  function trimLeadingZeros(value: string) {
-    value = value.toString();
-    value = value.replace(/^0+(?=\d|\.|$)/, "");
-    return value;
   }
 
   return (
@@ -72,6 +65,7 @@ export default function OptionCostInput({
             <label>Range </label>
             <input
               type="checkbox"
+              autoComplete="off"
               checked={!useExactCost}
               onChange={() => handleToggle(false)}
               className="cursor-pointer bg-sims-green-900"
@@ -81,6 +75,7 @@ export default function OptionCostInput({
             <label>Exact </label>
             <input
               type="checkbox"
+              autoComplete="off"
               checked={useExactCost}
               onChange={() => handleToggle(true)}
               className="cursor-pointer sims-green-900 "
@@ -95,25 +90,21 @@ export default function OptionCostInput({
             Exact Cost (Per Unit)
           </label>
           <div className="flex flex-row justify-center items-center">
-            <span className="p-1">$</span>
             <NumericFormat
-              value={option.exactCostInDollarsPerUnit}
-              prefix="$"
-              onValueChange={(values, sourceInfo) => {
-                onExactCostChange(values.floatValue);
-                console.log(values, sourceInfo);
-              }}
-            />
-            {/* <input
-              type="number"
+              className="border border-gray-300 p-1 rounded w-full"
+              autoComplete="off"
               id="exactCostInDollarsPerUnit"
               name="exactCostInDollarsPerUnit"
-              placeholder="Exact Cost"
               value={option.exactCostInDollarsPerUnit}
-              onChange={onExactCostChange}
+              prefix="$"
+              allowNegative={false}
+              decimalScale={2}
+              placeholder="Exact Cost"
               disabled={!useExactCost}
-              className="border border-gray-300 p-1 rounded w-full"
-            /> */}
+              onValueChange={(values) => {
+                onExactCostChange(values.floatValue);
+              }}
+            />
           </div>
         </div>
       ) : (
@@ -121,26 +112,36 @@ export default function OptionCostInput({
           <label className="mb-1 hidden">Cost Range (Per Unit):</label>
           <div className="flex space-x-2">
             <div className="flex flex-row justify-center items-center">
-              <span className="p-1">$</span>
-              <input
-                type="number"
-                name="lowCostInDollarsPerUnit"
-                placeholder="Low"
-                value={option.lowCostInDollarsPerUnit?.toString()}
-                onChange={onLowCostChange}
-                disabled={useExactCost}
+              <NumericFormat
                 className="border border-gray-300 p-1 rounded w-full"
+                autoComplete="off"
+                id="exactCostInDollarsPerUnit"
+                name="exactCostInDollarsPerUnit"
+                value={option.lowCostInDollarsPerUnit}
+                prefix="$"
+                allowNegative={false}
+                decimalScale={2}
+                placeholder="Low Cost"
+                disabled={useExactCost}
+                onValueChange={(values) => {
+                  onLowCostChange(values.floatValue);
+                }}
               />
               <span className="px-2"> - </span>
-              <span className="p-1">$</span>
-              <input
-                type="number"
-                name="highCostInDollarsPerUnit"
-                placeholder="High"
-                value={option.highCostInDollarsPerUnit?.toString()}
-                onChange={onHighCostChange}
-                disabled={useExactCost}
+              <NumericFormat
                 className="border border-gray-300 p-1 rounded w-full"
+                autoComplete="off"
+                id="exactCostInDollarsPerUnit"
+                name="exactCostInDollarsPerUnit"
+                value={option.highCostInDollarsPerUnit}
+                prefix="$"
+                allowNegative={false}
+                decimalScale={2}
+                placeholder="High Cost"
+                disabled={useExactCost}
+                onValueChange={(values) => {
+                  onHighCostChange(values.floatValue);
+                }}
               />
             </div>
           </div>

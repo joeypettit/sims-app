@@ -22,7 +22,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   const queryClient = useQueryClient();
   const quantity = props.lineItem.quantity ? props.lineItem.quantity : 0;
 
-  function onQuanityChange(value: number) {
+  function onQuantityChange(value: number) {
     updateLineItemQuantityMutation.mutate({
       lineItemId: props.lineItem.id,
       quantity: value,
@@ -65,6 +65,9 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["area"] });
+      queryClient.invalidateQueries({
+        queryKey: ["area-template"],
+      });
     },
   });
 
@@ -147,7 +150,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
     <div className="grid grid-cols-5 gap-4 py-2">
       <div className="flex flex-col text-center items-center pr-4">
         <h1>{props.lineItem.name}</h1>
-        <QuantityInput value={quantity} onChange={onQuanityChange} />
+        <QuantityInput value={quantity} onChange={onQuantityChange} />
         <h6 className="text-gray-500">{props.lineItem?.unit?.name}</h6>
       </div>
       {props.lineItem.lineItemOptions.map((option, index) => {

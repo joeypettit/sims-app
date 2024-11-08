@@ -13,6 +13,8 @@ import type { LineItem } from "../../app/types/line-item";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getLineItem } from "../../api/api";
 import OptionForm from "./option-form";
+import { updateLineItem } from "../../api/api";
+import Button from "../../components/button";
 
 // type LineItemFormData = {
 //   name: string;
@@ -48,6 +50,18 @@ export default function EditLineItem() {
     },
     staleTime: Infinity,
     refetchOnMount: "always",
+  });
+
+  const updateLineItemMutation = useMutation({
+    mutationFn: updateLineItem,
+    onError: (error) => {
+      console.log("error updating line item", error);
+    },
+    onSuccess: () => {
+      window.history.back();
+    },
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ["area-template"] }),
   });
 
   // Handle input changes
@@ -91,6 +105,21 @@ export default function EditLineItem() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (lineItemId) {
+      updateLineItemMutation.mutate({
+        lineItemId: lineItemId,
+        groupId: formData?.lineItemGroupId,
+        marginDecimal: formData?.marginDecimal,
+        name: formData?.name,
+        quantity: formData?.quantity,
+        unitId: formData?.unit?.id,
+        lineItemOptions: formData?.lineItemOptions,
+      });
+    }
+  }
+
+  function handleCancel() {
+    window.history.back();
   }
 
   useEffect(() => {
@@ -120,9 +149,9 @@ export default function EditLineItem() {
               <label htmlFor="name">Name</label>
               <input
                 type="text"
+                autoComplete="off"
                 id="name"
                 name="name"
-                autoComplete="off"
                 value={formData.name}
                 onChange={onNameInputChange}
                 required
@@ -133,9 +162,9 @@ export default function EditLineItem() {
               <label htmlFor="marginDecimal">Margin (Decimal)</label>
               <input
                 type="number"
+                autoComplete="off"
                 id="marginDecimal"
                 name="marginDecimal"
-                autoComplete="off"
                 value={formData.marginDecimal}
                 onChange={onMarginInputChange}
                 step="0.01"
@@ -183,13 +212,13 @@ export default function EditLineItem() {
           })}
           <hr />
         </div>
-        <div>
-          <button
-            type="submit"
-            className="bg-sims-green-600 text-white px-4 py-2 rounded hover:bg-sims-green-700"
-          >
-            Submit
-          </button>
+        <div className="flex flex-row gap-4 justify-end">
+          <Button variant="secondary" type="button" onClick={handleCancel}>
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit">
+            Save
+          </Button>
         </div>
       </form>
     </PanelWindow>

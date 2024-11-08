@@ -41,6 +41,7 @@ export default function QuantityInput({
       </button>
       <input
         type="text"
+        autoComplete="off"
         value={inputValue}
         id="quantity"
         name="quantity"

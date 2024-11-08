@@ -3,9 +3,9 @@ import type { LineItem } from "./line-item";
 
 export type LineItemOption = {
   id: string;
-  lowCostInDollarsPerUnit?: number;
-  highCostInDollarsPerUnit?: number;
-  exactCostInDollarsPerUnit?: number;
+  lowCostInDollarsPerUnit?: number | null;
+  highCostInDollarsPerUnit?: number | null;
+  exactCostInDollarsPerUnit?: number | null;
   priceAdjustmentDecimal: number;
   description: string?;
   optionTier: OptionTier;
