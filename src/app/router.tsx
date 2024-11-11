@@ -7,47 +7,95 @@ import ProjectAreaProposal from "../routes/projects/project-area-proposal.tsx";
 import SettingsPanel from "../routes/settings/settings.tsx";
 import EditAreaTemplate from "../routes/settings/edit-area-template.tsx";
 import EditLineItem from "../routes/settings/edit-line-item.tsx";
+import PanelWindow from "../components/panel-window.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <NavBar />,
-    errorElement: <ErrorPage />,
+    errorElement: (
+      <PanelWindow>
+        <ErrorPage />
+      </PanelWindow>
+    ),
     children: [
       {
         path: "/project",
-        element: <ProjectsPanel />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <ProjectsPanel />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
       {
         path: "/project/:id",
-        element: <ProjectDetails />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <ProjectDetails />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
       {
         path: "/project/:id/area/:areaId",
-        element: <ProjectAreaProposal />,
-        errorElement: <ErrorPage />,
-      },
-      {
-        path: "/project/:id/area/:areaId/create-line-item",
-        element: <ProjectAreaProposal />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <ProjectAreaProposal />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
       {
         path: "/settings",
-        element: <SettingsPanel />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <SettingsPanel />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
       {
         path: "/settings/edit-template/:templateId",
-        element: <EditAreaTemplate />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <EditAreaTemplate />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
       {
         path: "/edit-line-item/:lineItemId",
-        element: <EditLineItem />,
-        errorElement: <ErrorPage />,
+        element: (
+          <PanelWindow>
+            <EditLineItem />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
       },
     ],
   },

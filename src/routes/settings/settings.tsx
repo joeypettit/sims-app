@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import PanelWindow from "../../components/panel-window";
 import Button from "../../components/button";
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/modal";
@@ -65,11 +64,11 @@ export default function SettingsPanel() {
 
   if (isLoading || createAreaTemplateMutation.isPending) {
     return (
-      <PanelWindow>
+      <>
         <div className="flex justify-center items-center w-full h-full">
           <SimsSpinner />
         </div>
-      </PanelWindow>
+      </>
     );
   }
 
@@ -113,7 +112,7 @@ export default function SettingsPanel() {
   }
 
   return (
-    <PanelWindow>
+    <>
       <h1>Settings</h1>
       <div>
         <div className="flex flex-row bg-sims-green-100">
@@ -129,6 +128,6 @@ export default function SettingsPanel() {
         </div>
       </div>
       {renderTemplateModal()}
-    </PanelWindow>
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import type { LineItemOption } from "../../app/types/line-item-option";
-import PanelWindow from "../../components/panel-window";
 import { useLocation, useNavigation, useParams } from "react-router-dom";
 import type { LineItemUnit } from "../../app/types/line-item-unit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -131,16 +130,16 @@ export default function EditLineItem() {
 
   if (!formData) {
     return (
-      <PanelWindow>
+      <>
         <div className="flex justify-center items-center w-full h-full">
           <SimsSpinner centered />
         </div>
-      </PanelWindow>
+      </>
     );
   }
   console.log("line item", formData);
   return (
-    <PanelWindow>
+    <>
       <h1 className="font-bold">Line Item Data: </h1>
       <form onSubmit={handleSubmit} className="p-2">
         <div className="flex flex-col gap-6">
@@ -221,6 +220,6 @@ export default function EditLineItem() {
           </Button>
         </div>
       </form>
-    </PanelWindow>
+    </>
   );
 }

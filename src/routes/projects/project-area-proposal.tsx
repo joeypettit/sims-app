@@ -1,23 +1,48 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
-import { getProjectAreaById } from "../../api/api";
-import PanelWindow from "../../components/panel-window";
+import {
+  createGroup,
+  getAllGroupCategories,
+  getProjectAreaById,
+} from "../../api/api";
 import LineItemGroupContainer from "../../components/budget-columns/line-item-group";
 import type { LineItemGroup } from "../../app/types/line-item-group";
-import type { LineItem } from "../../app/types/line-item";
-import type { GroupCategory } from "../../app/types/group-category";
-import type { LineItemOption } from "../../app/types/line-item-option";
 import { getGroupsTotalSalePrice } from "../../util/utils";
 import type { PriceRange } from "../../app/types/price-range";
 import { formatNumberWithCommas } from "../../util/utils";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
-import { simulateNetworkLatency } from "../../util/utils";
+import Modal from "../../components/modal";
+import { useState } from "react";
+import { validateGroupName } from "../../util/form-validation";
+import Button from "../../components/button";
 
-export default function ProjectAreaProposal() {
+type ProjectAreaProposalProps = {
+  areaIdFromProps?: string;
+};
+
+export default function ProjectAreaProposal({
+  areaIdFromProps,
+}: ProjectAreaProposalProps) {
+  const { areaIdFromParams } = useParams();
   const queryClient = useQueryClient();
-  const { areaId } = useParams();
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
+  const [createGroupErrorMessage, setCreateGroupErrorMessage] =
+    useState<string>("");
+  const [groupNameInput, setGroupNameInput] = useState("");
+  const [newGroupCategoryId, setNewGroupCategoryId] = useState<string>("");
+  const [panelIsLoading, setPanelIsLoading] = useState(false);
+  const areaId = areaIdFromProps || areaIdFromParams;
 
-  const { data, isLoading, isError, error } = useQuery({
+  function handleOpenCreateGroupModal(categoryId: string) {
+    setNewGroupCategoryId(categoryId);
+    setIsCreateGroupModalOpen(true);
+  }
+  function handleCloseCreateGroupModal() {
+    setGroupNameInput("");
+    setIsCreateGroupModalOpen(false);
+  }
+
+  const projectAreaQuery = useQuery({
     queryKey: ["area"],
     queryFn: async () => {
       if (!areaId) {
@@ -55,77 +80,167 @@ export default function ProjectAreaProposal() {
     },
   });
 
-  const groupCategories = getGroupCategories();
+  const categoriesQuery = useQuery({
+    queryKey: ["all-group-categories"],
+    queryFn: async () => {
+      const result = await getAllGroupCategories();
+      return result;
+    },
+  });
 
-  function getGroupCategories() {
-    // ***** this should probably be tested later on!! ****
-    const catArray: GroupCategory[] = [];
-    if (data?.lineItemGroups) {
-      for (const group of data?.lineItemGroups) {
-        const alreadyInCatArray = catArray.some((cat) => {
-          return cat.id === group.groupCategory.id;
-        });
-        if (!alreadyInCatArray) catArray.push(group.groupCategory);
-      }
-    }
-    return catArray;
-  }
+  const createGroupMutation = useMutation({
+    mutationFn: createGroup,
+    onMutate: async () => {
+      await queryClient.cancelQueries({
+        queryKey: ["area"],
+      });
+      const previousArea = queryClient.getQueryData(["area"]);
+      return previousArea;
+    },
+    onError: (error) => {
+      console.log("Error in createGroupMutation", error);
+      setCreateGroupErrorMessage(
+        "There has been an error creating new group. Please try again."
+      );
+    },
+    onSuccess: () => {
+      setGroupNameInput("");
+      setIsCreateGroupModalOpen(false);
+      queryClient.invalidateQueries({
+        queryKey: ["area"],
+      });
+    },
+  });
 
   function getAreasTotalSalePrice() {
-    if (data?.totalSalePrice) {
+    if (projectAreaQuery.data?.totalSalePrice) {
       if (
-        data.totalSalePrice?.lowPriceInDollars <= 0 &&
-        data.totalSalePrice?.highPriceInDollars <= 0
+        projectAreaQuery.data.totalSalePrice?.lowPriceInDollars <= 0 &&
+        projectAreaQuery.data.totalSalePrice?.highPriceInDollars <= 0
       )
         return "-";
       const lowPrice = formatNumberWithCommas(
-        data.totalSalePrice?.lowPriceInDollars
+        projectAreaQuery.data.totalSalePrice?.lowPriceInDollars
       );
       const highPrice = formatNumberWithCommas(
-        data.totalSalePrice?.highPriceInDollars
+        projectAreaQuery.data.totalSalePrice?.highPriceInDollars
       );
       return `$${lowPrice} - $${highPrice}`;
     }
     return "-";
   }
 
-  if (isLoading) {
+  async function handleCreateGroup() {
+    setCreateGroupErrorMessage("");
+    const errorMessage = validateGroupName(groupNameInput);
+
+    if (errorMessage) {
+      setCreateGroupErrorMessage(errorMessage);
+      return;
+    }
+
+    if (!projectAreaQuery.data?.id) {
+      throw Error("Project Id Requred to create new group");
+    }
+
+    if (!newGroupCategoryId) {
+      throw Error("A category id is required to create a new group");
+    }
+
+    const trimmedName = groupNameInput.trim();
+
+    createGroupMutation.mutate({
+      categoryId: newGroupCategoryId,
+      groupName: trimmedName,
+      projectAreaId: projectAreaQuery.data?.id,
+    });
+  }
+
+  function renderCreateGroupModal() {
     return (
-      <PanelWindow>
-        <div className="flex justify-center items-center w-full h-full">
-          <SimsSpinner />
-        </div>
-      </PanelWindow>
+      <Modal
+        isOpen={isCreateGroupModalOpen}
+        onConfirm={handleCreateGroup}
+        onCancel={handleCloseCreateGroupModal}
+      >
+        {createGroupMutation.isPending ? (
+          <SimsSpinner centered />
+        ) : (
+          <div className="flex flex-col justify-center items-center">
+            <label
+              htmlFor="group-name"
+              className="block text-left mb-2 font-medium"
+            >
+              Group Name
+            </label>
+            <input
+              type="text"
+              autoComplete="off"
+              id="group-name"
+              value={groupNameInput}
+              onChange={(e) => setGroupNameInput(e.target.value)}
+              className="w-full px-3 py-2 mb-4 border rounded"
+              placeholder="Enter group name"
+              required
+            />
+            {createGroupErrorMessage && (
+              <div className="text-rose-700">{createGroupErrorMessage}</div>
+            )}
+          </div>
+        )}
+      </Modal>
     );
   }
 
-  if (isError) {
-    return <p>Error: {error.message}</p>;
+  if (projectAreaQuery.isLoading) {
+    return (
+      <div className="flex justify-center items-center w-full h-full">
+        <SimsSpinner />
+      </div>
+    );
   }
 
+  if (projectAreaQuery.isError) {
+    return <p>Error: {projectAreaQuery.error.message}</p>;
+  }
+  console.log("rerender");
   return (
-    <PanelWindow>
-      <h1 className="text-xl font-bold">{data?.name}</h1>
-      {groupCategories.map((category) => {
+    <>
+      <h1>{projectAreaQuery.data?.name}</h1>
+      {categoriesQuery.data?.map((category) => {
+        const key = category.id;
+        console.log("key is", key);
         return (
-          <div key={category.id}>
+          <div key={key}>
             <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">
               {category.name}
             </h2>
-            {data?.lineItemGroups.map((group: LineItemGroup, index) => {
-              if (group.groupCategory.id == category.id) {
-                return (
-                  <LineItemGroupContainer
-                    key={`line-item-group-${index}`}
-                    group={group}
-                  />
-                );
+            {projectAreaQuery.data?.lineItemGroups.map(
+              (group: LineItemGroup) => {
+                if (category.id == group.groupCategory.id) {
+                  return (
+                    <div key={group.id}>
+                      <LineItemGroupContainer
+                        group={group}
+                        setPanelIsLoading={setPanelIsLoading}
+                      />
+                    </div>
+                  );
+                }
               }
-            })}
+            )}
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => handleOpenCreateGroupModal(category.id)}
+            >
+              + Add Group
+            </Button>
           </div>
         );
       })}
+      {renderCreateGroupModal()}
       <div>Project Total: {getAreasTotalSalePrice()}</div>
-    </PanelWindow>
+    </>
   );
 }

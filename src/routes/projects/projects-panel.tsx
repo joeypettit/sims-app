@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { PanelTableColumn } from "../../components/panel-table";
-import PanelWindow from "../../components/panel-window";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../app/types/project";
@@ -64,7 +63,7 @@ export default function ProjectsPanel() {
   ];
 
   return (
-    <PanelWindow>
+    <>
       {query.data && (
         <PanelTable
           data={query.data}
@@ -72,6 +71,6 @@ export default function ProjectsPanel() {
           onRowClick={(row) => handleRowClick(row)}
         />
       )}
-    </PanelWindow>
+    </>
   );
 }

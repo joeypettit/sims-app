@@ -4,7 +4,6 @@ import { Project } from "../../app/types/project";
 import { getProjectById } from "../../api/api";
 import { ProjectArea } from "../../app/types/project-area";
 import { useNavigate } from "react-router-dom";
-import PanelWindow from "../../components/panel-window";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -29,7 +28,7 @@ export default function ProjectDetails() {
   }
 
   return (
-    <PanelWindow>
+    <>
       <h1>{data?.name}</h1>
       <div>
         {data?.areas.map((area: ProjectArea) => (
@@ -42,6 +41,6 @@ export default function ProjectDetails() {
           </div>
         ))}
       </div>
-    </PanelWindow>
+    </>
   );
 }
