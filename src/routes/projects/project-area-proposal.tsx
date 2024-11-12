@@ -209,7 +209,6 @@ export default function ProjectAreaProposal({
       <h1>{projectAreaQuery.data?.name}</h1>
       {categoriesQuery.data?.map((category) => {
         const key = category.id;
-        console.log("key is", key);
         return (
           <div key={key}>
             <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">

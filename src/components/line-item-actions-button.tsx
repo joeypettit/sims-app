@@ -8,6 +8,7 @@ import { LineItem } from "../app/types/line-item";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteLineItem } from "../api/api";
 import SimsSpinner from "./sims-spinner/sims-spinner";
+import { useNavigate } from "react-router-dom";
 
 type LineItemActionButtonProps = {
   lineItem: LineItem;
@@ -16,6 +17,7 @@ type LineItemActionButtonProps = {
 export default function LineItemActionsButton({
   lineItem,
 }: LineItemActionButtonProps) {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -26,20 +28,15 @@ export default function LineItemActionsButton({
     {
       icon: <MdOutlineEdit />,
       title: "Edit",
-      action: () => {},
+      action: () => {
+        navigate(`/edit-line-item/${lineItem.id}`);
+      },
     },
     {
       icon: <MdOutlineDeleteForever />,
       title: "Delete",
       action: () => {
         setIsDeleteModalOpen(true);
-      },
-    },
-    {
-      icon: <BiAddToQueue />,
-      title: "Something else",
-      action: () => {
-        console.log("Something else clicked");
       },
     },
   ];
@@ -95,7 +92,7 @@ export default function LineItemActionsButton({
 
   return (
     <div className="relative inline-block text-left">
-      <ThreeDotButton onClick={toggleDropdown} />
+      <ThreeDotButton onClick={toggleDropdown} menuIsOpen={isDropdownOpen} />
       {isDropdownOpen && (
         <div className="absolute left-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg z-10">
           <ul className="py-1">
