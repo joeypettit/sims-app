@@ -6,7 +6,7 @@ export type LineItemOption = {
   lowCostInDollarsPerUnit?: number | null;
   highCostInDollarsPerUnit?: number | null;
   exactCostInDollarsPerUnit?: number | null;
-  priceAdjustmentDecimal: number;
+  priceAdjustmentMultiplier: number | undefined;
   description: string?;
   optionTier: OptionTier;
   isSelected: boolean;

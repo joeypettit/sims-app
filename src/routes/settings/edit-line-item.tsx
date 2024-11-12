@@ -14,6 +14,7 @@ import { getLineItem } from "../../api/api";
 import OptionForm from "./option-form";
 import { updateLineItem } from "../../api/api";
 import Button from "../../components/button";
+import { NumericFormat } from "react-number-format";
 
 // type LineItemFormData = {
 //   name: string;
@@ -71,13 +72,6 @@ export default function EditLineItem() {
     }
   }
 
-  function onMarginInputChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const { value } = e.target;
-    if (formData) {
-      setFormData({ ...formData, marginDecimal: Number(value) });
-    }
-  }
-
   function onQuantityChange(newValue: number) {
     if (formData) {
       setFormData({ ...formData, quantity: newValue });
@@ -102,17 +96,48 @@ export default function EditLineItem() {
     setFormData(updatedFormData);
   }
 
+  function onMarginInputChange(value: number | undefined) {
+    if (formData) {
+      const updatedFormData = structuredClone(formData);
+      let valueAsDecimal = value ? value / 100 : undefined;
+      updatedFormData.marginDecimal = valueAsDecimal;
+      setFormData(updatedFormData);
+    }
+  }
+
+  function getMarginPercentage() {
+    const marginDecimal = formData?.marginDecimal;
+    return marginDecimal ? marginDecimal * 100 : undefined;
+  }
+
+  function validateForm() {
+    if (!formData) {
+      throw Error("Form Data is undefined");
+    }
+    const validatedFormData = structuredClone(formData);
+    validatedFormData?.lineItemOptions.forEach((option: LineItemOption) => {
+      if (option.priceAdjustmentMultiplier == undefined) {
+        option.priceAdjustmentMultiplier = 1;
+      }
+    });
+    if (validatedFormData?.marginDecimal == undefined) {
+      validatedFormData.marginDecimal = 0;
+    }
+    return validatedFormData;
+  }
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    const validatedForm = validateForm();
     if (lineItemId) {
       updateLineItemMutation.mutate({
         lineItemId: lineItemId,
-        groupId: formData?.lineItemGroupId,
-        marginDecimal: formData?.marginDecimal,
-        name: formData?.name,
-        quantity: formData?.quantity,
-        unitId: formData?.unit?.id,
-        lineItemOptions: formData?.lineItemOptions,
+        groupId: validatedForm?.lineItemGroupId,
+        marginDecimal: validatedForm?.marginDecimal,
+        name: validatedForm?.name,
+        quantity: validatedForm?.quantity,
+        unitId: validatedForm?.unit?.id,
+        lineItemOptions: validatedForm?.lineItemOptions,
       });
     }
   }
@@ -158,19 +183,20 @@ export default function EditLineItem() {
               />
             </div>
             <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="marginDecimal">Margin (Decimal)</label>
-              <input
-                type="number"
-                autoComplete="off"
-                id="marginDecimal"
-                name="marginDecimal"
-                value={formData.marginDecimal}
-                onChange={onMarginInputChange}
-                step="0.01"
-                max={"0.99"}
-                min={"0"}
-                required
+              <label htmlFor="marginDecimal">Margin</label>
+              <NumericFormat
                 className="border border-gray-300 p-1 rounded w-full"
+                autoComplete="off"
+                id="priceAdjustmentMultiplier"
+                name="priceAdjustmentMultiplier"
+                suffix="%"
+                value={getMarginPercentage()}
+                allowNegative={false}
+                decimalScale={2}
+                placeholder="Percent Margin"
+                onValueChange={(values) => {
+                  onMarginInputChange(values.floatValue);
+                }}
               />
             </div>
           </div>
@@ -197,13 +223,14 @@ export default function EditLineItem() {
         </div>
         <div className="py-6">
           <h1 className="font-bold">Options:</h1>
-          {formData.lineItemOptions.map((option, index) => {
+          {formData.lineItemOptions.map((option) => {
             return (
               <div>
                 <hr />
                 <OptionForm
                   key={option.id}
                   option={option}
+                  lineItem={formData}
                   onChange={onOptionChange}
                 />
               </div>

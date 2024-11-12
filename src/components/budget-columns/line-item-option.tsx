@@ -2,7 +2,7 @@ import type { LineItemOption } from "../../app/types/line-item-option";
 import IsCheckedIcon from "../is-checked-icon";
 import type { LineItem } from "../../app/types/line-item";
 import {
-  calculateOptionsTotalSalePrice,
+  getOptionsTotalSalePrice,
   formatNumberWithCommas,
 } from "../../util/utils";
 
@@ -22,7 +22,7 @@ export default function LineItemOptionDisplay({
   props: LineItemOptionDisplayProps;
 }) {
   function getDisplayedPrice() {
-    const salePrice = calculateOptionsTotalSalePrice({
+    const salePrice = getOptionsTotalSalePrice({
       option: props.lineItemOption,
       lineItem: props.lineItem,
     });

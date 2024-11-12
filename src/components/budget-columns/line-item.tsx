@@ -1,16 +1,13 @@
 import { LineItemOption } from "../../app/types/line-item-option";
-import { useState } from "react";
 import type { LineItem } from "../../app/types/line-item";
 import LineItemOptionDisplay from "./line-item-option";
 import QuantityInput from "../quantity-input";
-import type { PriceRange } from "../../app/types/price-range";
 import type { LineItemGroup } from "../../app/types/line-item-group";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateOptionSelection, updateLineItemQuantity } from "../../api/api";
 import type { ProjectArea } from "../../app/types/project-area";
-import { calculateSalesPricePerUnit } from "../../util/utils";
 import { getCurrentlySelectedOption } from "../../util/utils";
-import { calculateOptionsTotalSalePrice } from "../../util/utils";
+import { getOptionsTotalSalePrice } from "../../util/utils";
 import { formatNumberWithCommas } from "../../util/utils";
 
 export type LineItemDisplayProps = {
@@ -74,7 +71,7 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   function getCurrentLineTotal() {
     const selectedOption = getCurrentlySelectedOption(props.lineItem);
     if (selectedOption) {
-      const lineTotal = calculateOptionsTotalSalePrice({
+      const lineTotal = getOptionsTotalSalePrice({
         option: selectedOption,
         lineItem: props.lineItem,
       });

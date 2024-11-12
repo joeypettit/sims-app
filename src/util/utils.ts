@@ -20,13 +20,19 @@ export function calculateMarginDecimal({
 export function calculateSalesPricePerUnit({
   marginDecimal,
   costPerUnit,
+  priceAdjustmentMultiplier,
 }: {
   marginDecimal: number;
   costPerUnit: number;
+  priceAdjustmentMultiplier: number;
 }) {
-  if (typeof marginDecimal !== "number" || typeof costPerUnit !== "number") {
+  if (
+    typeof marginDecimal !== "number" ||
+    typeof costPerUnit !== "number" ||
+    typeof priceAdjustmentMultiplier !== "number"
+  ) {
     throw new Error(
-      "Invalid input: marginDecimal and costPerUnit must be numbers."
+      "Invalid input: marginDecimal, priceAdjustmentMultiplier, and costPerUnit must be numbers."
     );
   }
 
@@ -34,7 +40,7 @@ export function calculateSalesPricePerUnit({
     throw new Error("Invalid margin: Margin decimal must be between 0 and 1.");
   }
 
-  return costPerUnit / (1 - marginDecimal);
+  return (costPerUnit / (1 - marginDecimal)) * priceAdjustmentMultiplier;
 }
 
 export function getCurrentlySelectedOption(
@@ -49,7 +55,7 @@ export function getGroupsTotalSalePrice(group: LineItemGroup) {
       const selectedOption = getCurrentlySelectedOption(currentItem);
       if (!selectedOption) return acc;
 
-      const lineItemTotal = calculateOptionsTotalSalePrice({
+      const lineItemTotal = getOptionsTotalSalePrice({
         option: selectedOption,
         lineItem: currentItem,
       });
@@ -73,7 +79,7 @@ export function getGroupsTotalSalePrice(group: LineItemGroup) {
   return totalPriceRange;
 }
 
-export function calculateOptionsTotalSalePrice({
+export function getOptionsTotalSalePrice({
   option,
   lineItem,
 }: {
@@ -82,26 +88,73 @@ export function calculateOptionsTotalSalePrice({
 }) {
   const quantity = lineItem.quantity ? lineItem.quantity : 0;
   const optionCost = getOptionsPerUnitCost(option);
+  const marginDecimal = lineItem.marginDecimal ? lineItem.marginDecimal : 0;
+  const priceAdjustmentMultiplier = option.priceAdjustmentMultiplier
+    ? option.priceAdjustmentMultiplier
+    : 0;
 
+  // if optionCost is a number, that means that it is NOT a PriceRange and IS and exact price
   if (typeof optionCost === "number") {
     const salePricePerUnit = calculateSalesPricePerUnit({
-      marginDecimal: lineItem.marginDecimal,
+      marginDecimal: marginDecimal,
       costPerUnit: optionCost,
+      priceAdjustmentMultiplier,
     });
     return Math.ceil(salePricePerUnit * quantity);
   }
-
   const lowSalePricePerUnit = calculateSalesPricePerUnit({
-    marginDecimal: lineItem.marginDecimal,
+    marginDecimal: marginDecimal,
     costPerUnit: optionCost.lowPriceInDollars,
+    priceAdjustmentMultiplier,
   });
   const highSalePricePerUnit = calculateSalesPricePerUnit({
-    marginDecimal: lineItem.marginDecimal,
+    marginDecimal: marginDecimal,
     costPerUnit: optionCost.highPriceInDollars,
+    priceAdjustmentMultiplier,
   });
+
   return {
     lowPriceInDollars: Math.ceil(lowSalePricePerUnit * quantity),
     highPriceInDollars: Math.ceil(highSalePricePerUnit * quantity),
+  } as PriceRange;
+}
+
+export function getOptionsPerUnitSalePrice({
+  option,
+  lineItem,
+}: {
+  option: LineItemOption;
+  lineItem: LineItem;
+}) {
+  const optionCost = getOptionsPerUnitCost(option);
+  const marginDecimal = lineItem.marginDecimal ? lineItem.marginDecimal : 0;
+  const priceAdjustmentMultiplier = option.priceAdjustmentMultiplier
+    ? option.priceAdjustmentMultiplier
+    : 0;
+
+  // if optionCost is a number, that means that it is NOT a PriceRange and IS and exact price
+  if (typeof optionCost === "number") {
+    const salePricePerUnit = calculateSalesPricePerUnit({
+      marginDecimal: marginDecimal,
+      costPerUnit: optionCost,
+      priceAdjustmentMultiplier,
+    });
+    return Math.ceil(salePricePerUnit);
+  }
+  const lowSalePricePerUnit = calculateSalesPricePerUnit({
+    marginDecimal: marginDecimal,
+    costPerUnit: optionCost.lowPriceInDollars,
+    priceAdjustmentMultiplier,
+  });
+  const highSalePricePerUnit = calculateSalesPricePerUnit({
+    marginDecimal: marginDecimal,
+    costPerUnit: optionCost.highPriceInDollars,
+    priceAdjustmentMultiplier,
+  });
+
+  return {
+    lowPriceInDollars: Math.ceil(lowSalePricePerUnit),
+    highPriceInDollars: Math.ceil(highSalePricePerUnit),
   } as PriceRange;
 }
 
