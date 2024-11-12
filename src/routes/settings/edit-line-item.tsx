@@ -15,7 +15,9 @@ import OptionForm from "./option-form";
 import { updateLineItem } from "../../api/api";
 import Button from "../../components/button";
 import { NumericFormat } from "react-number-format";
+import { IoChevronBackOutline } from "react-icons/io5";
 
+import PanelHeaderBar from "../../components/page-header-bar";
 // type LineItemFormData = {
 //   name: string;
 //   quantity: number;
@@ -60,8 +62,9 @@ export default function EditLineItem() {
     onSuccess: () => {
       window.history.back();
     },
-    onSettled: () =>
-      queryClient.invalidateQueries({ queryKey: ["area-template"] }),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["area-template"] });
+    },
   });
 
   // Handle input changes
@@ -143,9 +146,9 @@ export default function EditLineItem() {
   }
 
   function handleCancel() {
+    setFormData(undefined);
     window.history.back();
   }
-
   useEffect(() => {
     // prepopulate local state for form
     if (lineItemQuery.data && !formData) {
@@ -165,7 +168,9 @@ export default function EditLineItem() {
   console.log("line item", formData);
   return (
     <>
-      <h1 className="font-bold">Line Item Data: </h1>
+      <PanelHeaderBar
+        title={`Editing Line Item: ${lineItemQuery.data?.name}`}
+      />
       <form onSubmit={handleSubmit} className="p-2">
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-4">

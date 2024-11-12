@@ -31,7 +31,6 @@ export default function EditAreaTemplate() {
     const error = areaTemplateQuery.error;
     return <p>Error: {error?.message}</p>;
   }
-  console.log("template", areaTemplateQuery.data);
   return (
     <>
       <h1>{areaTemplateQuery.data?.name}</h1>

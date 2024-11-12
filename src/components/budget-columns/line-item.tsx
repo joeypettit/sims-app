@@ -138,11 +138,16 @@ export default function LineItemDisplay({
   async function onOptionSelection({
     optionToSelect,
   }: {
-    optionToSelect: LineItemOption;
+    optionToSelect: LineItemOption | undefined;
   }) {
+    const optionToUnselect = getCurrentlySelectedOption(lineItem);
+    if (optionToSelect?.id == optionToUnselect?.id) {
+      optionToSelect = undefined;
+    }
+
     updateOptionSelectionMutation.mutate({
       optionToSelect: optionToSelect,
-      optionToUnselect: getCurrentlySelectedOption(lineItem),
+      optionToUnselect: optionToUnselect,
       lineItem: lineItem,
     });
   }

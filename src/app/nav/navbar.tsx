@@ -55,9 +55,6 @@ function LargeScreenNavBar() {
 
   return (
     <div className="flex flex-row justify-start h-screen relative bg-sims-beige">
-      <div className="py-2 px-4 absolute right-0 bg-white rounded shadow">
-        <ProfileCircle />
-      </div>
       <div className="flex flex-col bg-white shadow-sm border-r-gray-300 border-r">
         <div
           className={`

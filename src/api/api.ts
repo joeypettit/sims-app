@@ -14,9 +14,12 @@ export async function getAllProjects(): Promise<Project[]> {
 }
 
 export async function getProjectById(id: string) {
-  const response = await axios.get<Project>(`/api/projects/${id}`);
-  console.log("data", response.data);
-  return response.data;
+  try {
+    const response = await axios.get<Project>(`/api/projects/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error fetching project with id ${id}: ${error}`);
+  }
 }
 
 export async function getProjectAreaById(areaId: string) {
@@ -33,6 +36,7 @@ export async function updateOptionSelection({
   optionToUnselect: LineItemOption | undefined;
   lineItem: LineItem;
 }) {
+  console.log("in mutation", optionToSelect, optionToUnselect);
   try {
     let unselectResponse = undefined;
     let selectResponse = undefined;
@@ -47,6 +51,7 @@ export async function updateOptionSelection({
         `/api/line-items/${lineItem.id}/select-option/${optionToSelect.id}`
       );
     }
+    console.log("in mutation", unselectResponse, selectResponse);
 
     const newOptions: LineItemOption[] = lineItem.lineItemOptions.map(
       (option) => {
@@ -228,5 +233,52 @@ export async function deleteLineItem({ lineItemId }: { lineItemId: string }) {
     return response.data;
   } catch (error) {
     throw new Error(`Error deleting line item with ID ${lineItemId}: ${error}`);
+  }
+}
+
+export async function createBlankProject({ name }: { name: string }) {
+  try {
+    const response = await axios.post(`/api/projects/create-blank`, { name });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error creating new line Item: ${error}`);
+  }
+}
+
+export async function updateProject({
+  projectId,
+  name,
+  clientFirstName,
+  clientLastName,
+  clientId,
+  salesPersonFirstName,
+  salesPersonLastName,
+  salesPersonId,
+  description,
+}: {
+  projectId: string;
+  name: string;
+  clientFirstName: string;
+  clientLastName: string;
+  clientId: string;
+  salesPersonFirstName: string;
+  salesPersonLastName: string;
+  salesPersonId: string;
+  description: string;
+}) {
+  try {
+    const response = await axios.put(`/api/projects/${projectId}`, {
+      name,
+      clientFirstName,
+      clientLastName,
+      clientId,
+      salesPersonFirstName,
+      salesPersonLastName,
+      salesPersonId,
+      description,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error updating project with ID ${projectId}: ${error}`);
   }
 }

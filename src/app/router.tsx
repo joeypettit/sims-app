@@ -8,6 +8,7 @@ import SettingsPanel from "../routes/settings/settings.tsx";
 import EditAreaTemplate from "../routes/settings/edit-area-template.tsx";
 import EditLineItem from "../routes/settings/edit-line-item.tsx";
 import PanelWindow from "../components/panel-window.tsx";
+import EditProject from "../routes/projects/edit-project.tsx";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,19 @@ const router = createBrowserRouter([
         element: (
           <PanelWindow>
             <EditLineItem />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
+      },
+      {
+        path: "/edit-project/:projectId",
+        element: (
+          <PanelWindow>
+            <EditProject />
           </PanelWindow>
         ),
         errorElement: (

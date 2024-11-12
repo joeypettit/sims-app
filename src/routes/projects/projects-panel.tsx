@@ -3,12 +3,19 @@ import type { PanelTableColumn } from "../../components/panel-table";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../app/types/project";
-import { getAllProjects } from "../../api/api";
+import { createBlankProject, getAllProjects } from "../../api/api";
+import Button from "../../components/button";
+import { FaPlus } from "react-icons/fa6";
+import { useEffect, useRef, useState } from "react";
+import Modal from "../../components/modal";
+import AddProjectModal from "../../components/add-project-modal";
 
 export default function ProjectsPanel() {
   const navigate = useNavigate();
   // Access the client
   const queryClient = useQueryClient();
+  const [panelIsLoading, setPanelIsLoading] = useState(false);
+  const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
 
   // Queries
   const query = useQuery({
@@ -64,6 +71,11 @@ export default function ProjectsPanel() {
 
   return (
     <>
+      <div>
+        <Button variant="white" onClick={() => setAddProjectModalIsOpen(true)}>
+          <FaPlus />
+        </Button>
+      </div>
       {query.data && (
         <PanelTable
           data={query.data}
@@ -71,6 +83,10 @@ export default function ProjectsPanel() {
           onRowClick={(row) => handleRowClick(row)}
         />
       )}
+      <AddProjectModal
+        isOpen={addProjectModalIsOpen}
+        setIsOpen={setAddProjectModalIsOpen}
+      />
     </>
   );
 }

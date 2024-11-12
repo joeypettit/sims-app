@@ -1,7 +1,13 @@
 import React from "react";
 
 // Define types for button variants and sizes
-type ButtonVariant = "primary" | "secondary" | "success" | "danger" | "warning";
+type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "danger"
+  | "warning"
+  | "white";
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 type ButtonTypes = "submit" | "reset" | "button" | undefined;
 
@@ -38,6 +44,8 @@ export default function Button({
         return "bg-red-600 hover:bg-red-700 active:bg-red-900";
       case "warning":
         return "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700";
+      case "white":
+        return "text-black bg-white hover:bg-slate-100 active:bg-slate-100 active:shadow-inner";
       default:
         return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-900";
     }
@@ -66,8 +74,9 @@ export default function Button({
       onClick={onClick}
       type={type}
       disabled={disabled}
-      className={`text-white rounded-md font-semibold transition-all duration-200 
-                  disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60 
+      className={`rounded-md font-semibold transition-all duration-200 
+                  disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60
+                  ${variant == "white" ? "text-black" : "text-white"} 
                   ${getButtonClasses()} ${getSizeClasses()} ${className}`}
     >
       {children}

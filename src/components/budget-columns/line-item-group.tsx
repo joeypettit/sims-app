@@ -49,7 +49,9 @@ export default function LineItemGroupDisplay({
       navigate(`/edit-line-item/${data.id}`);
     },
     onError: (error) => {
+      setPanelIsLoading(false);
       console.error("Error creating line item:", error);
+      throw Error(`Error creating line item: ${error}`);
     },
   });
 
