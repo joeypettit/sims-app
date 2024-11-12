@@ -29,6 +29,9 @@ export default function LineItemOptionDisplay({
     if (typeof salePrice == "number") {
       return `$${salePrice}`;
     }
+    if (salePrice.lowPriceInDollars == salePrice.highPriceInDollars) {
+      return `$${salePrice.lowPriceInDollars}`;
+    }
     const lowPrice = formatNumberWithCommas(salePrice.lowPriceInDollars);
     const highPrice = formatNumberWithCommas(salePrice.highPriceInDollars);
     return `$${lowPrice} - $${highPrice}`;

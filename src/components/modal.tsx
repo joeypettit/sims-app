@@ -7,6 +7,8 @@ type ModalProps = {
   title?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
+  disableConfirm?: boolean;
+  disableCancel?: boolean;
   children: React.ReactNode;
 };
 
@@ -16,6 +18,8 @@ export default function Modal({
   onConfirm,
   onCancel,
   children,
+  disableConfirm = false,
+  disableCancel = false,
 }: ModalProps) {
   // Only render the modal if it's open
   if (!isOpen) return null;
@@ -29,12 +33,20 @@ export default function Modal({
 
         <div className="flex justify-center gap-2">
           {onCancel && (
-            <Button variant="secondary" onClick={onCancel}>
+            <Button
+              variant="secondary"
+              onClick={onCancel}
+              disabled={disableCancel}
+            >
               Cancel
             </Button>
           )}
           {onConfirm && (
-            <Button variant="primary" onClick={onConfirm}>
+            <Button
+              variant="primary"
+              onClick={onConfirm}
+              disabled={disableConfirm}
+            >
               Confirm
             </Button>
           )}

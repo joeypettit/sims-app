@@ -190,7 +190,7 @@ export async function getLineItem(lineItemId: string): Promise<LineItem> {
   }
 }
 
-export const updateLineItem = async ({
+export async function updateLineItem({
   name,
   lineItemId,
   groupId,
@@ -206,7 +206,7 @@ export const updateLineItem = async ({
   unitId?: string;
   marginDecimal?: number;
   lineItemOptions?: LineItemOption[];
-}) => {
+}) {
   try {
     const response = await axios.put(`/api/line-items/${lineItemId}`, {
       name,
@@ -220,51 +220,13 @@ export const updateLineItem = async ({
   } catch (error) {
     throw new Error(`Error updating line item with ID ${lineItemId}: ${error}`);
   }
+}
+
+export async function deleteLineItem({ lineItemId }: { lineItemId: string }) {
   try {
-    const response = await axios.put("/api/line-item");
-  } catch (error) {}
-};
-
-// export const updateLineItemOption = async ({
-//   optionId,
-//   description,
-//   priceAdjustmentDecimal,
-//   exactCostInDollarsPerUnit,
-//   highCostInDollarsPerUnit,
-//   lowCostInDollarsPerUnit,
-//   isSelected,
-//   optionTierId,
-// }: {
-//   optionId: string;
-//   description?: string;
-//   priceAdjustmentDecimal?: number;
-//   exactCostInDollarsPerUnit?: number;
-//   highCostInDollarsPerUnit?: number;
-//   lowCostInDollarsPerUnit?: number;
-//   isSelected?: boolean;
-//   optionTierId?: string;
-// }) => {
-//   try {
-//     // Construct the request data object
-//     let dataObj: any = {
-//       description,
-//       priceAdjustmentDecimal,
-//       exactCostInDollarsPerUnit,
-//       highCostInDollarsPerUnit,
-//       lowCostInDollarsPerUnit,
-//       isSelected,
-//       optionTierId,
-//     };
-
-//     const response = await axios.put(
-//       `/api/line-item-options/${optionId}`,
-//       dataObj
-//     );
-
-//     return response.data;
-//   } catch (error) {
-//     throw new Error(
-//       `Error updating line item option with ID ${optionId}: ${error}`
-//     );
-//   }
-// };
+    const response = await axios.delete(`/api/line-items/${lineItemId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error deleting line item with ID ${lineItemId}: ${error}`);
+  }
+}

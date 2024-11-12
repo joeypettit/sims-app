@@ -9,19 +9,23 @@ import type { ProjectArea } from "../../app/types/project-area";
 import { getCurrentlySelectedOption } from "../../util/utils";
 import { getOptionsTotalSalePrice } from "../../util/utils";
 import { formatNumberWithCommas } from "../../util/utils";
+import LineItemActionsButton from "../line-item-actions-button";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
   group: LineItemGroup;
 };
 
-export default function LineItemDisplay(props: LineItemDisplayProps) {
+export default function LineItemDisplay({
+  lineItem,
+  group,
+}: LineItemDisplayProps) {
   const queryClient = useQueryClient();
-  const quantity = props.lineItem.quantity ? props.lineItem.quantity : 0;
+  const quantity = lineItem.quantity ? lineItem.quantity : 0;
 
   function onQuantityChange(value: number) {
     updateLineItemQuantityMutation.mutate({
-      lineItemId: props.lineItem.id,
+      lineItemId: lineItem.id,
       quantity: value,
     });
   }
@@ -38,11 +42,11 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
         return {
           ...oldData,
           lineItemGroups: oldData.lineItemGroups.map((group) => {
-            if (group.id !== props.lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
+            if (group.id !== lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
             return {
               ...group,
               lineItems: group.lineItems.map((lineItem: LineItem) => {
-                if (lineItem.id !== props.lineItem.id) return lineItem;
+                if (lineItem.id !== lineItem.id) return lineItem;
                 return {
                   ...lineItem,
                   quantity: variables.quantity,
@@ -69,11 +73,11 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   });
 
   function getCurrentLineTotal() {
-    const selectedOption = getCurrentlySelectedOption(props.lineItem);
+    const selectedOption = getCurrentlySelectedOption(lineItem);
     if (selectedOption) {
       const lineTotal = getOptionsTotalSalePrice({
         option: selectedOption,
-        lineItem: props.lineItem,
+        lineItem: lineItem,
       });
       if (lineTotal == 0) return "-";
       else if (typeof lineTotal === "number")
@@ -100,11 +104,11 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
         return {
           ...oldData,
           lineItemGroups: oldData.lineItemGroups.map((group) => {
-            if (group.id !== props.lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
+            if (group.id !== lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
             return {
               ...group,
               lineItems: group.lineItems.map((lineItem: LineItem) => {
-                if (lineItem.id !== props.lineItem.id) return lineItem;
+                if (lineItem.id !== lineItem.id) return lineItem;
                 return {
                   ...lineItem,
                   lineItemOptions: lineItem.lineItemOptions.map((option) =>
@@ -138,25 +142,28 @@ export default function LineItemDisplay(props: LineItemDisplayProps) {
   }) {
     updateOptionSelectionMutation.mutate({
       optionToSelect: optionToSelect,
-      optionToUnselect: getCurrentlySelectedOption(props.lineItem),
-      lineItem: props.lineItem,
+      optionToUnselect: getCurrentlySelectedOption(lineItem),
+      lineItem: lineItem,
     });
   }
 
   return (
     <div className="grid grid-cols-5 gap-4 py-2">
       <div className="flex flex-col text-center items-center pr-4">
-        <h1>{props.lineItem.name}</h1>
+        <div className="flex flex-row justify-between w-full">
+          <h1>{lineItem.name}</h1>
+          <LineItemActionsButton lineItem={lineItem} />
+        </div>
         <QuantityInput value={quantity} onChange={onQuantityChange} />
-        <h6 className="text-gray-500">{props.lineItem?.unit?.name}</h6>
+        <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>
       </div>
-      {props.lineItem.lineItemOptions.map((option, index) => {
+      {lineItem.lineItemOptions.map((option, index) => {
         return (
           <LineItemOptionDisplay
             key={`product-option-${index}`}
             props={{
               lineItemOption: option,
-              lineItem: props.lineItem,
+              lineItem: lineItem,
               onOptionSelection: onOptionSelection,
             }}
           />

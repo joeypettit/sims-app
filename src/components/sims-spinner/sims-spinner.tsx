@@ -2,20 +2,26 @@ import "./sims-spinner.css";
 
 type SimsSpinnerProps = {
   centered?: boolean;
+  withLogo?: boolean;
 };
 
-const SimsSpinner = ({ centered = false }: SimsSpinnerProps) => {
+const SimsSpinner = ({
+  centered = false,
+  withLogo = true,
+}: SimsSpinnerProps) => {
   const size = 100;
 
   const spinnerElement = (
     <div className="spinner-container" style={{ width: size, height: size }}>
       <div className="spinner"></div>
-      <img
-        src={"/assets/logo-green-no-circle-whitebg.png"}
-        alt={"sims logo"}
-        className="image"
-        style={{ width: size, height: size }}
-      />
+      {withLogo && (
+        <img
+          src={"/assets/logo-green-no-circle-whitebg.png"}
+          alt={"sims logo"}
+          className="image"
+          style={{ width: size, height: size }}
+        />
+      )}
     </div>
   );
 
