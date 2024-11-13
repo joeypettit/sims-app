@@ -4,8 +4,8 @@ import axios from "axios";
 import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItem } from "../app/types/line-item";
 import type { GroupCategory } from "../app/types/group-category";
-import type { AreaTemplate } from "../app/types/area-template";
 import type { LineItemUnit } from "../app/types/line-item-unit";
+import type { AreaTemplate } from "../app/types/area-template";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
@@ -280,5 +280,16 @@ export async function updateProject({
     return response.data;
   } catch (error) {
     throw new Error(`Error updating project with ID ${projectId}: ${error}`);
+  }
+}
+
+export async function getAllAreaTemplates() {
+  try {
+    const response = await axios.get<AreaTemplate[]>(
+      "/api/templates/area/all-templates"
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error fetching line item units: ${error}`);
   }
 }

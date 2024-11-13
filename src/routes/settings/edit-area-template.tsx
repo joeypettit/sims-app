@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getAreaTemplate } from "../../api/api";
 import ProjectAreaProposal from "../projects/project-area-proposal";
+import PanelHeaderBar from "../../components/page-header-bar";
 
 export default function EditAreaTemplate() {
   const queryClient = useQueryClient();
@@ -33,7 +34,7 @@ export default function EditAreaTemplate() {
   }
   return (
     <>
-      <h1>{areaTemplateQuery.data?.name}</h1>
+      <PanelHeaderBar title={areaTemplateQuery.data?.name} />
       <ProjectAreaProposal
         areaIdFromProps={areaTemplateQuery.data?.projectAreaId}
       />

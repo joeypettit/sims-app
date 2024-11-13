@@ -4,13 +4,14 @@ import { Project } from "../../app/types/project";
 import { getProjectById } from "../../api/api";
 import { ProjectArea } from "../../app/types/project-area";
 import { useNavigate } from "react-router-dom";
+import PanelHeaderBar from "../../components/page-header-bar";
 
 export default function ProjectDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   // Fetch the details for the specific item using the ID from the route params
-  const { data, isLoading, isError, error } = useQuery({
+  const projectQuery = useQuery({
     queryKey: ["project", id],
     queryFn: async () => {
       if (id == undefined || id == null) throw Error;
@@ -19,26 +20,32 @@ export default function ProjectDetails() {
     },
   });
 
-  if (isLoading) {
+  if (projectQuery.isLoading) {
     return <p>Loading...</p>;
   }
 
-  if (isError) {
-    return <p>Error: {error.message}</p>;
+  if (projectQuery.isError) {
+    return <p>Error: {projectQuery.error.message}</p>;
   }
 
   return (
     <>
-      <h1>{data?.name}</h1>
+      <PanelHeaderBar title={`Project: ${projectQuery.data?.name}`} />
       <div>
-        {data?.areas.map((area: ProjectArea) => (
-          <div
-            className="cursor-pointer"
-            key={area.id}
-            onClick={() => navigate(`area/${area.id}`)}
-          >
-            {area.name}
-          </div>
+        {projectQuery.data?.areas.map((area: ProjectArea) => (
+          <ul>
+            {projectQuery.data?.areas.map((area) => {
+              return (
+                <li
+                  key={area.id}
+                  className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
+                  onClick={() => navigate(`area/${area.id}`)}
+                >
+                  {area.name}
+                </li>
+              );
+            })}
+          </ul>
         ))}
       </div>
     </>

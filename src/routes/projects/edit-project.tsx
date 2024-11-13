@@ -165,7 +165,9 @@ export default function EditProject() {
   console.log("form data", formData);
   return (
     <>
-      <PanelHeaderBar title={`Editing Project: ${projectQuery.data?.name}`} />
+      <PanelHeaderBar
+        title={`Editing Project Details: ${projectQuery.data?.name}`}
+      />
       <form onSubmit={handleSubmit} className="p-2">
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-4">

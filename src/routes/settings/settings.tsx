@@ -6,6 +6,8 @@ import Modal from "../../components/modal";
 import { validateTemplateName } from "../../util/form-validation";
 import { createAreaTemplate } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
+import { getAllAreaTemplates } from "../../api/api";
+import { AreaTemplate } from "../../app/types/area-template";
 
 export default function SettingsPanel() {
   const navigate = useNavigate();
@@ -24,10 +26,11 @@ export default function SettingsPanel() {
   }, [isCreateTemplateModalOpen]);
 
   // Fetch the details for the specific item using the ID from the route params
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["project"],
+  const allTemplatesQuery = useQuery({
+    queryKey: ["all-area-templates"],
     queryFn: async () => {
-      return { blah: "blahblah" };
+      const templates = await getAllAreaTemplates();
+      return templates;
     },
   });
 
@@ -62,7 +65,7 @@ export default function SettingsPanel() {
     setTemplateModalErrorMessage("");
   }
 
-  if (isLoading || createAreaTemplateMutation.isPending) {
+  if (allTemplatesQuery.isLoading || createAreaTemplateMutation.isPending) {
     return (
       <>
         <div className="flex justify-center items-center w-full h-full">
@@ -72,8 +75,8 @@ export default function SettingsPanel() {
     );
   }
 
-  if (isError) {
-    return <p>Error: {error.message}</p>;
+  if (allTemplatesQuery.isError) {
+    return <p>Error: {allTemplatesQuery.error.message}</p>;
   }
 
   function renderTemplateModal() {
@@ -113,18 +116,34 @@ export default function SettingsPanel() {
 
   return (
     <>
-      <h1>Settings</h1>
-      <div>
-        <div className="flex flex-row bg-sims-green-100">
-          <h2>Templates</h2>
-          <Button
-            size="xs"
-            variant="primary"
-            // onClick={() => navigate("/settings/add-template")}
-            onClick={() => setIsCreateTemplateModalOpen(true)}
-          >
-            +
-          </Button>
+      <h1 className="font-bold">Settings</h1>
+      <div className="flex justify-center">
+        <div className="border border-gray-300 p-1 my-20 rounded w-1/2">
+          <div className="flex flex-row justify-between">
+            <h2 className="font-bold my-4">Templates</h2>
+            <Button
+              className="my-4"
+              size="xs"
+              variant="white"
+              onClick={() => setIsCreateTemplateModalOpen(true)}
+            >
+              +
+            </Button>
+          </div>
+          <ul>
+            {allTemplatesQuery.data?.map((template) => {
+              return (
+                <li
+                  className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
+                  onClick={() => {
+                    navigate(`/settings/edit-template/${template.id}`);
+                  }}
+                >
+                  {template.name}
+                </li>
+              );
+            })}
+          </ul>
         </div>
       </div>
       {renderTemplateModal()}
