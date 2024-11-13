@@ -12,7 +12,7 @@ type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 type ButtonTypes = "submit" | "reset" | "button" | undefined;
 
 // Define the props type
-type ButtonProps = {
+export type ButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
@@ -25,11 +25,11 @@ type ButtonProps = {
 export default function Button({
   children,
   onClick,
-  className,
+  className = "",
   disabled = false,
   variant = "primary",
   size = "md",
-  type,
+  type = "button",
 }: ButtonProps) {
   // Set button color based on the variant prop
   const getButtonClasses = () => {

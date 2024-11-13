@@ -245,6 +245,24 @@ export async function createBlankProject({ name }: { name: string }) {
   }
 }
 
+export async function createBlankProjectArea({
+  name,
+  projectId,
+}: {
+  name: string;
+  projectId: string;
+}) {
+  try {
+    const response = await axios.post(`/api/project-areas/create-blank`, {
+      name,
+      projectId,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error creating new blank project area: ${error}`);
+  }
+}
+
 export async function updateProject({
   projectId,
   name,

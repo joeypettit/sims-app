@@ -60,14 +60,14 @@ export default function AddProjectModal({
         {/* <p className="text-sm text-gray-500 pb-4">
    
         </p> */}
-        <label htmlFor="templateName" className={`block mb-2`}>
+        <label htmlFor="projectName" className={`block mb-2`}>
           Project Name:
         </label>
         <input
           type="text"
           autoComplete="off"
-          id="project-name"
-          name="project-name"
+          id="projectName"
+          name="projectName"
           ref={inputRef}
           value={projectNameInput}
           onChange={(e) => setProjectNameInput(e.target.value)}

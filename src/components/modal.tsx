@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Button from "./button";
+import type { ButtonProps } from "./button";
 
 type ModalProps = {
   isOpen: boolean;
@@ -9,6 +10,7 @@ type ModalProps = {
   onCancel?: () => void;
   disableConfirm?: boolean;
   disableCancel?: boolean;
+  actionButtons?: ButtonProps[];
   children: React.ReactNode;
 };
 
@@ -20,6 +22,7 @@ export default function Modal({
   children,
   disableConfirm = false,
   disableCancel = false,
+  actionButtons = [],
 }: ModalProps) {
   // Only render the modal if it's open
   if (!isOpen) return null;
@@ -50,6 +53,21 @@ export default function Modal({
               Confirm
             </Button>
           )}
+          {actionButtons.map((button, index) => {
+            return (
+              <Button
+                key={`button ${index}`}
+                className={button.className}
+                disabled={button.disabled}
+                onClick={button.onClick}
+                size={button.size}
+                variant={button.variant}
+                type={button.type}
+              >
+                {button.children}
+              </Button>
+            );
+          })}
         </div>
       </div>
     </div>,
