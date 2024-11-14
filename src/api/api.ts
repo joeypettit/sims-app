@@ -311,3 +311,27 @@ export async function getAllAreaTemplates() {
     throw new Error(`Error fetching line item units: ${error}`);
   }
 }
+
+export async function createAreaFromTemplate({
+  name,
+  projectId,
+  templateId,
+}: {
+  name: string;
+  projectId: string;
+  templateId: string;
+}) {
+  try {
+    const response = await axios.post(
+      `/api/project-areas/create-from-template`,
+      {
+        name,
+        projectId,
+        templateId,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error creating new project area from template: ${error}`);
+  }
+}

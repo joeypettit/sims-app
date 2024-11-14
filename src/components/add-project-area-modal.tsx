@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "./modal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { createBlankProjectArea } from "../api/api";
+import { createBlankProjectArea, getAllAreaTemplates } from "../api/api";
 import Button from "./button";
 import type { Project } from "../app/types/project";
+import type { AreaTemplate } from "../app/types/area-template";
+import { FaCheck } from "react-icons/fa6";
+import { createAreaFromTemplate } from "../api/api";
 
 type AddProjectAreaModalProps = {
   isOpen: boolean;
@@ -24,6 +27,16 @@ export default function AddProjectAreaModal({
   const [creationOption, setCreationOption] = useState<"scratch" | "template">(
     "template"
   );
+  const [screenDisplayed, setScreenDisplayed] = useState<1 | 2>(1);
+  const [selectedTemplate, setSelectedTemplate] = useState<AreaTemplate>();
+
+  const allAreaTemplatesQuery = useQuery({
+    queryKey: ["all-area-templates"],
+    queryFn: async () => {
+      const result = await getAllAreaTemplates();
+      return result;
+    },
+  });
 
   const createBlankAreaMutation = useMutation({
     mutationFn: async () => {
@@ -48,10 +61,37 @@ export default function AddProjectAreaModal({
     },
   });
 
+  const createAreaFromTemplateMutation = useMutation({
+    mutationFn: async () => {
+      if (project?.id && selectedTemplate) {
+        const result = await createAreaFromTemplate({
+          name: areaNameInput,
+          projectId: project.id,
+          templateId: selectedTemplate.id,
+        });
+        return result;
+      }
+      throw Error(
+        "Project Id and template id required to create new project area"
+      );
+    },
+    onSuccess: (data) => {
+      if (project?.id) {
+        navigate(`/project/${project.id}/area/${data.id}`);
+      }
+    },
+    onError: (error) => {
+      console.error("Error creating project:", error);
+      throw Error(`Error creating project: ${error}`);
+    },
+  });
+
   function handleCancel() {
     setAreaNameInput("");
     setModalErrorMessage("");
     setCreationOption("template");
+    setScreenDisplayed(1);
+    setSelectedTemplate(undefined);
     setIsOpen(false);
   }
 
@@ -63,30 +103,27 @@ export default function AddProjectAreaModal({
     }
     if (creationOption == "scratch") {
       createBlankAreaMutation.mutate();
+      return;
     }
+    if (screenDisplayed == 1) {
+      setScreenDisplayed(2);
+      return;
+    }
+    if (!selectedTemplate) {
+      setModalErrorMessage("Please select a template before proceding.");
+      return;
+    }
+    createAreaFromTemplateMutation.mutate();
   }
 
-  // Set focus on the input element when the modal opens
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+  function handleTemplateListClick(template: AreaTemplate) {
+    console.log("selected");
+    setSelectedTemplate(template);
+    setModalErrorMessage("");
+  }
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      title="New Project Area"
-      onCancel={handleCancel}
-      actionButtons={[
-        {
-          variant: "primary",
-          children: "Next",
-          onClick: handleNextButtonClick,
-        },
-      ]}
-    >
+  function renderScreenOne() {
+    return (
       <div className="flex flex-col justify-center items-center">
         <label htmlFor="project-name" className="block mb-2">
           Project Area Name:
@@ -133,6 +170,70 @@ export default function AddProjectAreaModal({
           <div className="text-rose-700">{modalErrorMessage}</div>
         )}
       </div>
+    );
+  }
+
+  function renderScreenTwo() {
+    return (
+      <div className="flex flex-col justify-center items-center">
+        <h1>Please select a template.</h1>
+        <ul className="scroll-auto max-h-60 overflow-scroll rounded">
+          {allAreaTemplatesQuery.data?.map((template) => {
+            console.log(
+              "selected template",
+              selectedTemplate?.id == template.id
+            );
+            return (
+              <li
+                key={template.id}
+                className={
+                  selectedTemplate?.id == template.id
+                    ? "bg-sims-green-400 p-1 cursor-pointer hover:bg-sims-green-400 shadow-inner"
+                    : "p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
+                }
+                onClick={() => handleTemplateListClick(template)}
+              >
+                <div className="grid grid-cols-4">
+                  <div className="flex items-center p-1">
+                    {selectedTemplate?.id == template.id && <FaCheck />}
+                  </div>
+                  <div className="col-span-3 flex justify-start p-1">
+                    {template.name}
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+        {modalErrorMessage && (
+          <div className="text-rose-700">{modalErrorMessage}</div>
+        )}
+      </div>
+    );
+  }
+
+  // Set focus on the input element when the modal opens
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      title="New Project Area"
+      onCancel={handleCancel}
+      actionButtons={[
+        {
+          variant: "primary",
+          children: "Next",
+          onClick: handleNextButtonClick,
+        },
+      ]}
+    >
+      {screenDisplayed == 1 ? renderScreenOne() : renderScreenTwo()}
     </Modal>
   );
 }
