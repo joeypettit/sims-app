@@ -39,10 +39,12 @@ export default function EditLineItem() {
   const lineItemQuery = useQuery({
     queryKey: ["line-item", lineItemId],
     queryFn: async () => {
+      console.log("REFETCHING");
       if (!lineItemId) {
         throw Error("Line Item Id is required.");
       }
       const result = await getLineItem(lineItemId);
+      console.log("result is", result);
       return result;
     },
     staleTime: Infinity,
@@ -58,6 +60,7 @@ export default function EditLineItem() {
       window.history.back();
     },
     onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["line-item", lineItemId] });
       queryClient.invalidateQueries({ queryKey: ["area-template"] });
     },
   });
@@ -145,8 +148,10 @@ export default function EditLineItem() {
     window.history.back();
   }
   useEffect(() => {
+    console.log("use effect", lineItemQuery.data, formData);
     // prepopulate local state for form
-    if (lineItemQuery.data && !formData) {
+    if (lineItemQuery.data != undefined && formData == undefined) {
+      console.log("setting data", lineItemQuery.data, formData);
       setFormData(lineItemQuery.data);
     }
   }, [lineItemQuery.data, formData]);
@@ -160,7 +165,6 @@ export default function EditLineItem() {
       </>
     );
   }
-  console.log("line item", formData);
   return (
     <>
       <PanelHeaderBar
@@ -223,19 +227,25 @@ export default function EditLineItem() {
         </div>
         <div className="py-6">
           <h1 className="font-bold">Options:</h1>
-          {formData.lineItemOptions.map((option) => {
-            return (
-              <div>
-                <hr />
-                <OptionForm
-                  key={option.id}
-                  option={option}
-                  lineItem={formData}
-                  onChange={onOptionChange}
-                />
-              </div>
-            );
-          })}
+          {formData.lineItemOptions
+            .sort((a: LineItemOption, b: LineItemOption) => {
+              if (a.optionTier.tierLevel > b.optionTier.tierLevel) return 1;
+              if (a.optionTier.tierLevel < b.optionTier.tierLevel) return -1;
+              return 0;
+            })
+            .map((option) => {
+              return (
+                <div key={option.id}>
+                  <hr />
+                  <OptionForm
+                    key={option.id}
+                    option={option}
+                    lineItem={formData}
+                    onChange={onOptionChange}
+                  />
+                </div>
+              );
+            })}
           <hr />
         </div>
         <div className="flex flex-row gap-4 justify-end">

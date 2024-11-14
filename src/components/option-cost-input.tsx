@@ -11,7 +11,10 @@ export default function OptionCostInput({
   option,
   onChange,
 }: OptionCostInputProps) {
-  const [useExactCost, setUseExactCost] = useState(false);
+  const [useExactCost, setUseExactCost] = useState(() => {
+    if (option.exactCostInDollarsPerUnit != null) return true;
+    return false;
+  });
 
   const handleToggle = (isExact: boolean) => {
     const newOption = structuredClone(option);
@@ -60,9 +63,9 @@ export default function OptionCostInput({
         <div>
           Cost <span className="text-slate-500">(per unit)</span>:
         </div>
-        <div className="flex flex-row gap-2">
-          <div className="flex flex-row justify-center items-center">
-            <label>Range </label>
+        <div className="flex flex-row">
+          <div className="flex px-1 flex-row justify-center items-center border-r border-gray-300">
+            <label className="pr-1">Range</label>
             <input
               type="checkbox"
               autoComplete="off"
@@ -71,8 +74,8 @@ export default function OptionCostInput({
               className="cursor-pointer bg-sims-green-900"
             />
           </div>
-          <div className="flex flex-row justify-center items-center">
-            <label>Exact </label>
+          <div className="flex flex-row justify-center items-center px-1">
+            <label className="pr-1">Exact</label>
             <input
               type="checkbox"
               autoComplete="off"
@@ -85,7 +88,7 @@ export default function OptionCostInput({
       </div>
 
       {useExactCost ? (
-        <div>
+        <div className="py-1">
           <label htmlFor="exactCostInDollarsPerUnit" className="hidden mb-1">
             Exact Cost (Per Unit)
           </label>
@@ -108,7 +111,7 @@ export default function OptionCostInput({
           </div>
         </div>
       ) : (
-        <div>
+        <div className="py-1">
           <label className="mb-1 hidden">Cost Range (Per Unit):</label>
           <div className="flex space-x-2">
             <div className="flex flex-row justify-center items-center">
