@@ -9,6 +9,7 @@ import EditAreaTemplate from "../routes/settings/edit-area-template.tsx";
 import EditLineItem from "../routes/settings/edit-line-item.tsx";
 import PanelWindow from "../components/panel-window.tsx";
 import EditProject from "../routes/projects/edit-project.tsx";
+import EditProjectArea from "../routes/projects/edit-project-area.tsx";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +51,7 @@ const router = createBrowserRouter([
         path: "/project/:id/area/:areaId",
         element: (
           <PanelWindow>
-            <ProjectAreaProposal />
+            <EditProjectArea />
           </PanelWindow>
         ),
         errorElement: (

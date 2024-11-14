@@ -34,10 +34,8 @@ export default function EditAreaTemplate() {
   }
   return (
     <>
-      <PanelHeaderBar title={areaTemplateQuery.data?.name} />
-      <ProjectAreaProposal
-        areaIdFromProps={areaTemplateQuery.data?.projectAreaId}
-      />
+      <PanelHeaderBar title={`Template: ${areaTemplateQuery.data?.name}`} />
+      <ProjectAreaProposal areaId={areaTemplateQuery.data?.projectAreaId} />
     </>
   );
 }

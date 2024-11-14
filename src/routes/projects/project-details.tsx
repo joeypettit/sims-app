@@ -53,21 +53,19 @@ export default function ProjectDetails() {
             </Button>
           </div>
           <div>
-            {projectQuery.data?.areas.map((area: ProjectArea) => (
-              <ul>
-                {projectQuery.data?.areas.map((area) => {
-                  return (
-                    <li
-                      key={area.id}
-                      className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
-                      onClick={() => navigate(`area/${area.id}`)}
-                    >
-                      {area.name}
-                    </li>
-                  );
-                })}
-              </ul>
-            ))}
+            <ul>
+              {projectQuery.data?.areas.map((area) => {
+                return (
+                  <li
+                    key={area.id}
+                    className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
+                    onClick={() => navigate(`area/${area.id}`)}
+                  >
+                    {area.name}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
       </div>

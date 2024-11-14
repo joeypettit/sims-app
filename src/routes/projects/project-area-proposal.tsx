@@ -17,13 +17,12 @@ import { validateGroupName } from "../../util/form-validation";
 import Button from "../../components/button";
 
 type ProjectAreaProposalProps = {
-  areaIdFromProps?: string;
+  areaId?: string;
 };
 
 export default function ProjectAreaProposal({
-  areaIdFromProps,
+  areaId,
 }: ProjectAreaProposalProps) {
-  const { areaIdFromParams } = useParams();
   const queryClient = useQueryClient();
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [createGroupErrorMessage, setCreateGroupErrorMessage] =
@@ -31,7 +30,6 @@ export default function ProjectAreaProposal({
   const [groupNameInput, setGroupNameInput] = useState("");
   const [newGroupCategoryId, setNewGroupCategoryId] = useState<string>("");
   const [panelIsLoading, setPanelIsLoading] = useState(false);
-  const areaId = areaIdFromProps || areaIdFromParams;
 
   function handleOpenCreateGroupModal(categoryId: string) {
     setNewGroupCategoryId(categoryId);
@@ -203,10 +201,11 @@ export default function ProjectAreaProposal({
   if (projectAreaQuery.isError) {
     return <p>Error: {projectAreaQuery.error.message}</p>;
   }
-  console.log("rerender");
   return (
     <>
-      <h1>{projectAreaQuery.data?.name}</h1>
+      <div className="flex justify-center items-center p-4">
+        <h1 className="font-bold text-lg">{projectAreaQuery.data?.name}</h1>
+      </div>
       {categoriesQuery.data?.map((category) => {
         const key = category.id;
         return (

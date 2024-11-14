@@ -134,6 +134,7 @@ export default function SettingsPanel() {
             {allTemplatesQuery.data?.map((template) => {
               return (
                 <li
+                  key={template.id}
                   className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
                   onClick={() => {
                     navigate(`/settings/edit-template/${template.id}`);
