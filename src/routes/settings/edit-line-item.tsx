@@ -1,12 +1,9 @@
 import { useState, useEffect } from "react";
 import type { LineItemOption } from "../../app/types/line-item-option";
-import { useLocation, useNavigation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import type { LineItemUnit } from "../../app/types/line-item-unit";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getUnits } from "../../api/api";
 import UnitSelector from "../../components/unit-selector";
-import { createBlankLineItem } from "../../api/api";
-import type { LineItemGroup } from "../../app/types/line-item-group";
 import QuantityInput from "../../components/quantity-input";
 import type { LineItem } from "../../app/types/line-item";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
@@ -15,7 +12,6 @@ import OptionForm from "./option-form";
 import { updateLineItem } from "../../api/api";
 import Button from "../../components/button";
 import { NumericFormat } from "react-number-format";
-import { IoChevronBackOutline } from "react-icons/io5";
 
 import PanelHeaderBar from "../../components/page-header-bar";
 // type LineItemFormData = {
@@ -37,7 +33,6 @@ import PanelHeaderBar from "../../components/page-header-bar";
 
 export default function EditLineItem() {
   const queryClient = useQueryClient();
-  const location = useLocation();
   const { lineItemId } = useParams();
   const [formData, setFormData] = useState<LineItem | undefined>(undefined);
 

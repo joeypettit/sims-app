@@ -14,7 +14,6 @@ export default function AddProjectModal({
   setIsOpen,
 }: AddProjectModalProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [projectNameInput, setProjectNameInput] = useState("");
   const [modalErrorMessage, setModalErrorMessage] = useState<String>("");
 

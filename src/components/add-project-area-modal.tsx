@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "./modal";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createBlankProjectArea, getAllAreaTemplates } from "../api/api";
-import Button from "./button";
 import type { Project } from "../app/types/project";
 import type { AreaTemplate } from "../app/types/area-template";
 import { FaCheck } from "react-icons/fa6";
@@ -21,7 +20,6 @@ export default function AddProjectAreaModal({
   project,
 }: AddProjectAreaModalProps) {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [areaNameInput, setAreaNameInput] = useState("");
   const [modalErrorMessage, setModalErrorMessage] = useState<string>("");
   const [creationOption, setCreationOption] = useState<"scratch" | "template">(

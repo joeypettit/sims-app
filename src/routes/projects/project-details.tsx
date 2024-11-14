@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { Project } from "../../app/types/project";
 import { getProjectById } from "../../api/api";
-import { ProjectArea } from "../../app/types/project-area";
 import { useNavigate } from "react-router-dom";
 import PanelHeaderBar from "../../components/page-header-bar";
 import Button from "../../components/button";
