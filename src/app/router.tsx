@@ -10,6 +10,7 @@ import EditLineItem from "../routes/settings/edit-line-item.tsx";
 import PanelWindow from "../components/panel-window.tsx";
 import EditProject from "../routes/projects/edit-project.tsx";
 import EditProjectArea from "../routes/projects/edit-project-area.tsx";
+import SpinnerPage from "../components/spinner-page.tsx";
 
 const router = createBrowserRouter([
   {
@@ -104,6 +105,19 @@ const router = createBrowserRouter([
         element: (
           <PanelWindow>
             <EditProject />
+          </PanelWindow>
+        ),
+        errorElement: (
+          <PanelWindow>
+            <ErrorPage />
+          </PanelWindow>
+        ),
+      },
+      {
+        path: "/spinner-page",
+        element: (
+          <PanelWindow>
+            <SpinnerPage />
           </PanelWindow>
         ),
         errorElement: (

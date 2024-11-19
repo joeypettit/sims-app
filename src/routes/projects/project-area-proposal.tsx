@@ -15,6 +15,7 @@ import Modal from "../../components/modal";
 import { useState } from "react";
 import { validateGroupName } from "../../util/form-validation";
 import Button from "../../components/button";
+import StickyTierToolbar from "../../components/tier-toolbar";
 
 type ProjectAreaProposalProps = {
   areaId?: string;
@@ -206,11 +207,12 @@ export default function ProjectAreaProposal({
       <div className="flex justify-center items-center p-4">
         <h1 className="font-bold text-lg">{projectAreaQuery.data?.name}</h1>
       </div>
+      <StickyTierToolbar />
       {categoriesQuery.data?.map((category) => {
         const key = category.id;
         return (
-          <div key={key}>
-            <h2 className="text-md font-bold text-center bg-sims-green-50 rounded-sm">
+          <div key={key} className="py-4">
+            <h2 className="text-md font-bold text-center bg-sims-green-100 shadow-sm rounded-sm">
               {category.name}
             </h2>
             {projectAreaQuery.data?.lineItemGroups.map(
@@ -229,7 +231,7 @@ export default function ProjectAreaProposal({
             )}
             <Button
               size="sm"
-              variant="primary"
+              variant="white"
               onClick={() => handleOpenCreateGroupModal(category.id)}
             >
               + Add Group
@@ -238,7 +240,11 @@ export default function ProjectAreaProposal({
         );
       })}
       {renderCreateGroupModal()}
-      <div>Project Total: {getAreasTotalSalePrice()}</div>
+      <div className="flex justify-center ">
+        <div className="p-8 border border-gray-300 font-bold rounded shadow">
+          Project Total: {getAreasTotalSalePrice()}
+        </div>
+      </div>
     </>
   );
 }

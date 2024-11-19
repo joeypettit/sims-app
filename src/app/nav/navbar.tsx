@@ -5,6 +5,7 @@ import { BsChevronDoubleLeft } from "react-icons/bs";
 import { BsChevronDoubleRight } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { BsHousesFill } from "react-icons/bs";
+import { ImSpinner11 } from "react-icons/im";
 
 const iconSize = "1.8rem";
 
@@ -18,6 +19,11 @@ const links = [
     to: "/settings",
     label: "Settings",
     icon: <IoMdSettings size={iconSize} />,
+  },
+  {
+    to: "/spinner-page",
+    label: "Spinner",
+    icon: <ImSpinner11 size={iconSize} />,
   },
 ];
 
@@ -39,11 +45,12 @@ function NavBar() {
     };
   }, []);
 
-  if (windowWidth > 768) {
-    return <LargeScreenNavBar />;
-  } else {
-    return <SmallScreenNavBar />;
-  }
+  return <LargeScreenNavBar />;
+
+  // if (windowWidth > 768) {
+  // } else {
+  //   return <SmallScreenNavBar />;
+  // }
 }
 
 function LargeScreenNavBar() {

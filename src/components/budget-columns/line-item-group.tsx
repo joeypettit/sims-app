@@ -6,6 +6,7 @@ import Button from "../button";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { createBlankLineItem } from "../../api/api";
+import { IoIosArrowUp } from "react-icons/io";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
@@ -71,14 +72,14 @@ export default function LineItemGroupDisplay({
             />
           );
         })}
-        <Button
-          size={"xs"}
-          variant="secondary"
-          className="m-1"
-          onClick={handleCreateLineItem}
-        >
-          + Add Line
-        </Button>
+        <div className="grid grid-cols-5 gap-4 py-2 pl-4">
+          <div>
+            <Button size={"xs"} variant="white" onClick={handleCreateLineItem}>
+              + Add Line
+            </Button>
+          </div>
+          <div></div>
+        </div>
       </CollapsibleDiv>
       <hr />
     </div>
