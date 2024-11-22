@@ -1,16 +1,19 @@
-import React, { useState, ReactNode } from "react";
+import { ReactNode } from "react";
 import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
 
 export default function CollapsibleDiv({
   title,
   price,
+  isOpen,
+  setIsOpen,
   children,
 }: {
   title: string;
   price: string;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   children: ReactNode;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
 
   const toggleCollapse = () => {
     setIsOpen(!isOpen);
@@ -41,9 +44,8 @@ export default function CollapsibleDiv({
         </div>
       </div>
       <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
-        }`}
+        className={`transition-all duration-300 ease-in-out ${isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
+          }`}
       >
         {isOpen && <div className="mt-4">{children}</div>}
       </div>

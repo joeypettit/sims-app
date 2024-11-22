@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Modal from "./modal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createBlankProject } from "../api/api";
 
@@ -15,7 +15,7 @@ export default function AddProjectModal({
 }: AddProjectModalProps) {
   const navigate = useNavigate();
   const [projectNameInput, setProjectNameInput] = useState("");
-  const [modalErrorMessage, setModalErrorMessage] = useState<String>("");
+  const [modalErrorMessage, setModalErrorMessage] = useState<string>("");
 
   const createProjectMutation = useMutation({
     mutationFn: async () => {

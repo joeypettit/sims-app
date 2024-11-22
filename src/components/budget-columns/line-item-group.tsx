@@ -3,10 +3,10 @@ import LineItemDisplay from "./line-item";
 import CollapsibleDiv from "../collapsible-div";
 import { formatNumberWithCommas } from "../../util/utils";
 import Button from "../button";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { createBlankLineItem } from "../../api/api";
-import { IoIosArrowUp } from "react-icons/io";
+import { createBlankLineItem, setGroupIsOpen } from "../../api/api";
+import { useState } from "react";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
@@ -18,7 +18,7 @@ export default function LineItemGroupDisplay({
   setPanelIsLoading,
 }: LineItemGroupDisplayProps) {
   const navigate = useNavigate();
-  const location = useLocation();
+  const [isOpen, setIsOpen] = useState(() => group.isOpen)
 
   function getGroupsTotalSalePrice() {
     if (group.totalSalePrice) {
@@ -55,14 +55,31 @@ export default function LineItemGroupDisplay({
       throw Error(`Error creating line item: ${error}`);
     },
   });
+  const setIsOpenMutation = useMutation({
+    mutationFn: async ({ groupId, isOpen }: { groupId: string, isOpen: boolean }) => {
+      const result = await setGroupIsOpen({ groupId, isOpen });
+      return result;
+    },
+    onSuccess: (data) => {
+      setIsOpen(data.isOpen)
+    },
+    onError: (error) => {
+      console.error("Error setting isOpen", error);
+      throw Error(`Error setting isOpen: ${error}`);
+    },
+  });
+
 
   function handleCreateLineItem() {
     createLineItemMutation.mutate({ groupId: group.id });
   }
+  function handleToggleOpenGroup() {
+    setIsOpenMutation.mutate({ groupId: group.id, isOpen: !isOpen });
+  }
 
   return (
     <div className="py-2">
-      <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()}>
+      <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup}>
         {group.lineItems.map((lineItem) => {
           return (
             <LineItemDisplay

@@ -8,4 +8,5 @@ export type LineItemGroup = {
   lineItems: LineItem[];
   groupCategory: GroupCategory;
   totalSalePrice: PriceRange;
+  isOpen: boolean;
 };

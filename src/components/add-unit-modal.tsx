@@ -12,7 +12,7 @@ type AddUnitModalProps = {
 export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
   const queryClient = useQueryClient();
   const [unitNameInput, setUnitNameInput] = useState("");
-  const [modalErrorMessage, setModalErrorMessage] = useState<String>("");
+  const [modalErrorMessage, setModalErrorMessage] = useState<string>("");
   async function handleModalConfirm() {
     setModalErrorMessage("");
     const errorMessage = validateUnitName(unitNameInput);
@@ -32,12 +32,12 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
 
   const createUnitMutation = useMutation({
     mutationFn: createUnit,
-    onError: (error, variables, context) => {
+    onError: () => {
       setModalErrorMessage(
         "There has been an error creating a new unit. Please try again."
       );
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: (data) => {
       console.log("Unit Created with id", data.id);
       queryClient.invalidateQueries({ queryKey: ["units"] });
       setUnitNameInput("");

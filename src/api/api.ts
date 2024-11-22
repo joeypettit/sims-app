@@ -6,6 +6,7 @@ import type { LineItem } from "../app/types/line-item";
 import type { GroupCategory } from "../app/types/group-category";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
+import { LineItemGroup } from "../app/types/line-item-group";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
@@ -23,8 +24,13 @@ export async function getProjectById(id: string) {
 }
 
 export async function getProjectAreaById(areaId: string) {
-  const response = await axios.get<ProjectArea>(`/api/projects/area/${areaId}`);
-  return response.data;
+  try {
+    const response = await axios.get<ProjectArea>(`/api/projects/area/${areaId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error getting project area by id with id ${areaId}`, error);
+    throw new Error(`Failed to update line item option selection`);
+  }
 }
 
 export async function updateOptionSelection({
@@ -335,3 +341,20 @@ export async function createAreaFromTemplate({
     throw new Error(`Error creating new project area from template: ${error}`);
   }
 }
+
+export async function setGroupIsOpen({
+  groupId,
+  isOpen,
+}: {
+  groupId: string;
+  isOpen: boolean;
+}) {
+  const response = await axios.put<LineItemGroup>(
+    `/api/groups/${groupId}/update-isopen`,
+    {
+      isOpen,
+    }
+  );
+
+  return response.data;
+};
