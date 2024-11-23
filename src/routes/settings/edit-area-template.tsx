@@ -33,8 +33,7 @@ export default function EditAreaTemplate() {
   }
   return (
     <>
-      <PanelHeaderBar title={`Template: ${areaTemplateQuery.data?.name}`} />
-      <ProjectAreaProposal areaId={areaTemplateQuery.data?.projectAreaId} />
+      <ProjectAreaProposal areaId={areaTemplateQuery.data?.projectAreaId} templateTitle={areaTemplateQuery.data?.name} />
     </>
   );
 }

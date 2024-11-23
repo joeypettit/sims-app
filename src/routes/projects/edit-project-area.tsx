@@ -7,7 +7,6 @@ export default function EditProjectArea() {
 
   return (
     <>
-      <PanelHeaderBar />
       <ProjectAreaProposal areaId={areaId} />
     </>
   );

@@ -20,10 +20,12 @@ import { ProjectArea } from "../../app/types/project-area";
 
 type ProjectAreaProposalProps = {
   areaId?: string;
+  templateTitle?: string;
 };
 
 export default function ProjectAreaProposal({
   areaId,
+  templateTitle
 }: ProjectAreaProposalProps) {
   const queryClient = useQueryClient();
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
@@ -48,7 +50,12 @@ export default function ProjectAreaProposal({
       setIsOpenAllGroupsInAreaMutation.mutate({ areaId: areaId, isOpen: isOpen })
     }
   }
-
+  function getTitle() {
+    if (templateTitle) {
+      return templateTitle;
+    }
+    return projectAreaQuery.data?.name || ""
+  }
   const projectAreaQuery = useQuery({
     queryKey: ["area"],
     queryFn: async () => {
@@ -243,10 +250,7 @@ export default function ProjectAreaProposal({
   }
   return (
     <>
-      <div className="flex justify-center items-center p-4">
-        <h1 className="font-bold text-lg">{projectAreaQuery.data?.name}</h1>
-      </div>
-      <StickyTierToolbar handleSetIsOpen={handleToggleOpenAllGroups} />
+      <StickyTierToolbar title={getTitle()} handleSetIsOpen={handleToggleOpenAllGroups} />
       {categoriesQuery.data?.map((category) => {
         const key = category.id;
         return (
