@@ -355,6 +355,23 @@ export async function setGroupIsOpen({
       isOpen,
     }
   );
+  return response.data;
+};
 
+export async function setIsOpenOnAllGroupsInArea({
+  areaId,
+  isOpen,
+}: {
+  areaId: string;
+  isOpen: boolean;
+}) {
+  console.log("isOpen", isOpen)
+  const response = await axios.put<ProjectArea>(
+    `/api/groups/update-isopen-by-area`,
+    {
+      areaId,
+      isOpen,
+    }
+  );
   return response.data;
 };

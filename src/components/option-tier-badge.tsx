@@ -23,7 +23,7 @@ export default function OptionTierBadge({ tier }: OptionTierBadgeProps) {
     <>
       {tier && (
         <span
-          className={`px-2 py-1  bg-blue-500  rounded text-sm font-semibold ${getBadgeColor(
+          className={`px-2 py-1  flex justify-center items-center  bg-blue-500  rounded text-sm font-semibold ${getBadgeColor(
             tier.tierLevel
           )}`}
         >

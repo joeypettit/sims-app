@@ -3,6 +3,7 @@ import {
   createGroup,
   getAllGroupCategories,
   getProjectAreaById,
+  setIsOpenOnAllGroupsInArea,
 } from "../../api/api";
 import LineItemGroupContainer from "../../components/budget-columns/line-item-group";
 import type { LineItemGroup } from "../../app/types/line-item-group";
@@ -15,6 +16,7 @@ import { useState } from "react";
 import { validateGroupName } from "../../util/form-validation";
 import Button from "../../components/button";
 import StickyTierToolbar from "../../components/tier-toolbar";
+import { ProjectArea } from "../../app/types/project-area";
 
 type ProjectAreaProposalProps = {
   areaId?: string;
@@ -29,15 +31,22 @@ export default function ProjectAreaProposal({
     useState<string>("");
   const [groupNameInput, setGroupNameInput] = useState("");
   const [newGroupCategoryId, setNewGroupCategoryId] = useState<string>("");
-  const [panelIsLoading, setPanelIsLoading] = useState(false);
 
   function handleOpenCreateGroupModal(categoryId: string) {
     setNewGroupCategoryId(categoryId);
     setIsCreateGroupModalOpen(true);
   }
+
   function handleCloseCreateGroupModal() {
     setGroupNameInput("");
     setIsCreateGroupModalOpen(false);
+  }
+
+
+  function handleToggleOpenAllGroups(isOpen: boolean) {
+    if (areaId) {
+      setIsOpenAllGroupsInAreaMutation.mutate({ areaId: areaId, isOpen: isOpen })
+    }
   }
 
   const projectAreaQuery = useQuery({
@@ -83,6 +92,37 @@ export default function ProjectAreaProposal({
     queryFn: async () => {
       const result = await getAllGroupCategories();
       return result;
+    },
+  });
+
+  const setIsOpenAllGroupsInAreaMutation = useMutation({
+    mutationFn: setIsOpenOnAllGroupsInArea,
+    onMutate: async ({ areaId, isOpen }) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+
+      // Optimistic Update: Update the query cache directly
+      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+      if (previousArea) {
+        queryClient.setQueryData(["area"], {
+          ...previousArea,
+          lineItemGroups: previousArea.lineItemGroups.map((group) => ({
+            ...group,
+            isOpen: isOpen, // Update the isOpen property for all groups
+          })),
+        });
+      }
+
+      return previousArea; // Return to rollback in case of error
+    },
+    onError: (error) => {
+      console.log("Error in setIsOpenAllGroupsInArea", error);
+      setCreateGroupErrorMessage(
+        "There has been an error setting isOpen on all groups. Please try again."
+      );
+    },
+    onSuccess: () => {
+      // Optionally refetch to ensure data consistency
+      queryClient.invalidateQueries({ queryKey: ["area"] });
     },
   });
 
@@ -206,7 +246,7 @@ export default function ProjectAreaProposal({
       <div className="flex justify-center items-center p-4">
         <h1 className="font-bold text-lg">{projectAreaQuery.data?.name}</h1>
       </div>
-      <StickyTierToolbar />
+      <StickyTierToolbar handleSetIsOpen={handleToggleOpenAllGroups} />
       {categoriesQuery.data?.map((category) => {
         const key = category.id;
         return (
@@ -221,7 +261,6 @@ export default function ProjectAreaProposal({
                     <div key={group.id}>
                       <LineItemGroupContainer
                         group={group}
-                        setPanelIsLoading={setPanelIsLoading}
                       />
                     </div>
                   );
@@ -239,7 +278,7 @@ export default function ProjectAreaProposal({
         );
       })}
       {renderCreateGroupModal()}
-      <div className="flex justify-center ">
+      <div className="flex justify-center">
         <div className="p-8 border border-gray-300 font-bold rounded shadow">
           Project Total: {getAreasTotalSalePrice()}
         </div>

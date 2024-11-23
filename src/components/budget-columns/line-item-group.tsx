@@ -6,16 +6,14 @@ import Button from "../button";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { createBlankLineItem, setGroupIsOpen } from "../../api/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
-  setPanelIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default function LineItemGroupDisplay({
   group,
-  setPanelIsLoading,
 }: LineItemGroupDisplayProps) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(() => group.isOpen)
@@ -41,16 +39,13 @@ export default function LineItemGroupDisplay({
 
   const createLineItemMutation = useMutation({
     mutationFn: async ({ groupId }: { groupId: string }) => {
-      setPanelIsLoading(true);
       const result = await createBlankLineItem({ groupId });
       return result;
     },
     onSuccess: (data) => {
-      setPanelIsLoading(false);
       navigate(`/edit-line-item/${data.id}`);
     },
     onError: (error) => {
-      setPanelIsLoading(false);
       console.error("Error creating line item:", error);
       throw Error(`Error creating line item: ${error}`);
     },
@@ -76,6 +71,9 @@ export default function LineItemGroupDisplay({
   function handleToggleOpenGroup() {
     setIsOpenMutation.mutate({ groupId: group.id, isOpen: !isOpen });
   }
+  useEffect(() => {
+    setIsOpen(group.isOpen); // Sync state with updated prop
+  }, [group.isOpen]);
 
   return (
     <div className="py-2">
