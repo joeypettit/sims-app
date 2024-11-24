@@ -156,7 +156,7 @@ export default function LineItemDisplay({
     <div className="grid grid-cols-5 gap-4 py-2 pl-4 ">
       <div className="flex flex-col text-center items-center pr-4 ">
         <div className="flex flex-row justify-between w-full">
-          <h1>{lineItem.name}</h1>
+          <h1 className="text-left">{lineItem.name}</h1>
           <LineItemActionsButton lineItem={lineItem} />
         </div>
         <QuantityInput value={quantity} onChange={onQuantityChange} />
