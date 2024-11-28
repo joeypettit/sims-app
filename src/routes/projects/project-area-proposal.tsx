@@ -3,6 +3,7 @@ import {
   createGroup,
   getAllGroupCategories,
   getProjectAreaById,
+  setIndexOfGroupInCategory,
   setIsOpenOnAllGroupsInArea,
 } from "../../api/api";
 import LineItemGroupContainer from "../../components/budget-columns/line-item-group";
@@ -17,6 +18,7 @@ import { validateGroupName } from "../../util/form-validation";
 import Button from "../../components/button";
 import StickyTierToolbar from "../../components/tier-toolbar";
 import { ProjectArea } from "../../app/types/project-area";
+import { DragDropContext, Droppable, DropResult, OnDragEndResponder } from "@hello-pangea/dnd";
 
 type ProjectAreaProposalProps = {
   areaId?: string;
@@ -101,6 +103,37 @@ export default function ProjectAreaProposal({
       return result;
     },
   });
+
+
+  const changeGroupIndexInCategoryMutation = useMutation({
+    mutationFn: setIndexOfGroupInCategory,
+    onMutate: async ({ }) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+
+      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+      if (previousArea) {
+        queryClient.setQueryData(["area"], {
+          ...previousArea,
+          lineItemGroups: previousArea.lineItemGroups.map((group) => ({
+            ...group,
+          })),
+        });
+      }
+
+      return previousArea; // Return to rollback in case of error
+    },
+    onError: (error) => {
+      console.log("Error in setIsOpenAllGroupsInArea", error);
+      setCreateGroupErrorMessage(
+        "There has been an error setting isOpen on all groups. Please try again."
+      );
+    },
+    onSuccess: () => {
+      // Optionally refetch to ensure data consistency
+      queryClient.invalidateQueries({ queryKey: ["area"] });
+    },
+  });
+
 
   const setIsOpenAllGroupsInAreaMutation = useMutation({
     mutationFn: setIsOpenOnAllGroupsInArea,
@@ -237,6 +270,24 @@ export default function ProjectAreaProposal({
     );
   }
 
+  function onDragEnd(
+    result: DropResult<string>
+  ) {
+
+    if (!result.destination) {
+      return;
+    }
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+
+    const startingIndex = result.source.index;
+    const endingEnding = result.destination.index
+
+    const draggedGroupId = projectAreaQuery.data?.lineItemGroups[startingIndex]
+    console.log("dragged group is", draggedGroupId?.name)
+  }
+
   if (projectAreaQuery.isLoading) {
     return (
       <div className="flex justify-center items-center w-full h-full">
@@ -248,6 +299,22 @@ export default function ProjectAreaProposal({
   if (projectAreaQuery.isError) {
     return <p>Error: {projectAreaQuery.error.message}</p>;
   }
+
+  function GroupCategoryList({ categoryId }: { categoryId: string }) {
+    return projectAreaQuery.data?.lineItemGroups.map(
+      (group: LineItemGroup) => {
+        if (categoryId == group.groupCategory.id) {
+          return (
+            <LineItemGroupContainer
+              key={group.id}
+              group={group}
+            />
+          );
+        }
+      }
+    )
+  }
+
   return (
     <>
       <StickyTierToolbar title={getTitle()} handleSetIsOpen={handleToggleOpenAllGroups} />
@@ -258,19 +325,19 @@ export default function ProjectAreaProposal({
             <h2 className="text-md font-bold text-center bg-sims-green-100 shadow-sm rounded-sm">
               {category.name}
             </h2>
-            {projectAreaQuery.data?.lineItemGroups.map(
-              (group: LineItemGroup) => {
-                if (category.id == group.groupCategory.id) {
-                  return (
-                    <div key={group.id}>
-                      <LineItemGroupContainer
-                        group={group}
-                      />
-                    </div>
-                  );
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable
+                droppableId={`
+                categoryGroupList-${category.id}`}>
+                {provided => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    <GroupCategoryList categoryId={category.id} />
+                    {provided.placeholder}
+                  </div>
+                )
                 }
-              }
-            )}
+              </Droppable>
+            </DragDropContext>
             <Button
               size="sm"
               variant="white"

@@ -189,3 +189,7 @@ export function simulateNetworkLatency(delay = 2000) {
     }, delay);
   });
 }
+
+export function determineNewIndex({ previousItemIndex, followingItemIndex }: { previousItemIndex: number, followingItemIndex: number }) {
+  console.log("determineNewIndex")
+}

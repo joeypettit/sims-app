@@ -375,3 +375,30 @@ export async function setIsOpenOnAllGroupsInArea({
   );
   return response.data;
 };
+
+export async function setIndexOfGroupInCategory({
+  categoryId,
+  groupId,
+  newIndex
+}: {
+  categoryId: string;
+  groupId: string;
+  newIndex: number;
+}) {
+  console.log("setting group index", categoryId, groupId, newIndex)
+  try {
+    const response = await axios.put<ProjectArea>(
+      `/api/groups/${groupId}/set-index-in-category`,
+      {
+        categoryId,
+        groupId,
+        newIndex
+      }
+    );
+    return response.data;
+
+  } catch (error) {
+
+    throw new Error(`Error setting index of group in category. GroupId:${groupId}: ${error}`);
+  }
+};
