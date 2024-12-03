@@ -11,10 +11,12 @@ import { Draggable } from "@hello-pangea/dnd";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
+  index: number;
 };
 
 export default function LineItemGroupDisplay({
   group,
+  index
 }: LineItemGroupDisplayProps) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(() => group.isOpen)
@@ -79,7 +81,7 @@ export default function LineItemGroupDisplay({
   }, [group.isOpen]);
 
   return (
-    <Draggable index={group.indexInCategory} draggableId={`group-${group.id}`}>
+    <Draggable index={index} draggableId={`group-${group.id}`}>
       {(provided) => (
         <div className="py-2" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup}>

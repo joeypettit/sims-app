@@ -25,8 +25,10 @@ export async function getProjectById(id: string) {
 
 export async function getProjectAreaById(areaId: string) {
   try {
-    const response = await axios.get<ProjectArea>(`/api/projects/area/${areaId}`);
+    const response = await axios.get<ProjectArea>(`/api/project-areas/${areaId}`);
+    console.log('getting area', response.data)
     return response.data;
+
   } catch (error) {
     console.error(`Error getting project area by id with id ${areaId}`, error);
     throw new Error(`Failed to update line item option selection`);
@@ -396,9 +398,7 @@ export async function setIndexOfGroupInCategory({
       }
     );
     return response.data;
-
   } catch (error) {
-
     throw new Error(`Error setting index of group in category. GroupId:${groupId}: ${error}`);
   }
 };

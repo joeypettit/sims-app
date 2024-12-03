@@ -191,5 +191,5 @@ export function simulateNetworkLatency(delay = 2000) {
 }
 
 export function determineNewIndex({ previousItemIndex, followingItemIndex }: { previousItemIndex: number, followingItemIndex: number }) {
-  console.log("determineNewIndex")
+  console.log("determineNewIndex", previousItemIndex, followingItemIndex)
 }

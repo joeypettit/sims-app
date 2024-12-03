@@ -302,12 +302,13 @@ export default function ProjectAreaProposal({
 
   function GroupCategoryList({ categoryId }: { categoryId: string }) {
     return projectAreaQuery.data?.lineItemGroups.map(
-      (group: LineItemGroup) => {
+      (group: LineItemGroup, index) => {
         if (categoryId == group.groupCategory.id) {
           return (
             <LineItemGroupContainer
               key={group.id}
               group={group}
+              index={index}
             />
           );
         }
