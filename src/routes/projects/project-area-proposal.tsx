@@ -113,10 +113,17 @@ export default function ProjectAreaProposal({
       const result = await setIndexOfGroupInCategory({ categoryId, groupId, newIndex })
       return result;
     },
-    onMutate: async ({ categoryId, groupId, newIndex }) => {
-      // await queryClient.cancelQueries({ queryKey: ["area"] });
-      // const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
-      // return previousArea; // Return to rollback in case of error
+    onMutate: async ({ groupId, newIndex }) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+      if (previousArea) {
+        const reorderedGroups = updateGroupIndexInCategory({ groups: previousArea.lineItemGroups, newIndex, groupId })
+        queryClient.setQueryData(["area"], {
+          ...projectAreaQuery.data,
+          lineItemGroups: reorderedGroups,
+        });
+      }
+      return previousArea; // Return to rollback in case of error
     },
     onError: (error) => {
       console.log("Error in setIsOpenAllGroupsInArea", error);
@@ -275,15 +282,9 @@ export default function ProjectAreaProposal({
       return;
     }
     if (!projectAreaQuery.data?.lineItemGroups) return;
-    console.log("results", result)
     const categoryId = result.destination.droppableId;
     const groupId = result.draggableId;
-    const newIndex = result.destination.index
-    const reorderedGroups = updateGroupIndexInCategory({ groups: projectAreaQuery.data?.lineItemGroups, newIndex, groupId })
-    queryClient.setQueryData(["area"], {
-      ...projectAreaQuery.data,
-      lineItemGroups: reorderedGroups,
-    });
+    const newIndex = result.destination.index;
 
     changeGroupIndexInCategoryMutation.mutate({ groupId, categoryId, newIndex })
   }
@@ -317,7 +318,6 @@ export default function ProjectAreaProposal({
     )
   }
 
-  console.log("area is", projectAreaQuery.data)
   return (
     <>
       <StickyTierToolbar title={getTitle()} handleSetIsOpen={handleToggleOpenAllGroups} />
