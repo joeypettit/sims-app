@@ -1,4 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { simulateNetworkLatency, sortArrayByIndexProperty, updateGroupIndexInCategory } from "../../util/utils";
+import { filterGroupsByCategory } from "../../util/utils";
 import {
   createGroup,
   getAllGroupCategories,
@@ -64,6 +66,7 @@ export default function ProjectAreaProposal({
       if (!areaId) {
         throw new Error("Area ID is required");
       }
+      console.log("running area query")
       const response = await getProjectAreaById(areaId);
       return response;
     },
@@ -106,21 +109,14 @@ export default function ProjectAreaProposal({
 
 
   const changeGroupIndexInCategoryMutation = useMutation({
-    mutationFn: setIndexOfGroupInCategory,
-    onMutate: async ({ }) => {
-      await queryClient.cancelQueries({ queryKey: ["area"] });
-
-      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
-      if (previousArea) {
-        queryClient.setQueryData(["area"], {
-          ...previousArea,
-          lineItemGroups: previousArea.lineItemGroups.map((group) => ({
-            ...group,
-          })),
-        });
-      }
-
-      return previousArea; // Return to rollback in case of error
+    mutationFn: async ({ categoryId, groupId, newIndex, }: { categoryId: string, groupId: string, newIndex: number }) => {
+      const result = await setIndexOfGroupInCategory({ categoryId, groupId, newIndex })
+      return result;
+    },
+    onMutate: async ({ categoryId, groupId, newIndex }) => {
+      // await queryClient.cancelQueries({ queryKey: ["area"] });
+      // const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+      // return previousArea; // Return to rollback in case of error
     },
     onError: (error) => {
       console.log("Error in setIsOpenAllGroupsInArea", error);
@@ -130,10 +126,9 @@ export default function ProjectAreaProposal({
     },
     onSuccess: () => {
       // Optionally refetch to ensure data consistency
-      queryClient.invalidateQueries({ queryKey: ["area"] });
+      // queryClient.invalidateQueries({ queryKey: ["area"] });
     },
   });
-
 
   const setIsOpenAllGroupsInAreaMutation = useMutation({
     mutationFn: setIsOpenOnAllGroupsInArea,
@@ -273,19 +268,24 @@ export default function ProjectAreaProposal({
   function onDragEnd(
     result: DropResult<string>
   ) {
-
     if (!result.destination) {
       return;
     }
     if (result.destination.index === result.source.index) {
       return;
     }
+    if (!projectAreaQuery.data?.lineItemGroups) return;
+    console.log("results", result)
+    const categoryId = result.destination.droppableId;
+    const groupId = result.draggableId;
+    const newIndex = result.destination.index
+    const reorderedGroups = updateGroupIndexInCategory({ groups: projectAreaQuery.data?.lineItemGroups, newIndex, groupId })
+    queryClient.setQueryData(["area"], {
+      ...projectAreaQuery.data,
+      lineItemGroups: reorderedGroups,
+    });
 
-    const startingIndex = result.source.index;
-    const endingEnding = result.destination.index
-
-    const draggedGroupId = projectAreaQuery.data?.lineItemGroups[startingIndex]
-    console.log("dragged group is", draggedGroupId?.name)
+    changeGroupIndexInCategoryMutation.mutate({ groupId, categoryId, newIndex })
   }
 
   if (projectAreaQuery.isLoading) {
@@ -300,39 +300,41 @@ export default function ProjectAreaProposal({
     return <p>Error: {projectAreaQuery.error.message}</p>;
   }
 
-  function GroupCategoryList({ categoryId }: { categoryId: string }) {
-    return projectAreaQuery.data?.lineItemGroups.map(
+  function GroupCategoryList({ groups }: { groups: LineItemGroup[] | undefined }) {
+    if (!groups) return;
+    // const orderedGroups = sortArrayByIndexProperty({ arr: groups, indexProperty: "indexInCategory" })
+    return groups.map(
       (group: LineItemGroup, index) => {
-        if (categoryId == group.groupCategory.id) {
-          return (
-            <LineItemGroupContainer
-              key={group.id}
-              group={group}
-              index={index}
-            />
-          );
-        }
+        return (
+          <LineItemGroupContainer
+            key={group.id}
+            group={group}
+            index={index}
+          />
+        );
+
       }
     )
   }
 
+  console.log("area is", projectAreaQuery.data)
   return (
     <>
       <StickyTierToolbar title={getTitle()} handleSetIsOpen={handleToggleOpenAllGroups} />
       {categoriesQuery.data?.map((category) => {
-        const key = category.id;
+        if (!projectAreaQuery.data?.lineItemGroups) return;
+        const groupsInCategory = filterGroupsByCategory({ groups: projectAreaQuery.data?.lineItemGroups, categoryId: category.id })
         return (
-          <div key={key} className="py-4">
+          <div key={category.id} className="py-4">
             <h2 className="text-md font-bold text-center bg-sims-green-100 shadow-sm rounded-sm">
               {category.name}
             </h2>
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable
-                droppableId={`
-                categoryGroupList-${category.id}`}>
+                droppableId={category.id}>
                 {provided => (
                   <div ref={provided.innerRef} {...provided.droppableProps}>
-                    <GroupCategoryList categoryId={category.id} />
+                    <GroupCategoryList groups={groupsInCategory} />
                     {provided.placeholder}
                   </div>
                 )

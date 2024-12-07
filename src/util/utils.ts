@@ -3,6 +3,7 @@ import type { LineItemOption } from "../app/types/line-item-option";
 import type { LineItemGroup } from "../app/types/line-item-group";
 import type { PriceRange } from "../app/types/price-range";
 
+
 export function calculateMarginDecimal({
   salePricePerUnit,
   costPerUnit,
@@ -190,6 +191,52 @@ export function simulateNetworkLatency(delay = 2000) {
   });
 }
 
-export function determineNewIndex({ previousItemIndex, followingItemIndex }: { previousItemIndex: number, followingItemIndex: number }) {
-  console.log("determineNewIndex", previousItemIndex, followingItemIndex)
+export function filterGroupsByCategory({ groups, categoryId }: { groups: LineItemGroup[], categoryId: string }) {
+  const groupsArr = groups.filter((group) => categoryId == group.groupCategory.id)
+  return groupsArr ? groupsArr : []
+}
+
+// export function orderGroupsByIndexInCategory(groups: LineItemGroup[]){
+//   const groupsArr = groups.sort((a, b)=> a.indexInCategory)
+// }
+//
+export function sortArrayByIndexProperty<T>({ arr, indexProperty }: { arr: T[], indexProperty: keyof T }) {
+  return arr.sort((a, b) => {
+    if (a[indexProperty] > b[indexProperty]) return 1;
+    if (a[indexProperty] < b[indexProperty]) return -1;
+    return 0;
+  })
+}
+
+export function updateGroupIndexInCategory({
+  groups,
+  newIndex,
+  groupId,
+}: {
+  groups: LineItemGroup[];
+  newIndex: number;
+  groupId: string;
+}) {
+  const groupToMove = groups.find((group) => group.id === groupId);
+  if (!groupToMove) throw new Error("Error changing group index: group ids do not match");
+  const oldIndex = groupToMove.indexInCategory;
+  if (oldIndex === newIndex) {
+    return [...groups];
+  }
+  const updatedGroups = groups.map((group) => {
+    // Move other groups in the range
+    if (group.indexInCategory >= Math.min(oldIndex, newIndex) &&
+      group.indexInCategory <= Math.max(oldIndex, newIndex)) {
+      if (group.id === groupId) {
+        return { ...group, indexInCategory: newIndex };
+      }
+      return {
+        ...group,
+        indexInCategory: group.indexInCategory + (oldIndex < newIndex ? -1 : 1),
+      };
+    }
+    return group;
+  });
+
+  return updatedGroups.sort((a, b) => a.indexInCategory - b.indexInCategory);
 }

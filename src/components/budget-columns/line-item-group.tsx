@@ -18,6 +18,7 @@ export default function LineItemGroupDisplay({
   group,
   index
 }: LineItemGroupDisplayProps) {
+
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(() => group.isOpen)
 
@@ -53,6 +54,7 @@ export default function LineItemGroupDisplay({
       throw Error(`Error creating line item: ${error}`);
     },
   });
+
   const setIsOpenMutation = useMutation({
     mutationFn: async ({ groupId, isOpen }: { groupId: string, isOpen: boolean }) => {
       const result = await setGroupIsOpen({ groupId, isOpen });
@@ -81,7 +83,7 @@ export default function LineItemGroupDisplay({
   }, [group.isOpen]);
 
   return (
-    <Draggable index={index} draggableId={`group-${group.id}`}>
+    <Draggable index={index} draggableId={group.id}>
       {(provided) => (
         <div className="py-2" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
           <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup}>

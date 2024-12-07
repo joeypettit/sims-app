@@ -389,7 +389,7 @@ export async function setIndexOfGroupInCategory({
 }) {
   console.log("setting group index", categoryId, groupId, newIndex)
   try {
-    const response = await axios.put<ProjectArea>(
+    const response = await axios.put<LineItemGroup>(
       `/api/groups/${groupId}/set-index-in-category`,
       {
         categoryId,
