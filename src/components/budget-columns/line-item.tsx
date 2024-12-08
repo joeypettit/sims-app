@@ -13,12 +13,12 @@ import LineItemActionsButton from "../line-item-actions-button";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
-  group: LineItemGroup;
+  index: number;
 };
 
 export default function LineItemDisplay({
   lineItem,
-  group,
+  index
 }: LineItemDisplayProps) {
   const queryClient = useQueryClient();
   const quantity = lineItem.quantity ? lineItem.quantity : 0;
