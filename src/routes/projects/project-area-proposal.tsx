@@ -117,6 +117,7 @@ export default function ProjectAreaProposal({
       await queryClient.cancelQueries({ queryKey: ["area"] });
       const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
       if (previousArea) {
+        console.log("setting area", groupId,)
         const reorderedGroups = updateGroupIndexInCategory({ groups: previousArea.lineItemGroups, newIndex, groupId })
         queryClient.setQueryData(["area"], {
           ...projectAreaQuery.data,
@@ -303,8 +304,8 @@ export default function ProjectAreaProposal({
 
   function GroupCategoryList({ groups }: { groups: LineItemGroup[] | undefined }) {
     if (!groups) return;
-    // const orderedGroups = sortArrayByIndexProperty({ arr: groups, indexProperty: "indexInCategory" })
-    return groups.map(
+    const orderedGroups = sortArrayByIndexProperty({ arr: groups, indexProperty: "indexInCategory" })
+    return orderedGroups.map(
       (group: LineItemGroup, index) => {
         return (
           <LineItemGroupContainer
@@ -313,7 +314,6 @@ export default function ProjectAreaProposal({
             index={index}
           />
         );
-
       }
     )
   }
@@ -326,7 +326,7 @@ export default function ProjectAreaProposal({
         const groupsInCategory = filterGroupsByCategory({ groups: projectAreaQuery.data?.lineItemGroups, categoryId: category.id })
         return (
           <div key={category.id} className="py-4">
-            <h2 className="text-md font-bold text-center bg-sims-green-100 shadow-sm rounded-sm">
+            <h2 className="text-md font-bold text-center border  border-b-slate-200 border-r-0 border-l-0 border-t-0">
               {category.name}
             </h2>
             <DragDropContext onDragEnd={onDragEnd}>

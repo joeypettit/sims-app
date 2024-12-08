@@ -4,7 +4,7 @@ import CollapsibleDiv from "../collapsible-div";
 import { formatNumberWithCommas } from "../../util/utils";
 import Button from "../button";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBlankLineItem, setGroupIsOpen } from "../../api/api";
 import { useEffect, useState } from "react";
 import { Draggable } from "@hello-pangea/dnd";
@@ -18,6 +18,7 @@ export default function LineItemGroupDisplay({
   group,
   index
 }: LineItemGroupDisplayProps) {
+  const queryClient = useQueryClient();
 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(() => group.isOpen)
@@ -60,8 +61,11 @@ export default function LineItemGroupDisplay({
       const result = await setGroupIsOpen({ groupId, isOpen });
       return result;
     },
+    onMutate: ({ isOpen }) => {
+      setIsOpen(isOpen)
+    },
     onSuccess: (data) => {
-      setIsOpen(data.isOpen)
+      queryClient.invalidateQueries({ queryKey: ["area"] })
     },
     onError: (error) => {
       console.error("Error setting isOpen", error);
@@ -85,8 +89,8 @@ export default function LineItemGroupDisplay({
   return (
     <Draggable index={index} draggableId={group.id}>
       {(provided) => (
-        <div className="py-2" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-          <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup}>
+        <div className="py-2" ref={provided.innerRef} {...provided.draggableProps} >
+          <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup} provided={provided}>
             {group.lineItems.map((lineItem) => {
               return (
                 <LineItemDisplay
@@ -105,7 +109,6 @@ export default function LineItemGroupDisplay({
               <div></div>
             </div>
           </CollapsibleDiv>
-          <hr />
         </div>)}
     </Draggable>
   );
