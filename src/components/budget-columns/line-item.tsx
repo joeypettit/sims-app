@@ -1,4 +1,5 @@
 import { LineItemOption } from "../../app/types/line-item-option";
+import { RiDraggable } from "react-icons/ri";
 import type { LineItem } from "../../app/types/line-item";
 import LineItemOptionDisplay from "./line-item-option";
 import QuantityInput from "../quantity-input";
@@ -10,6 +11,7 @@ import { getCurrentlySelectedOption } from "../../util/utils";
 import { getOptionsTotalSalePrice } from "../../util/utils";
 import { formatNumberWithCommas } from "../../util/utils";
 import LineItemActionsButton from "../line-item-actions-button";
+import { Draggable } from "@hello-pangea/dnd";
 
 export type LineItemDisplayProps = {
   lineItem: LineItem;
@@ -153,30 +155,38 @@ export default function LineItemDisplay({
   }
 
   return (
-    <div className="grid grid-cols-5 gap-4 py-2 pl-4 ">
-      <div className="flex flex-col text-center items-center pr-4 ">
-        <div className="flex flex-row justify-between w-full">
-          <h1 className="text-left">{lineItem.name}</h1>
-          <LineItemActionsButton lineItem={lineItem} />
+    <Draggable index={index} draggableId={lineItem.id}>
+      {(provided) => (
+        <div className="grid grid-cols-5 gap-4 py-2 pl-4 " ref={provided.innerRef} {...provided.draggableProps}>
+          <div className="flex flex-row">
+            <div className="flex justify-center items-center"{...provided.dragHandleProps}><RiDraggable /></div>
+            <div className="flex flex-col text-center items-center pr-4">
+              <div className="flex flex-row justify-between w-full">
+                <h1 className="text-left">{lineItem.name}</h1>
+                <LineItemActionsButton lineItem={lineItem} />
+              </div>
+              <QuantityInput value={quantity} onChange={onQuantityChange} />
+              <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>
+            </div>
+          </div>
+          {lineItem.lineItemOptions.map((option, index) => {
+            return (
+              <LineItemOptionDisplay
+                key={`product-option-${index}`}
+                props={{
+                  lineItemOption: option,
+                  lineItem: lineItem,
+                  onOptionSelection: onOptionSelection,
+                }}
+              />
+            );
+          })}
+          <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6">
+            {getCurrentLineTotal()}
+          </div>
         </div>
-        <QuantityInput value={quantity} onChange={onQuantityChange} />
-        <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>
-      </div>
-      {lineItem.lineItemOptions.map((option, index) => {
-        return (
-          <LineItemOptionDisplay
-            key={`product-option-${index}`}
-            props={{
-              lineItemOption: option,
-              lineItem: lineItem,
-              onOptionSelection: onOptionSelection,
-            }}
-          />
-        );
-      })}
-      <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6">
-        {getCurrentLineTotal()}
-      </div>
-    </div>
+      )}
+
+    </Draggable>
   );
 }
