@@ -66,7 +66,6 @@ export default function ProjectAreaProposal({
       if (!areaId) {
         throw new Error("Area ID is required");
       }
-      console.log("running area query")
       const response = await getProjectAreaById(areaId);
       return response;
     },
@@ -326,7 +325,7 @@ export default function ProjectAreaProposal({
         const groupsInCategory = filterGroupsByCategory({ groups: projectAreaQuery.data?.lineItemGroups, categoryId: category.id })
         return (
           <div key={category.id} className="py-4">
-            <h2 className="text-md font-bold text-center border  border-b-slate-200 border-r-0 border-l-0 border-t-0">
+            <h2 className="text-md font-bold text-center">
               {category.name}
             </h2>
             <DragDropContext onDragEnd={onDragEnd}>

@@ -240,3 +240,40 @@ export function updateGroupIndexInCategory({
 
   return updatedGroups.sort((a, b) => a.indexInCategory - b.indexInCategory);
 }
+
+export function updateLineItemIndexInGroup({
+  group,
+  newIndex,
+  lineItemId
+}: {
+  group: LineItemGroup;
+  newIndex: number;
+  lineItemId: string;
+}) {
+  const itemToMove = group.lineItems.find((lineItem) => lineItem.id === lineItemId);
+  if (!itemToMove) throw new Error("Error changing line item index in group: lineItem ids do not match");
+  const oldIndex = itemToMove.indexInGroup;
+
+  if (oldIndex === newIndex) {
+    return group;
+  }
+  const updatedLineItems = group.lineItems.map((lineItem) => {
+    if (lineItem.indexInGroup >= Math.min(oldIndex, newIndex) &&
+      lineItem.indexInGroup <= Math.max(oldIndex, newIndex)) {
+      console.log("matched", { ...lineItem, indexInGroup: newIndex })
+      if (lineItem.id === lineItemId) {
+        return { ...lineItem, indexInGroup: newIndex };
+      }
+      console.log("unmatched", { ...lineItem, indexInGroup: lineItem.indexInGroup + (oldIndex < newIndex ? -1 : 1) })
+      return {
+        ...lineItem,
+        indexInGroup: lineItem.indexInGroup + (oldIndex < newIndex ? -1 : 1),
+      };
+    }
+    console.log("not in range:", lineItem)
+    return lineItem;
+  });
+  const updatedGroup: LineItemGroup = { ...group, lineItems: updatedLineItems.sort((a, b) => a.indexInGroup - b.indexInGroup) }
+
+  return updatedGroup
+}

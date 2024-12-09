@@ -1,14 +1,15 @@
 import { LineItemGroup } from "../../app/types/line-item-group";
 import LineItemDisplay from "./line-item";
 import CollapsibleDiv from "../collapsible-div";
-import { formatNumberWithCommas, sortArrayByIndexProperty } from "../../util/utils";
+import { formatNumberWithCommas, sortArrayByIndexProperty, updateLineItemIndexInGroup } from "../../util/utils";
 import Button from "../button";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBlankLineItem, setGroupIsOpen } from "../../api/api";
+import { createBlankLineItem, setGroupIsOpen, setIndexOfLineItemInGroup } from "../../api/api";
 import { useEffect, useState } from "react";
 import { DragDropContext, Draggable, Droppable, DropResult } from "@hello-pangea/dnd";
 import { LineItem } from "../../app/types/line-item";
+import { ProjectArea } from "../../app/types/project-area";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
@@ -57,6 +58,43 @@ export default function LineItemGroupDisplay({
     },
   });
 
+  const changeLineItemIndexInGroupMutation = useMutation({
+    mutationFn: async ({ lineItemId, newIndex }: { lineItemId: string, newIndex: number }) => {
+      // const result = await setIndexOfLineItemInGroup({ lineItemId, newIndex })
+      // return result;
+      return {}
+    },
+    onMutate: async ({ lineItemId, newIndex }) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+      if (previousArea) {
+        console.log("setting area", lineItemId,)
+        const reorderedGroup = updateLineItemIndexInGroup({ group, lineItemId, newIndex })
+        const newArea = { ...previousArea }
+
+        const newGroups = newArea.lineItemGroups.map((group) => {
+          if (group.id === reorderedGroup.id) {
+            return reorderedGroup
+          }
+          return group
+        })
+        console.log("newgroups", newGroups)
+        queryClient.setQueryData(["area"], {
+          ...previousArea,
+          lineItemGroups: newGroups
+        });
+      }
+      return previousArea; // Return to rollback in case of error
+    },
+    onError: (error) => {
+      console.log("Error in setIsOpenAllGroupsInArea", error);
+    },
+    onSuccess: () => {
+      // Optionally refetch to ensure data consistency
+      // queryClient.invalidateQueries({ queryKey: ["area"] });
+    },
+  });
+
   const setIsOpenMutation = useMutation({
     mutationFn: async ({ groupId, isOpen }: { groupId: string, isOpen: boolean }) => {
       const result = await setGroupIsOpen({ groupId, isOpen });
@@ -84,28 +122,29 @@ export default function LineItemGroupDisplay({
   }
 
   function onLineItemDragEnd(result: DropResult<string>) {
-    {
-      if (!result.destination) {
-        return;
-      }
-      if (result.destination.index === result.source.index) {
-        return;
-      }
-      const groupId = result.destination.droppableId;
-      const lineItemId = result.draggableId;
-      const newIndex = result.destination.index;
-      console.log("onlineitemdragend", groupId, lineItemId, newIndex)
+
+    if (!result.destination) {
+      return;
     }
+    if (result.destination.index === result.source.index) {
+      return;
+    }
+    const lineItemId = result.draggableId;
+    const newIndex = result.destination.index;
+    changeLineItemIndexInGroupMutation.mutate({ lineItemId, newIndex })
   }
 
   function LineItemList({ lineItems }: { lineItems: LineItem[] | undefined }) {
     if (!lineItems) return;
-    const orderedGroups = sortArrayByIndexProperty({ arr: lineItems, indexProperty: "indexInGroup" })
-    return orderedGroups.map(
+    console.log("first", lineItems)
+
+    const orderedLineItems = sortArrayByIndexProperty({ arr: lineItems, indexProperty: "indexInGroup" })
+    console.log("second", orderedLineItems)
+    return orderedLineItems.map(
       (lineItem: LineItem, index) => {
         return (
           <LineItemDisplay
-            key={group.id}
+            key={lineItem.id}
             lineItem={lineItem}
             index={index}
           />

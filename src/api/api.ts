@@ -402,3 +402,23 @@ export async function setIndexOfGroupInCategory({
     throw new Error(`Error setting index of group in category. GroupId:${groupId}: ${error}`);
   }
 };
+
+export async function setIndexOfLineItemInGroup({
+  lineItemId,
+  newIndex
+}: {
+  lineItemId: string;
+  newIndex: number;
+}) {
+  //     `/api/groups/${groupId}/set-index-in-category`,
+  //     {
+  //       categoryId,
+  //       groupId,
+  //       newIndex
+  //     }
+  //   );
+  //   return response.data;
+  // } catch (error) {
+  //   throw new Error(`Error setting index of group in category. GroupId:${groupId}: ${error}`);
+  // }
+};
