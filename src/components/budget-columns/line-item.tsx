@@ -44,13 +44,13 @@ export default function LineItemDisplay({
         return {
           ...oldData,
           lineItemGroups: oldData.lineItemGroups.map((group) => {
-            if (group.id !== lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
+            if (group.id !== lineItem.lineItemGroupId) return group; // Not the target group, keep it the same
             return {
               ...group,
-              lineItems: group.lineItems.map((lineItem: LineItem) => {
-                if (lineItem.id !== lineItem.id) return lineItem;
+              lineItems: group.lineItems.map((item: LineItem) => {
+                if (lineItem.id !== item.id) return item;
                 return {
-                  ...lineItem,
+                  ...item,
                   quantity: variables.quantity,
                 };
               }),
@@ -106,13 +106,13 @@ export default function LineItemDisplay({
         return {
           ...oldData,
           lineItemGroups: oldData.lineItemGroups.map((group) => {
-            if (group.id !== lineItem.lineItemGroup.id) return group; // Not the target group, keep it the same
+            if (group.id !== lineItem.lineItemGroupId) return group; // Not the target group, keep it the same
             return {
               ...group,
-              lineItems: group.lineItems.map((lineItem: LineItem) => {
-                if (lineItem.id !== lineItem.id) return lineItem;
+              lineItems: group.lineItems.map((item: LineItem) => {
+                if (lineItem.id !== item.id) return item;
                 return {
-                  ...lineItem,
+                  ...item,
                   lineItemOptions: lineItem.lineItemOptions.map((option) =>
                     option.id === optionToSelect?.id
                       ? { ...option, isSelected: true }
@@ -136,6 +136,10 @@ export default function LineItemDisplay({
       queryClient.invalidateQueries({ queryKey: ["area"] });
     },
   });
+  function getSortedOptions() {
+    const sorted = lineItem.lineItemOptions.sort((a: LineItemOption, b: LineItemOption) => a.optionTier.tierLevel - b.optionTier.tierLevel)
+    return sorted
+  }
 
   async function onOptionSelection({
     optionToSelect,
@@ -169,7 +173,7 @@ export default function LineItemDisplay({
               <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>
             </div>
           </div>
-          {lineItem.lineItemOptions.map((option, index) => {
+          {getSortedOptions().map((option, index) => {
             return (
               <LineItemOptionDisplay
                 key={`product-option-${index}`}

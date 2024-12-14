@@ -116,7 +116,6 @@ export default function ProjectAreaProposal({
       await queryClient.cancelQueries({ queryKey: ["area"] });
       const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
       if (previousArea) {
-        console.log("setting area", groupId,)
         const reorderedGroups = updateGroupIndexInCategory({ groups: previousArea.lineItemGroups, newIndex, groupId })
         queryClient.setQueryData(["area"], {
           ...projectAreaQuery.data,

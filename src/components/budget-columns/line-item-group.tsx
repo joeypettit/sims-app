@@ -68,7 +68,6 @@ export default function LineItemGroupDisplay({
       await queryClient.cancelQueries({ queryKey: ["area"] });
       const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
       if (previousArea) {
-        console.log("setting area", lineItemId,)
         const reorderedGroup = updateLineItemIndexInGroup({ group, lineItemId, newIndex })
         const newArea = { ...previousArea }
 
@@ -78,7 +77,6 @@ export default function LineItemGroupDisplay({
           }
           return group
         })
-        console.log("newgroups", newGroups)
         queryClient.setQueryData(["area"], {
           ...previousArea,
           lineItemGroups: newGroups
@@ -136,10 +134,8 @@ export default function LineItemGroupDisplay({
 
   function LineItemList({ lineItems }: { lineItems: LineItem[] | undefined }) {
     if (!lineItems) return;
-    console.log("first", lineItems)
 
     const orderedLineItems = sortArrayByIndexProperty({ arr: lineItems, indexProperty: "indexInGroup" })
-    console.log("second", orderedLineItems)
     return orderedLineItems.map(
       (lineItem: LineItem, index) => {
         return (

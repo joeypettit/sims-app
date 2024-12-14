@@ -10,7 +10,6 @@ export type LineItem = {
   unitId: string;
   marginDecimal: number | undefined;
   indexInGroup: number;
-  lineItemGroup: LineItemGroup;
   lineItemGroupId: string;
   lineItemOptions: LineItemOption[];
 };

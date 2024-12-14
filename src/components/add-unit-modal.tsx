@@ -38,7 +38,6 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
       );
     },
     onSuccess: (data) => {
-      console.log("Unit Created with id", data.id);
       queryClient.invalidateQueries({ queryKey: ["units"] });
       setUnitNameInput("");
       setIsOpen(false);

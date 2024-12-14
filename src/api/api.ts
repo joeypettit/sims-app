@@ -7,10 +7,10 @@ import type { GroupCategory } from "../app/types/group-category";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
+import { simulateNetworkLatency } from "../util/utils";
 
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
-  console.log("data", response.data);
   return response.data; // Return the actual data, which will be typed as `Project[]`
 }
 
@@ -26,7 +26,6 @@ export async function getProjectById(id: string) {
 export async function getProjectAreaById(areaId: string) {
   try {
     const response = await axios.get<ProjectArea>(`/api/project-areas/${areaId}`);
-    console.log('getting area', response.data)
     return response.data;
 
   } catch (error) {
@@ -44,7 +43,6 @@ export async function updateOptionSelection({
   optionToUnselect: LineItemOption | undefined;
   lineItem: LineItem;
 }) {
-  console.log("in mutation", optionToSelect, optionToUnselect);
   try {
     let unselectResponse = undefined;
     let selectResponse = undefined;
@@ -59,7 +57,6 @@ export async function updateOptionSelection({
         `/api/line-items/${lineItem.id}/select-option/${optionToSelect.id}`
       );
     }
-    console.log("in mutation", unselectResponse, selectResponse);
 
     const newOptions: LineItemOption[] = lineItem.lineItemOptions.map(
       (option) => {
@@ -117,7 +114,6 @@ export async function createAreaTemplate(templateName: string) {
         name: templateName,
       }
     );
-    console.log("response", response.data);
     return response.data;
   } catch (error) {
     throw new Error(
@@ -176,7 +172,6 @@ export async function createUnit({ unitName }: { unitName: string }) {
     const response = await axios.post(`/api/units`, {
       unitName,
     });
-    console.log("create unit response", response.data);
     return response.data;
   } catch (error) {
     throw new Error(`Error creating new unit: ${error}`);
@@ -367,7 +362,6 @@ export async function setIsOpenOnAllGroupsInArea({
   areaId: string;
   isOpen: boolean;
 }) {
-  console.log("isOpen", isOpen)
   const response = await axios.put<ProjectArea>(
     `/api/groups/update-isopen-by-area`,
     {
@@ -387,7 +381,6 @@ export async function setIndexOfGroupInCategory({
   groupId: string;
   newIndex: number;
 }) {
-  console.log("setting group index", categoryId, groupId, newIndex)
   try {
     const response = await axios.put<LineItemGroup>(
       `/api/groups/${groupId}/set-index-in-category`,

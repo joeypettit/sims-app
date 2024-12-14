@@ -192,7 +192,7 @@ export function simulateNetworkLatency(delay = 2000) {
 }
 
 export function filterGroupsByCategory({ groups, categoryId }: { groups: LineItemGroup[], categoryId: string }) {
-  const groupsArr = groups.filter((group) => categoryId == group.groupCategory.id)
+  const groupsArr = groups.filter((group) => categoryId == group.groupCategoryId)
   return groupsArr ? groupsArr : []
 }
 
@@ -260,17 +260,14 @@ export function updateLineItemIndexInGroup({
   const updatedLineItems = group.lineItems.map((lineItem) => {
     if (lineItem.indexInGroup >= Math.min(oldIndex, newIndex) &&
       lineItem.indexInGroup <= Math.max(oldIndex, newIndex)) {
-      console.log("matched", { ...lineItem, indexInGroup: newIndex })
       if (lineItem.id === lineItemId) {
         return { ...lineItem, indexInGroup: newIndex };
       }
-      console.log("unmatched", { ...lineItem, indexInGroup: lineItem.indexInGroup + (oldIndex < newIndex ? -1 : 1) })
       return {
         ...lineItem,
         indexInGroup: lineItem.indexInGroup + (oldIndex < newIndex ? -1 : 1),
       };
     }
-    console.log("not in range:", lineItem)
     return lineItem;
   });
   const updatedGroup: LineItemGroup = { ...group, lineItems: updatedLineItems.sort((a, b) => a.indexInGroup - b.indexInGroup) }

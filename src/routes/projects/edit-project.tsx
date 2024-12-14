@@ -162,7 +162,6 @@ export default function EditProject() {
       </>
     );
   }
-  console.log("form data", formData);
   return (
     <>
       <PanelHeaderBar

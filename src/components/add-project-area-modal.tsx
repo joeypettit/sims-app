@@ -48,7 +48,6 @@ export default function AddProjectAreaModal({
       throw Error("Project Id required to create new project area");
     },
     onSuccess: (data) => {
-      console.log("SUCCESS", data, project?.id);
       if (project?.id) {
         navigate(`/project/${project.id}/area/${data.id}`);
       }
@@ -115,7 +114,6 @@ export default function AddProjectAreaModal({
   }
 
   function handleTemplateListClick(template: AreaTemplate) {
-    console.log("selected");
     setSelectedTemplate(template);
     setModalErrorMessage("");
   }
@@ -177,10 +175,6 @@ export default function AddProjectAreaModal({
         <h1>Please select a template.</h1>
         <ul className="scroll-auto max-h-60 overflow-scroll rounded">
           {allAreaTemplatesQuery.data?.map((template) => {
-            console.log(
-              "selected template",
-              selectedTemplate?.id == template.id
-            );
             return (
               <li
                 key={template.id}
