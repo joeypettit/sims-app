@@ -192,7 +192,7 @@ export function simulateNetworkLatency(delay = 2000) {
 }
 
 export function filterGroupsByCategory({ groups, categoryId }: { groups: LineItemGroup[], categoryId: string }) {
-  const groupsArr = groups.filter((group) => categoryId == group.groupCategory.id)
+  const groupsArr = groups.filter((group) => categoryId == group.groupCategoryId)
   return groupsArr ? groupsArr : []
 }
 

@@ -5,9 +5,11 @@ import { formatNumberWithCommas } from "../../util/utils";
 import Button from "../button";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createBlankLineItem, setGroupIsOpen } from "../../api/api";
+import { createBlankLineItem, setGroupIsOpen, setLineItemIndex } from "../../api/api";
 import { useEffect, useState } from "react";
-import { Draggable } from "@hello-pangea/dnd";
+import { Draggable, Droppable, DragDropContext, DropResult } from "@hello-pangea/dnd";
+import { LineItem } from "../../app/types/line-item";
+import { ProjectArea } from "../../app/types/project-area";
 
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
@@ -73,6 +75,42 @@ export default function LineItemGroupDisplay({
     },
   });
 
+  const changeLineItemIndexMutation = useMutation({
+    mutationFn: async ({ lineItemId, newIndex }: { lineItemId: string, newIndex: number }) => {
+      const result = await setLineItemIndex({ groupId: group.id, lineItemId, newIndex });
+      return result;
+    },
+    onMutate: async ({ lineItemId, newIndex }) => {
+      await queryClient.cancelQueries({ queryKey: ["area"] });
+      const previousArea: ProjectArea | undefined = queryClient.getQueryData(["area"]);
+
+      if (previousArea) {
+        queryClient.setQueryData(["area"], {
+          ...previousArea,
+          lineItemGroups: previousArea.lineItemGroups.map(g => {
+            if (g.id !== group.id) return g;
+            
+            const lineItems = [...g.lineItems];
+            const oldIndex = lineItems.findIndex(item => item.id === lineItemId);
+            const [movedItem] = lineItems.splice(oldIndex, 1);
+            lineItems.splice(newIndex, 0, movedItem);
+            
+            return {
+              ...g,
+              lineItems
+            };
+          })
+        });
+      }
+      return { previousArea };
+    },
+    onError: (error, variables, context) => {
+      console.error("Error reordering line items:", error);
+      if (context?.previousArea) {
+        queryClient.setQueryData(["area"], context.previousArea);
+      }
+    }
+  });
 
   function handleCreateLineItem() {
     createLineItemMutation.mutate({ groupId: group.id });
@@ -81,6 +119,16 @@ export default function LineItemGroupDisplay({
   function handleToggleOpenGroup() {
     setIsOpenMutation.mutate({ groupId: group.id, isOpen: !isOpen });
   }
+
+  const handleLineItemDragEnd = (result: DropResult) => {
+    if (!result.destination) return;
+    if (result.destination.index === result.source.index) return;
+
+    const lineItemId = result.draggableId;
+    const newIndex = result.destination.index;
+
+    changeLineItemIndexMutation.mutate({ lineItemId, newIndex });
+  };
 
   useEffect(() => {
     setIsOpen(group.isOpen); // Sync state with updated prop
@@ -91,15 +139,24 @@ export default function LineItemGroupDisplay({
       {(provided) => (
         <div className="py-2" ref={provided.innerRef} {...provided.draggableProps} >
           <CollapsibleDiv title={group.name} price={getGroupsTotalSalePrice()} isOpen={isOpen} setIsOpen={handleToggleOpenGroup} provided={provided}>
-            {group.lineItems.map((lineItem) => {
-              return (
-                <LineItemDisplay
-                  key={lineItem.id}
-                  lineItem={lineItem}
-                  group={group}
-                />
-              );
-            })}
+          <DragDropContext onDragEnd={handleLineItemDragEnd}>
+            <Droppable droppableId={group.id}>
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {group.lineItems.map((lineItem, index) => {
+                    return (
+                      <LineItemDisplay
+                        key={lineItem.id}
+                        lineItem={lineItem}
+                        index={index}
+                      />
+                    );
+                  })}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
             <div className="grid grid-cols-5 gap-4 py-2 pl-4">
               <div>
                 <Button size={"xs"} variant="white" onClick={handleCreateLineItem}>

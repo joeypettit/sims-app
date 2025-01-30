@@ -323,6 +323,7 @@ export default function ProjectAreaProposal({
       <StickyTierToolbar title={getTitle()} handleSetIsOpen={handleToggleOpenAllGroups} />
       {categoriesQuery.data?.map((category) => {
         if (!projectAreaQuery.data?.lineItemGroups) return;
+        console.log("projectAreaQuery.data?.lineItemGroups",projectAreaQuery.data?.lineItemGroups)
         const groupsInCategory = filterGroupsByCategory({ groups: projectAreaQuery.data?.lineItemGroups, categoryId: category.id })
         return (
           <div key={category.id} className="py-4">

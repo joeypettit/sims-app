@@ -402,3 +402,26 @@ export async function setIndexOfGroupInCategory({
     throw new Error(`Error setting index of group in category. GroupId:${groupId}: ${error}`);
   }
 };
+
+export async function setLineItemIndex({
+  groupId,
+  lineItemId,
+  newIndex
+}: {
+  groupId: string;
+  lineItemId: string;
+  newIndex: number;
+}) {
+  try {
+    const response = await axios.put<LineItem>(
+      `/api/line-items/${lineItemId}/set-index`,
+      {
+        groupId,
+        newIndex
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error setting index of line item. LineItemId:${lineItemId}: ${error}`);
+  }
+};

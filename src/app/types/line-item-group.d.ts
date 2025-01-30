@@ -7,6 +7,7 @@ export type LineItemGroup = {
   name: string;
   lineItems: LineItem[];
   groupCategory: GroupCategory;
+  groupCategoryId: string;
   totalSalePrice: PriceRange;
   isOpen: boolean;
   indexInCategory: number;
