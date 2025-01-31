@@ -16,7 +16,7 @@ export async function getAllProjects(): Promise<Project[]> {
 
 export async function getProjectById(id: string) {
   try {
-    const response = await axios.get<Project>(`/api/projects/${id}`);
+    const response = await axios.get<Project>(`/api/projects/get-by-id/${id}`);
     return response.data;
   } catch (error) {
     throw new Error(`Error fetching project with id ${id}: ${error}`);
