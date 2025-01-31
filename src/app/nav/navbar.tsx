@@ -74,7 +74,7 @@ function LargeScreenNavBar() {
                 src="/assets/sims-logo-w-name-vertical.png"
                 alt="Sims Logo"
                 // style={{ height: "2.5rem", width: "2.5rem" }}
-              />
+             />
             </div>
           </div>
         </div>
@@ -91,7 +91,7 @@ function LargeScreenNavBar() {
                       pl-1 pr-2 py-3
                       flex flex-row 
                       group
-                      hover:bg-slate-200 ${
+                      hover:bg-slate-100 ${
                         isOpen ? "justify-between" : "justify-center"
                       }`}
                       >

@@ -8,6 +8,15 @@ import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
 
+type SearchProjectsResponse = {
+  projects: Project[];
+  pagination: {
+    total: number;
+    pages: number;
+    currentPage: number;
+  };
+};
+
 export async function getAllProjects(): Promise<Project[]> {
   const response = await axios.get<Project[]>("/api/projects");
   console.log("data", response.data);
@@ -425,3 +434,22 @@ export async function setLineItemIndex({
     throw new Error(`Error setting index of line item. LineItemId:${lineItemId}: ${error}`);
   }
 };
+
+export async function searchProjects({ 
+  query = "", 
+  page = "1", 
+  limit = "10" 
+}: { 
+  query?: string, 
+  page?: string, 
+  limit?: string 
+}) {
+  try {
+    const response = await axios.get<SearchProjectsResponse>(`/api/projects/search`, {
+      params: { query, page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error searching projects: ${error}`);
+  }
+}
