@@ -6,14 +6,20 @@ import { BsChevronDoubleRight } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { BsHousesFill } from "react-icons/bs";
 import { ImSpinner11 } from "react-icons/im";
+import { FaUsers } from "react-icons/fa";
 
 const iconSize = "1.8rem";
 
 const links = [
   {
-    to: "/project",
+    to: "/projects",
     label: "Projects",
     icon: <BsHousesFill size={iconSize} />,
+  },
+  {
+    to: "/users",
+    label: "Users",
+    icon: <FaUsers size={iconSize} />,
   },
   {
     to: "/settings",

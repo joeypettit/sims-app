@@ -7,6 +7,18 @@ import type { GroupCategory } from "../app/types/group-category";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
+import { User, LoginCredentials } from "../app/types/user";
+
+// Add response interceptor to handle unauthorized responses
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 type SearchProjectsResponse = {
   projects: Project[];
@@ -451,5 +463,45 @@ export async function searchProjects({
     return response.data;
   } catch (error) {
     throw new Error(`Error searching projects: ${error}`);
+  }
+}
+
+export async function login({ email, password }: LoginCredentials) {
+  try {
+    const response = await axios.post('/api/auth/login', { email, password });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.error || 'Login failed');
+    }
+    throw new Error('Login failed');
+  }
+}
+
+export async function logout() {
+  try {
+    const response = await axios.post('/api/auth/logout');
+    return response.data;
+  } catch (error) {
+    throw new Error('Logout failed');
+  }
+}
+
+export async function getCurrentUser(): Promise<User> {
+  try {
+    const response = await axios.get('/api/auth/me');
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get current user');
+  }
+}
+
+export async function getUsers(): Promise<User[]>{
+  try {
+    console.log('Getting users');
+    const response = await axios.get<User[]>('/api/auth/users');
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get users');
   }
 }
