@@ -20,6 +20,7 @@ export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   type?: ButtonTypes;
+  form?: string;
 };
 
 export default function Button({
@@ -30,6 +31,7 @@ export default function Button({
   variant = "primary",
   size = "md",
   type = "button",
+  form,
 }: ButtonProps) {
   // Set button color based on the variant prop
   const getButtonClasses = () => {
@@ -73,6 +75,7 @@ export default function Button({
     <button
       onClick={onClick}
       type={type}
+      form={form}
       disabled={disabled}
       className={`rounded-md font-semibold transition-all duration-200 
                   disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60

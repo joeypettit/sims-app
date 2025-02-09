@@ -12,6 +12,7 @@ import EditProject from '../routes/projects/edit-project';
 import SpinnerPage from '../components/spinner-page';
 import LoginPage from '../routes/login/login-page';
 import UsersPanel from '../routes/users/users-panel';
+import UserDetails from '../routes/users/user-details';
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
       {
         path: 'users',
         element: <PanelWindow><UsersPanel /></PanelWindow>
+      },
+      {
+        path: 'users/:userId',
+        element: <PanelWindow><UserDetails /></PanelWindow>
       },
       {
         path: 'settings',

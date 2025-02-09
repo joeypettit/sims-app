@@ -5,6 +5,7 @@ import type { ButtonProps } from "./button";
 
 type ModalProps = {
   isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
   title?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
@@ -16,6 +17,7 @@ type ModalProps = {
 
 export default function Modal({
   isOpen,
+  setIsOpen,
   title = "Are you sure?",
   onConfirm,
   onCancel,
@@ -63,6 +65,7 @@ export default function Modal({
                 size={button.size}
                 variant={button.variant}
                 type={button.type}
+                form={button.form}
               >
                 {button.children}
               </Button>

@@ -496,12 +496,96 @@ export async function getCurrentUser(): Promise<User> {
   }
 }
 
-export async function getUsers(): Promise<User[]>{
+export async function getUsers({ 
+  page = "1", 
+  limit = "10" 
+}: { 
+  page?: string, 
+  limit?: string 
+} = {}): Promise<{
+  users: User[];
+  pagination: {
+    total: number;
+    pages: number;
+    currentPage: number;
+  };
+}> {
   try {
     console.log('Getting users');
-    const response = await axios.get<User[]>('/api/auth/users');
+    const response = await axios.get('/api/auth/users', {
+      params: { page, limit }
+    });
     return response.data;
   } catch (error) {
     throw new Error('Failed to get users');
+  }
+}
+
+export async function getUser(userId: string): Promise<User> {
+  try {
+    const response = await axios.get<User>(`/api/auth/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get user details');
+  }
+}
+
+export async function updateUser({
+  userId,
+  firstName,
+  lastName,
+  email,
+  isAdmin,
+}: {
+  userId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  isAdmin: boolean;
+}): Promise<User> {
+  try {
+    const response = await axios.put<User>(`/api/auth/users/${userId}`, {
+      firstName,
+      lastName,
+      email,
+      isAdmin,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to update user');
+    }
+    throw new Error('Failed to update user');
+  }
+}
+
+export async function createUser({
+  firstName,
+  lastName,
+  email,
+  password,
+  isAdmin,
+}: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  isAdmin: boolean;
+}): Promise<User> {
+  try {
+    console.log('Creating user', { firstName, lastName, email, password, isAdmin });
+    const response = await axios.post<User>('/api/auth/create-user', {
+      firstName,
+      lastName,
+      email,
+      password,
+      isAdmin,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to create user');
+    }
+    throw new Error('Failed to create user');
   }
 }
