@@ -8,6 +8,12 @@ import { useState } from "react";
 import Button from "../../components/button";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import AddUserModal from "../../components/add-user-modal";
+import StatusPill from "../../components/status-pill";
+
+const formatRole = (role: string) => {
+  if (role === 'SUPER_ADMIN') return 'Super Admin';
+  return role.charAt(0) + role.slice(1).toLowerCase();
+};
 
 export default function UsersPanel() {
   const navigate = useNavigate();
@@ -46,7 +52,16 @@ export default function UsersPanel() {
     {
       columnName: "Role",
       orderIndex: 3,
-      cellRenderer: (user) => user.userAccount?.isAdmin ? "Admin" : "User"
+      cellRenderer: (user) => formatRole(user.userAccount?.role || '')
+    },
+    {
+      columnName: "Status",
+      orderIndex: 4,
+      cellRenderer: (user) => (
+        <StatusPill variant={user.userAccount?.isBlocked ? "danger" : "success"}>
+          {user.userAccount?.isBlocked ? "Blocked" : "Active"}
+        </StatusPill>
+      )
     }
   ];
 

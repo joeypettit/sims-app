@@ -7,7 +7,7 @@ import type { GroupCategory } from "../app/types/group-category";
 import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
-import { User, LoginCredentials } from "../app/types/user";
+import { User, LoginCredentials, UserRole } from "../app/types/user";
 
 // Add response interceptor to handle unauthorized responses
 axios.interceptors.response.use(
@@ -535,20 +535,20 @@ export async function updateUser({
   firstName,
   lastName,
   email,
-  isAdmin,
+  role,
 }: {
   userId: string;
   firstName: string;
   lastName: string;
   email: string;
-  isAdmin: boolean;
+  role: UserRole;
 }): Promise<User> {
   try {
     const response = await axios.put<User>(`/api/auth/users/${userId}`, {
       firstName,
       lastName,
       email,
-      isAdmin,
+      role,
     });
     return response.data;
   } catch (error) {
@@ -559,27 +559,38 @@ export async function updateUser({
   }
 }
 
+export async function deleteUser(userId: string): Promise<void> {
+  try {
+    await axios.delete(`/api/auth/users/${userId}`);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to delete user');
+    }
+    throw new Error('Failed to delete user');
+  }
+}
+
 export async function createUser({
   firstName,
   lastName,
   email,
   password,
-  isAdmin,
+  role,
 }: {
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  isAdmin: boolean;
+  role: UserRole;
 }): Promise<User> {
   try {
-    console.log('Creating user', { firstName, lastName, email, password, isAdmin });
+    console.log('Creating user', { firstName, lastName, email, password, role });
     const response = await axios.post<User>('/api/auth/create-user', {
       firstName,
       lastName,
       email,
       password,
-      isAdmin,
+      role,
     });
     return response.data;
   } catch (error) {
@@ -587,5 +598,17 @@ export async function createUser({
       throw new Error(error.response.data.error || 'Failed to create user');
     }
     throw new Error('Failed to create user');
+  }
+}
+
+export async function toggleUserBlocked(userAccountId: string): Promise<User> {
+  try {
+    const response = await axios.patch<{ message: string, user: User }>(`/api/auth/users/${userAccountId}/toggle-block`);
+    return response.data.user;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to toggle user blocked status');
+    }
+    throw new Error('Failed to toggle user blocked status');
   }
 }

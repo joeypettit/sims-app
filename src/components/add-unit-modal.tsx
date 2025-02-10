@@ -64,7 +64,7 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
         <p className="text-sm text-gray-500 pb-4">
           Create a new unit that can be used across the application.
         </p>
-        <label htmlFor="unitName" className={`block mb-2`}>
+        <label htmlFor="unitName" className="block text-sm font-medium text-gray-700 mb-1">
           Unit Name:
         </label>
         <input
@@ -76,7 +76,7 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
           value={unitNameInput}
           onChange={(e) => setUnitNameInput(e.target.value)}
           required
-          className="w-full p-2 border rounded-md mb-4"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
         />
         {modalErrorMessage && (
           <div className="text-rose-700">{modalErrorMessage}</div>

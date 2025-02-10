@@ -123,7 +123,7 @@ export default function AddProjectAreaModal({
   function renderScreenOne() {
     return (
       <div className="flex flex-col justify-center items-center">
-        <label htmlFor="project-name" className="block mb-2">
+        <label htmlFor="project-name" className="block text-sm font-medium text-gray-700 mb-1">
           Project Area Name:
         </label>
         <input
@@ -135,7 +135,7 @@ export default function AddProjectAreaModal({
           value={areaNameInput}
           onChange={(e) => setAreaNameInput(e.target.value)}
           required
-          className="w-full p-2 border rounded-md mb-4"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
         />
         <fieldset className="mb-4">
           <legend className="text-sm font-medium mb-2">Create Option:</legend>

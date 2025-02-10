@@ -5,7 +5,6 @@ import type { ButtonProps } from "./button";
 
 type ModalProps = {
   isOpen: boolean;
-  setIsOpen: (isOpen: boolean) => void;
   title?: string;
   onConfirm?: () => void;
   onCancel?: () => void;
@@ -17,7 +16,6 @@ type ModalProps = {
 
 export default function Modal({
   isOpen,
-  setIsOpen,
   title = "Are you sure?",
   onConfirm,
   onCancel,
@@ -39,7 +37,7 @@ export default function Modal({
         <div className="flex justify-center gap-2">
           {onCancel && (
             <Button
-              variant="secondary"
+              variant="white"
               onClick={onCancel}
               disabled={disableCancel}
             >

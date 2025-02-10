@@ -7,7 +7,10 @@ type ButtonVariant =
   | "success"
   | "danger"
   | "warning"
-  | "white";
+  | "white"
+  | "outline-danger"
+  | "outline-primary"
+  | "outline-success";
 type ButtonSize = "xs" | "sm" | "md" | "lg" | "xl";
 type ButtonTypes = "submit" | "reset" | "button" | undefined;
 
@@ -41,13 +44,19 @@ export default function Button({
       case "secondary":
         return "bg-gray-400 hover:bg-gray-600 active:bg-gray-700";
       case "success":
-        return "bg-green-600 hover:bg-green-700 active:bg-green-900";
+        return "bg-emerald-600 hover:bg-emerald-700 active:bg-green-900";
       case "danger":
-        return "bg-red-600 hover:bg-red-700 active:bg-red-900";
+        return "bg-red-700 hover:bg-red-800 active:bg-red-900";
       case "warning":
         return "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700";
       case "white":
         return "text-black bg-white hover:bg-slate-100 active:bg-slate-100 active:shadow-inner";
+      case "outline-danger":
+        return "text-red-700 border-2 border-red-700 bg-transparent hover:bg-red-50 active:bg-red-100";
+      case "outline-primary":
+        return "text-sims-green-600 border-2 border-sims-green-600 bg-transparent hover:bg-sims-green-50 active:bg-sims-green-100";
+      case "outline-success":
+        return "text-emerald-700 border-2 border-emerald-700 bg-transparent hover:bg-green-50 active:bg-green-100";
       default:
         return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-900";
     }
@@ -79,7 +88,7 @@ export default function Button({
       disabled={disabled}
       className={`rounded-md font-semibold transition-all duration-200 
                   disabled:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-60
-                  ${variant == "white" ? "text-black" : "text-white"} 
+                  ${variant.startsWith('outline-') ? '' : variant == "white" ? "text-black" : "text-white"} 
                   ${getButtonClasses()} ${getSizeClasses()} ${className}`}
     >
       {children}

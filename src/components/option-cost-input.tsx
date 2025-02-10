@@ -116,7 +116,7 @@ export default function OptionCostInput({
           <div className="flex space-x-2">
             <div className="flex flex-row justify-center items-center">
               <NumericFormat
-                className="border border-gray-300 p-1 rounded w-full"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
                 autoComplete="off"
                 id="exactCostInDollarsPerUnit"
                 name="exactCostInDollarsPerUnit"
@@ -132,7 +132,7 @@ export default function OptionCostInput({
               />
               <span className="px-2"> - </span>
               <NumericFormat
-                className="border border-gray-300 p-1 rounded w-full"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
                 autoComplete="off"
                 id="exactCostInDollarsPerUnit"
                 name="exactCostInDollarsPerUnit"

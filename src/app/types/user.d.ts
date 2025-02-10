@@ -1,10 +1,14 @@
+export type UserRole = 'USER' | 'ADMIN' | 'SUPER_ADMIN';
+
 export type User = {
   id: string;
   firstName: string;
   lastName: string;
   userAccount?: {
+    id: string;
     email: string;
-    isAdmin: boolean;
+    role: UserRole;
+    isBlocked: boolean;
   };
 };
 

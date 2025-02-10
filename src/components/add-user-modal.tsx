@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Modal from './modal';
 import { createUser } from '../api/api';
+import type { UserRole } from '../app/types/user';
 
 type AddUserModalProps = {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
     lastName: '',
     email: '',
     password: '',
-    isAdmin: false
+    role: 'USER' as UserRole
   });
 
   useEffect(() => {
@@ -35,23 +36,20 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
         lastName: '',
         email: '',
         password: '',
-        isAdmin: false
+        role: 'USER' as UserRole
       });
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('handleSubmit', formData);
     createUserMutation.mutate(formData);
   };
 
   const actionButtons = [
     {
-      variant: "secondary" as const,
-      onClick: () => {
-        
-        setIsOpen(false)},
+      variant: "white" as const,
+      onClick: () => setIsOpen(false),
       children: "Cancel"
     },
     {
@@ -66,72 +64,71 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
   return (
     <Modal 
       isOpen={isOpen}
-      setIsOpen={setIsOpen}
       title="Create New User"
       actionButtons={actionButtons}
     >
       <form id="createUserForm" onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-600">First Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
             <input
               ref={firstNameRef}
               type="text"
               value={formData.firstName}
               onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-600">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
             <input
               type="text"
               value={formData.lastName}
               onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-600">Email</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-600">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               required
             />
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-600">Role</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select
-              value={formData.isAdmin ? "admin" : "user"}
-              onChange={(e) => setFormData({ ...formData, isAdmin: e.target.value === "admin" })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              value={formData.role}
+              onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
             </select>
           </div>
         </div>
 
         {createUserMutation.isError && (
-          <div className="mt-2 text-red-600">
+          <div className="mt-2 text-red-700">
             {createUserMutation.error.message || "Failed to create user"}
           </div>
         )}

@@ -174,7 +174,7 @@ export default function EditLineItem() {
         <div className="flex flex-col gap-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="name">Name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
                 type="text"
                 autoComplete="off"
@@ -183,13 +183,13 @@ export default function EditLineItem() {
                 value={formData.name}
                 onChange={onNameInputChange}
                 required
-                className="border border-gray-300 p-1 rounded w-full"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               />
             </div>
             <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="marginDecimal">Margin</label>
+              <label htmlFor="marginDecimal" className="block text-sm font-medium text-gray-700 mb-1">Margin</label>
               <NumericFormat
-                className="border border-gray-300 p-1 rounded w-full"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
                 autoComplete="off"
                 id="priceAdjustmentMultiplier"
                 name="priceAdjustmentMultiplier"
@@ -249,7 +249,7 @@ export default function EditLineItem() {
           <hr />
         </div>
         <div className="flex flex-row gap-4 justify-end">
-          <Button variant="secondary" type="button" onClick={handleCancel}>
+          <Button variant="white" type="button" onClick={handleCancel}>
             Cancel
           </Button>
           <Button variant="primary" type="submit">

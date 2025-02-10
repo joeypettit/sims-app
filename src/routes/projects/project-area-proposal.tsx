@@ -250,7 +250,7 @@ export default function ProjectAreaProposal({
           <div className="flex flex-col justify-center items-center">
             <label
               htmlFor="group-name"
-              className="block text-left mb-2 font-medium"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Group Name
             </label>
@@ -260,7 +260,7 @@ export default function ProjectAreaProposal({
               id="group-name"
               value={groupNameInput}
               onChange={(e) => setGroupNameInput(e.target.value)}
-              className="w-full px-3 py-2 mb-4 border rounded"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
               placeholder="Enter group name"
               required
             />
