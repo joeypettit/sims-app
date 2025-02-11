@@ -23,7 +23,7 @@ export default function AddProjectModal({
       return result;
     },
     onSuccess: (data) => {
-      navigate(`/edit-project/${data.id}`);
+      navigate(`/project/${data.id}`);
     },
     onError: (error) => {
       console.error("Error creating project:", error);

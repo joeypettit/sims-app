@@ -292,44 +292,6 @@ export async function createBlankProjectArea({
   }
 }
 
-export async function updateProject({
-  projectId,
-  name,
-  clientFirstName,
-  clientLastName,
-  clientId,
-  salesPersonFirstName,
-  salesPersonLastName,
-  salesPersonId,
-  description,
-}: {
-  projectId: string;
-  name: string;
-  clientFirstName: string;
-  clientLastName: string;
-  clientId: string;
-  salesPersonFirstName: string;
-  salesPersonLastName: string;
-  salesPersonId: string;
-  description: string;
-}) {
-  try {
-    const response = await axios.put(`/api/projects/${projectId}`, {
-      name,
-      clientFirstName,
-      clientLastName,
-      clientId,
-      salesPersonFirstName,
-      salesPersonLastName,
-      salesPersonId,
-      description,
-    });
-    return response.data;
-  } catch (error) {
-    throw new Error(`Error updating project with ID ${projectId}: ${error}`);
-  }
-}
-
 export async function getAllAreaTemplates() {
   try {
     const response = await axios.get<AreaTemplate[]>(
@@ -610,5 +572,49 @@ export async function toggleUserBlocked(userAccountId: string): Promise<User> {
       throw new Error(error.response.data.error || 'Failed to toggle user blocked status');
     }
     throw new Error('Failed to toggle user blocked status');
+  }
+}
+
+export async function searchUsers({ 
+  query = "", 
+  page = "1", 
+  limit = "10" 
+}: { 
+  query?: string, 
+  page?: string, 
+  limit?: string 
+} = {}): Promise<{
+  users: User[];
+  pagination: {
+    total: number;
+    pages: number;
+    currentPage: number;
+  };
+}> {
+  try {
+    const response = await axios.get('/api/auth/users/search', {
+      params: { query, page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to search users');
+  }
+}
+
+export async function addUserToProject(projectId: string, userId: string) {
+  try {
+    const response = await axios.post(`/api/projects/${projectId}/users`, { userId });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to add user to project');
+  }
+}
+
+export async function removeUserFromProject(projectId: string, userId: string) {
+  try {
+    const response = await axios.delete(`/api/projects/${projectId}/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to remove user from project');
   }
 }

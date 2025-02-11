@@ -9,6 +9,7 @@ import { FaPlus, FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/modal";
 import AddProjectModal from "../../components/add-project-modal";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export default function ProjectsPanel() {
   const navigate = useNavigate();
@@ -16,13 +17,14 @@ export default function ProjectsPanel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState("1");
   const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Queries
   const { data, isLoading } = useQuery({
-    queryKey: ["projects", searchQuery, currentPage],
+    queryKey: ["projects", debouncedSearch, currentPage],
     queryFn: async () => {
       const response = await searchProjects({
-        query: searchQuery,
+        query: debouncedSearch,
         page: currentPage,
         limit: "10"
       });

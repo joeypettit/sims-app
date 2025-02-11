@@ -8,7 +8,6 @@ import EditProjectArea from '../routes/projects/edit-project-area';
 import SettingsPanel from '../routes/settings/settings';
 import EditAreaTemplate from '../routes/settings/edit-area-template';
 import EditLineItem from '../routes/settings/edit-line-item';
-import EditProject from '../routes/projects/edit-project';
 import SpinnerPage from '../components/spinner-page';
 import LoginPage from '../routes/login/login-page';
 import UsersPanel from '../routes/users/users-panel';
@@ -59,10 +58,6 @@ export const router = createBrowserRouter([
       {
         path: 'edit-line-item/:lineItemId',
         element: <PanelWindow><EditLineItem /></PanelWindow>
-      },
-      {
-        path: 'edit-project/:projectId',
-        element: <PanelWindow><EditProject /></PanelWindow>
       },
       {
         path: 'spinner-page',

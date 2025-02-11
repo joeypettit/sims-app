@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { PanelTableColumn } from "../../components/panel-table";
 import PanelTable from "../../components/panel-table";
-import { getUsers } from "../../api/api";
+import { searchUsers } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../app/types/user";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import Button from "../../components/button";
 import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import AddUserModal from "../../components/add-user-modal";
 import StatusPill from "../../components/status-pill";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const formatRole = (role: string) => {
   if (role === 'SUPER_ADMIN') return 'Super Admin';
@@ -18,16 +19,19 @@ const formatRole = (role: string) => {
 export default function UsersPanel() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState("1");
+  const [searchQuery, setSearchQuery] = useState("");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const limit = "10";
   
-  // Queries
+  // Query for users with search
   const { data, isLoading } = useQuery({
-    queryKey: ["users", currentPage],
-    queryFn: async () => {
-      const response = await getUsers({ page: currentPage, limit });
-      return response;
-    }
+    queryKey: ["users", "search", debouncedSearch, currentPage],
+    queryFn: () => searchUsers({ 
+      query: debouncedSearch, 
+      page: currentPage, 
+      limit 
+    })
   });
 
   const handleRowClick = (user: User) => {
@@ -36,6 +40,11 @@ export default function UsersPanel() {
 
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage.toString());
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+    setCurrentPage("1"); // Reset to first page on new search
   };
 
   const columns: PanelTableColumn<User>[] = [
@@ -68,7 +77,13 @@ export default function UsersPanel() {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">Users</h2>
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchQuery}
+          onChange={handleSearch}
+          className="px-4 py-2 border rounded-lg"
+        />
         <Button variant="white" onClick={() => setIsAddUserModalOpen(true)}>
           <FaPlus />
         </Button>
@@ -79,7 +94,9 @@ export default function UsersPanel() {
       ) : !data ? (
         <div className="text-center py-4 text-gray-500">Error loading users</div>
       ) : data.users.length === 0 ? (
-        <div className="text-center py-4 text-gray-500">No users found</div>
+        <div className="text-center py-4 text-gray-500">
+          {searchQuery ? "No users found matching your search" : "No users found"}
+        </div>
       ) : (
         <>
           <PanelTable
