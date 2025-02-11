@@ -8,6 +8,7 @@ import type { LineItemUnit } from "../app/types/line-item-unit";
 import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
 import { User, LoginCredentials, UserRole } from "../app/types/user";
+import { Client } from "../app/types/client";
 
 // Add response interceptor to handle unauthorized responses
 axios.interceptors.response.use(
@@ -620,5 +621,118 @@ export async function removeUserFromProject(projectId: string, userId: string) {
     return response.data;
   } catch (error) {
     throw new Error('Failed to remove user from project');
+  }
+}
+
+export type SearchClientsResponse = {
+  clients: Client[];
+  pagination: {
+    total: number;
+    pages: number;
+    currentPage: number;
+  };
+};
+
+export async function searchClients({ 
+  query = "", 
+  page = "1", 
+  limit = "10" 
+}: { 
+  query?: string, 
+  page?: string, 
+  limit?: string 
+} = {}): Promise<SearchClientsResponse> {
+  try {
+    const response = await axios.get('/api/clients/search', {
+      params: { query, page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to search clients');
+  }
+}
+
+export async function getClient(clientId: string): Promise<Client> {
+  try {
+    const response = await axios.get<Client>(`/api/clients/${clientId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get client');
+  }
+}
+
+export async function createClient({
+  firstName,
+  lastName,
+  email,
+  phone
+}: {
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+}): Promise<Client> {
+  try {
+    const response = await axios.post('/api/clients', {
+      firstName,
+      lastName,
+      email,
+      phone
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to create client');
+  }
+}
+
+export async function updateClient({
+  clientId,
+  firstName,
+  lastName,
+  email,
+  phone
+}: {
+  clientId: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+}): Promise<Client> {
+  try {
+    const response = await axios.put(`/api/clients/${clientId}`, {
+      firstName,
+      lastName,
+      email,
+      phone
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update client');
+  }
+}
+
+export async function deleteClient(clientId: string): Promise<void> {
+  try {
+    await axios.delete(`/api/clients/${clientId}`);
+  } catch (error) {
+    throw new Error('Failed to delete client');
+  }
+}
+
+export async function addClientToProject(projectId: string, clientId: string) {
+  try {
+    const response = await axios.post(`/api/projects/${projectId}/clients`, { clientId });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to add client to project: ${error}`);
+  }
+}
+
+export async function removeClientFromProject(projectId: string, clientId: string) {
+  try {
+    const response = await axios.delete(`/api/projects/${projectId}/clients/${clientId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Failed to remove client from project: ${error}`);
   }
 }

@@ -4,6 +4,10 @@ export type User = {
   id: string;
   firstName: string;
   lastName: string;
+  projects?: {
+    id: string;
+    name: string;
+  }[];
   userAccount?: {
     id: string;
     email: string;

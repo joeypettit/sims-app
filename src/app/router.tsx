@@ -12,6 +12,8 @@ import SpinnerPage from '../components/spinner-page';
 import LoginPage from '../routes/login/login-page';
 import UsersPanel from '../routes/users/users-panel';
 import UserDetails from '../routes/users/user-details';
+import ClientsPanel from "../routes/clients/clients-panel";
+import ClientDetails from "../routes/clients/client-details";
 
 export const router = createBrowserRouter([
   {
@@ -62,6 +64,14 @@ export const router = createBrowserRouter([
       {
         path: 'spinner-page',
         element: <PanelWindow><SpinnerPage /></PanelWindow>
+      },
+      {
+        path: 'clients',
+        element: <PanelWindow><ClientsPanel /></PanelWindow>
+      },
+      {
+        path: 'clients/:clientId',
+        element: <PanelWindow><ClientDetails /></PanelWindow>
       }
     ]
   }

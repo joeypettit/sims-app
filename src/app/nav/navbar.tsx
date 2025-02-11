@@ -7,6 +7,7 @@ import { IoMdSettings } from "react-icons/io";
 import { BsHousesFill } from "react-icons/bs";
 import { ImSpinner11 } from "react-icons/im";
 import { FaUsers } from "react-icons/fa";
+import { FaUserTie } from "react-icons/fa";
 
 const iconSize = "1.8rem";
 
@@ -15,6 +16,11 @@ const links = [
     to: "/projects",
     label: "Projects",
     icon: <BsHousesFill size={iconSize} />,
+  },
+  {
+    to: "/clients",
+    label: "Clients",
+    icon: <FaUserTie size={iconSize} />,
   },
   {
     to: "/users",

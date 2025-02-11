@@ -1,30 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUser, updateUser, deleteUser, toggleUserBlocked } from "../../api/api";
+import { getClient, updateClient, deleteClient } from "../../api/api";
 import { useState, useEffect } from "react";
 import Button from "../../components/button";
 import IconButton from "../../components/icon-button";
 import PanelHeaderBar from "../../components/page-header-bar";
 import Modal from "../../components/modal";
-import { UserRole } from "../../app/types/user";
 import ProjectsList from "../../components/projects-list";
-import StatusPill from "../../components/status-pill";
-import { FaTrash } from "react-icons/fa6";
+import { FaTrash } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { FaUserTimes, FaUserCheck } from "react-icons/fa";
 
-const roleOptions = [
-  { value: "USER", label: "User" },
-  { value: "ADMIN", label: "Admin" }
-];
-
-const formatRole = (role: string) => {
-  if (role === 'SUPER_ADMIN') return 'Super Admin';
-  return role.charAt(0) + role.slice(1).toLowerCase();
-};
-
-export default function UserDetails() {
-  const { userId } = useParams();
+export default function ClientDetails() {
+  const { clientId } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
@@ -33,50 +20,43 @@ export default function UserDetails() {
     firstName: '',
     lastName: '',
     email: '',
-    role: 'USER' as UserRole
+    phone: ''
+  });
+  
+  const { data: client, isLoading } = useQuery({
+    queryKey: ["client", clientId],
+    queryFn: () => getClient(clientId!),
+    enabled: !!clientId
   });
 
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["user", userId],
-    queryFn: () => getUser(userId!),
-    enabled: !!userId
-  });
-
-  const updateUserMutation = useMutation({
-    mutationFn: (data: { userId: string, firstName: string, lastName: string, email: string, role: UserRole }) => 
-      updateUser(data),
+  const updateClientMutation = useMutation({
+    mutationFn: (data: { clientId: string, firstName: string, lastName: string, email?: string, phone?: string }) => 
+      updateClient(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", userId] });
+      queryClient.invalidateQueries({ queryKey: ["client", clientId] });
       setIsEditing(false);
     }
   });
 
-  const deleteUserMutation = useMutation({
-    mutationFn: () => deleteUser(userId!),
+  const deleteClientMutation = useMutation({
+    mutationFn: () => deleteClient(clientId!),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      navigate("/users");
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      navigate("/clients");
     }
   });
 
-  const toggleBlockedMutation = useMutation({
-    mutationFn: () => toggleUserBlocked(user?.userAccount?.id || ''),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", userId] });
-    }
-  });
-
-  // Initialize form data when user data is loaded
+  // Initialize form data when client data is loaded
   useEffect(() => {
-    if (user) {
+    if (client) {
       setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.userAccount?.email || '',
-        role: user.userAccount?.role || 'USER'
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email || '',
+        phone: client.phone || ''
       });
     }
-  }, [user]);
+  }, [client]);
 
   const startEditing = () => {
     setIsEditing(true);
@@ -84,22 +64,22 @@ export default function UserDetails() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userId) return;
+    if (!clientId) return;
 
-    updateUserMutation.mutate({
-      userId,
+    updateClientMutation.mutate({
+      clientId,
       ...formData
     });
   };
 
   const handleCancel = () => {
     setIsEditing(false);
-    if (user) {
+    if (client) {
       setFormData({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.userAccount?.email || '',
-        role: user.userAccount?.role || 'USER'
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email || '',
+        phone: client.phone || ''
       });
     }
   };
@@ -108,55 +88,40 @@ export default function UserDetails() {
     setShowDeleteModal(true);
   };
 
-  const canModifyUser = user?.userAccount?.role !== 'SUPER_ADMIN';
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
-    return <div>User not found</div>;
+  if (!client) {
+    return <div>Client not found</div>;
   }
 
   return (
     <>
-      <PanelHeaderBar title={`User: ${user.firstName} ${user.lastName}`} />
+      <PanelHeaderBar title={`Client: ${client.firstName} ${client.lastName}`} />
       <div className="flex flex-col items-center gap-6 mt-20">
         <div className="w-full max-w-4xl mx-4">
           <div className="border border-gray-300 p-4 rounded mb-6">
             <div className="flex justify-between mb-4">
-              <h2 className="font-bold">User Details</h2>
+              <h2 className="font-bold">Client Details</h2>
               <div className="space-x-2">
-                {!isEditing && canModifyUser && (
+                {!isEditing && (
                   <>
                     <IconButton
                       icon={<FaTrash size={18} />}
                       onClick={handleDelete}
                       color="text-gray-600 hover:text-gray-800"
-                      title="Delete User"
-                    />
-                    <IconButton
-                      icon={user.userAccount?.isBlocked ? <FaUserCheck size={20} /> : <FaUserTimes size={20} />}
-                      onClick={() => toggleBlockedMutation.mutate()}
-                      disabled={toggleBlockedMutation.isPending || !user?.userAccount?.id}
-                      color="text-gray-600 hover:text-gray-800"
-                      title={user.userAccount?.isBlocked ? "Unblock User" : "Block User"}
+                      title="Delete Client"
                     />
                     <IconButton
                       icon={<MdEdit size={20} />}
                       onClick={startEditing}
                       color="text-gray-600 hover:text-gray-800"
-                      title="Edit User"
+                      title="Edit Client"
                     />
                   </>
                 )}
               </div>
-            </div>
-
-            <div className="mb-4">
-              <StatusPill variant={user.userAccount?.isBlocked ? "danger" : "success"}>
-                {user.userAccount?.isBlocked ? "Blocked" : "Active"}
-              </StatusPill>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -199,34 +164,20 @@ export default function UserDetails() {
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600 disabled:bg-gray-100"
-                    required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
+                    Phone
                   </label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value as UserRole })}
-                    disabled={!isEditing || !canModifyUser}
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={!isEditing}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600 disabled:bg-gray-100"
-                  >
-                    {roleOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                    {user.userAccount?.role === 'SUPER_ADMIN' && (
-                      <option value="SUPER_ADMIN">Super Admin</option>
-                    )}
-                  </select>
-                  {!canModifyUser && (
-                    <p className="mt-1 text-sm text-gray-500">
-                      Super Admin role cannot be modified
-                    </p>
-                  )}
+                  />
                 </div>
               </div>
 
@@ -238,30 +189,30 @@ export default function UserDetails() {
                   <Button
                     variant="primary"
                     type="submit"
-                    disabled={updateUserMutation.isPending}
+                    disabled={updateClientMutation.isPending}
                   >
-                    {updateUserMutation.isPending ? "Saving..." : "Save Changes"}
+                    {updateClientMutation.isPending ? "Saving..." : "Save Changes"}
                   </Button>
                 </div>
               )}
 
-              {updateUserMutation.isError && (
+              {updateClientMutation.isError && (
                 <div className="text-red-600 text-center">
-                  {updateUserMutation.error.message || "Error updating user"}
+                  {updateClientMutation.error.message || "Error updating client"}
                 </div>
               )}
             </form>
           </div>
 
           {/* Projects List */}
-          <ProjectsList projects={user.projects || []} />
+          <ProjectsList projects={client.projects || []} />
         </div>
       </div>
 
       {/* Delete Confirmation Modal */}
       <Modal
         isOpen={showDeleteModal}
-        title="Delete User"
+        title="Delete Client"
         actionButtons={[
           {
             variant: "white",
@@ -270,28 +221,23 @@ export default function UserDetails() {
           },
           {
             variant: "danger",
-            onClick: () => deleteUserMutation.mutate(),
-            disabled: deleteUserMutation.isPending,
-            children: deleteUserMutation.isPending ? "Deleting..." : "Delete"
+            onClick: () => deleteClientMutation.mutate(),
+            disabled: deleteClientMutation.isPending,
+            children: deleteClientMutation.isPending ? "Deleting..." : "Delete"
           }
         ]}
       >
         <div className="space-y-4 text-left">
           <p className="text-red-600 font-medium">Warning: This action cannot be undone!</p>
-          <p>Deleting this user will:</p>
+          <p>Deleting this client will:</p>
           <ul className="list-disc pl-5 text-gray-600">
-            <li>Permanently remove their account</li>
+            <li>Permanently remove their information from the system</li>
             <li>Remove them from all associated projects</li>
-            <li>Delete all their system access</li>
+            <li>Delete all their project history and associations</li>
           </ul>
-          <div className="bg-yellow-50 p-3 rounded border border-yellow-200 mt-2">
-            <p className="text-sm text-yellow-800">
-              <span className="font-medium">Consider blocking instead:</span> Blocking the user will prevent them from logging in while preserving their project history and associations. You can unblock them later if needed.
-            </p>
-          </div>
-          {deleteUserMutation.isError && (
+          {deleteClientMutation.isError && (
             <p className="text-red-600 mt-2">
-              {deleteUserMutation.error.message || "Error deleting user"}
+              {deleteClientMutation.error.message || "Error deleting client"}
             </p>
           )}
         </div>

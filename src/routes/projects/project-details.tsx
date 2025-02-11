@@ -1,20 +1,24 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProjectById, removeUserFromProject } from "../../api/api";
+import { getProjectById, removeUserFromProject, removeClientFromProject } from "../../api/api";
 import Button from "../../components/button";
 import AddProjectManagerModal from "../../components/add-project-manager-modal";
+import AddProjectClientModal from "../../components/add-project-client-modal";
 import PanelHeaderBar from "../../components/page-header-bar";
 import AddProjectAreaModal from "../../components/add-project-area-modal";
 import { useState } from "react";
 import { Project } from "../../app/types/project";
 import ProjectManagersList from "../../components/project-managers-list";
+import ProjectClientsList from "../../components/project-clients-list";
 
 export default function ProjectDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [showAddAreaModal, setShowAddAreaModal] = useState(false);
   const [showAddManagerModal, setShowAddManagerModal] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [managerErrorMessage, setManagerErrorMessage] = useState<string | null>(null);
+  const [clientErrorMessage, setClientErrorMessage] = useState<string | null>(null);
 
   const projectQuery = useQuery({
     queryKey: ["project", id],
@@ -31,12 +35,24 @@ export default function ProjectDetails() {
     },
     onSuccess: () => {
       projectQuery.refetch();
-      setErrorMessage(null);
+      setManagerErrorMessage(null);
     },
     onError: (error: Error) => {
-      setErrorMessage(error.message);
+      setManagerErrorMessage(error.message);
       // Clear error message after 3 seconds
-      setTimeout(() => setErrorMessage(null), 3000);
+      setTimeout(() => setManagerErrorMessage(null), 3000);
+    }
+  });
+
+  const removeClientMutation = useMutation({
+    mutationFn: (clientId: string) => removeClientFromProject(id || '', clientId),
+    onSuccess: () => {
+      projectQuery.refetch();
+      setClientErrorMessage(null);
+    },
+    onError: (error: Error) => {
+      setClientErrorMessage(error.message);
+      setTimeout(() => setClientErrorMessage(null), 3000);
     }
   });
 
@@ -46,6 +62,10 @@ export default function ProjectDetails() {
 
   function handleAddManagerClick() {
     setShowAddManagerModal(true);
+  }
+
+  function handleAddClientClick() {
+    setShowAddClientModal(true);
   }
 
   if (projectQuery.isLoading) {
@@ -63,30 +83,20 @@ export default function ProjectDetails() {
         {/* Project Managers and Clients Grid */}
         <div className="grid grid-cols-2 gap-4 w-full max-w-4xl mx-4">
           {/* Clients Section */}
-          <div className="border border-gray-300 p-4 rounded">
-            <div className="flex flex-row justify-between">
-              <h2 className="font-bold mb-4">Clients</h2>
-            </div>
-            <div>
-              <ul>
-                {projectQuery.data?.clients.map((client) => (
-                  <li
-                    key={client.id}
-                    className="p-2 bg-white odd:bg-sims-green-100 rounded"
-                  >
-                    {client.firstName} {client.lastName}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+          <ProjectClientsList
+            clients={projectQuery.data?.clients || []}
+            onRemoveClient={(clientId) => removeClientMutation.mutate(clientId)}
+            onAddClient={handleAddClientClick}
+            errorMessage={clientErrorMessage}
+            isRemoveLoading={removeClientMutation.isPending}
+          />
 
           {/* Project Managers Section */}
           <ProjectManagersList
             users={projectQuery.data?.users || []}
             onRemoveUser={(userId) => removeUserMutation.mutate(userId)}
             onAddManager={handleAddManagerClick}
-            errorMessage={errorMessage}
+            errorMessage={managerErrorMessage}
             isRemoveLoading={removeUserMutation.isPending}
           />
         </div>
@@ -130,6 +140,12 @@ export default function ProjectDetails() {
         setIsOpen={setShowAddManagerModal}
         projectId={id || ''}
         currentUsers={projectQuery.data?.users || []}
+      />
+      <AddProjectClientModal
+        isOpen={showAddClientModal}
+        setIsOpen={setShowAddClientModal}
+        projectId={id || ''}
+        currentClients={projectQuery.data?.clients || []}
       />
     </>
   );
