@@ -267,10 +267,14 @@ export async function deleteLineItem({ lineItemId }: { lineItemId: string }) {
 
 export async function createBlankProject({ name }: { name: string }) {
   try {
-    const response = await axios.post(`/api/projects/create-blank`, { name });
+    const currentUser = await getCurrentUser();
+    const response = await axios.post(`/api/projects/create-blank`, { 
+      name,
+      userId: currentUser.id 
+    });
     return response.data;
   } catch (error) {
-    throw new Error(`Error creating new line Item: ${error}`);
+    throw new Error(`Error creating new project: ${error}`);
   }
 }
 
