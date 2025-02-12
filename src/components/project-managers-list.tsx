@@ -2,6 +2,7 @@ import { User } from "../app/types/user";
 import Button from "./button";
 import { IoMdCloseCircle } from "react-icons/io";
 import { FiAlertCircle } from "react-icons/fi";
+import { FaPlus } from "react-icons/fa6";
 
 type ProjectManagersListProps = {
   users: User[];
@@ -20,14 +21,15 @@ export default function ProjectManagersList({
 }: ProjectManagersListProps) {
   return (
     <div className="border border-gray-300 p-4 rounded">
-      <div className="flex flex-row justify-between">
-        <h2 className="font-bold mb-4">Project Managers</h2>
+      <div className="flex flex-row mb-4 justify-between items-center">
+        <h2 className="font-bold">Project Managers</h2>
         <Button
           size="xs"
           variant="white"
           onClick={onAddManager}
+          className="py-1"
         >
-          +
+          <FaPlus />
         </Button>
       </div>
       <div>

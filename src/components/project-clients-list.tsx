@@ -2,6 +2,7 @@ import { Client } from "../app/types/client";
 import Button from "./button";
 import { IoMdCloseCircle } from "react-icons/io";
 import { FiAlertCircle } from "react-icons/fi";
+import { FaPlus } from "react-icons/fa6";
 
 type ProjectClientsListProps = {
   clients: Client[];
@@ -20,14 +21,15 @@ export default function ProjectClientsList({
 }: ProjectClientsListProps) {
   return (
     <div className="border border-gray-300 p-4 rounded">
-      <div className="flex flex-row justify-between">
-        <h2 className="font-bold mb-4">Clients</h2>
+      <div className="flex flex-row mb-4 justify-between items-center">
+        <h2 className="font-bold">Clients</h2>
         <Button
           size="xs"
           variant="white"
           onClick={onAddClient}
+          className="py-1"
         >
-          +
+          <FaPlus />
         </Button>
       </div>
       <div>

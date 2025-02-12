@@ -41,6 +41,8 @@ export default function AddProjectClientModal({
     onSuccess: () => {
       // Invalidate and refetch project data
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      // Invalidate projects list to reflect the updated client
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       handleClose();
     }
   });

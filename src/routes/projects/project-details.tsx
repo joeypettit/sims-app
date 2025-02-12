@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Project } from "../../app/types/project";
 import ProjectManagersList from "../../components/project-managers-list";
 import ProjectClientsList from "../../components/project-clients-list";
+import { FaPlus } from "react-icons/fa6";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -26,6 +27,8 @@ export default function ProjectDetails() {
     enabled: !!id,
   });
 
+  const queryClient = useQueryClient();
+
   const removeUserMutation = useMutation({
     mutationFn: (userId: string) => {
       if (projectQuery.data?.users.length === 1) {
@@ -35,6 +38,7 @@ export default function ProjectDetails() {
     },
     onSuccess: () => {
       projectQuery.refetch();
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       setManagerErrorMessage(null);
     },
     onError: (error: Error) => {
@@ -48,6 +52,7 @@ export default function ProjectDetails() {
     mutationFn: (clientId: string) => removeClientFromProject(id || '', clientId),
     onSuccess: () => {
       projectQuery.refetch();
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       setClientErrorMessage(null);
     },
     onError: (error: Error) => {
@@ -103,14 +108,15 @@ export default function ProjectDetails() {
 
         {/* Project Areas Section */}
         <div className="border border-gray-300 p-4 rounded w-full max-w-4xl mx-4">
-          <div className="flex flex-row justify-between">
-            <h2 className="font-bold mb-4">Project Areas</h2>
+          <div className="flex flex-row mb-4 justify-between items-center">
+            <h2 className="font-bold">Project Areas</h2>
             <Button
               size="xs"
               variant="white"
               onClick={handleAddAreaClick}
+              className="py-1"
             >
-              +
+              <FaPlus />
             </Button>
           </div>
           <div>

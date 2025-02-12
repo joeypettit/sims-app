@@ -43,6 +43,8 @@ export default function AddProjectManagerModal({
     onSuccess: () => {
       // Invalidate and refetch project data
       queryClient.invalidateQueries({ queryKey: ['project', projectId] });
+      // Invalidate projects list to reflect the updated manager
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
       handleClose();
     }
   });
