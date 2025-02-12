@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { simulateNetworkLatency, sortArrayByIndexProperty, updateGroupIndexInCategory } from "../../util/utils";
+import {sortArrayByIndexProperty, updateGroupIndexInCategory } from "../../util/utils";
 import { filterGroupsByCategory } from "../../util/utils";
 import {
   createGroup,
@@ -7,11 +7,12 @@ import {
   getProjectAreaById,
   setIndexOfGroupInCategory,
   setIsOpenOnAllGroupsInArea,
+  getAreaCostRange,
+  updateOptionSelection
 } from "../../api/api";
 import LineItemGroupContainer from "../../components/budget-columns/line-item-group";
 import type { LineItemGroup } from "../../app/types/line-item-group";
 import { getGroupsTotalSalePrice } from "../../util/utils";
-import type { PriceRange } from "../../app/types/price-range";
 import { formatNumberWithCommas } from "../../util/utils";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import Modal from "../../components/modal";
@@ -20,7 +21,7 @@ import { validateGroupName } from "../../util/form-validation";
 import Button from "../../components/button";
 import StickyTierToolbar from "../../components/tier-toolbar";
 import { ProjectArea } from "../../app/types/project-area";
-import { DragDropContext, Droppable, DropResult, OnDragEndResponder } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, DropResult, } from "@hello-pangea/dnd";
 
 type ProjectAreaProposalProps = {
   areaId?: string;
@@ -77,24 +78,10 @@ export default function ProjectAreaProposal({
           return { ...group, totalSalePrice: salePrice };
         }
       );
-      const totalAreaPrice: PriceRange = updatedGroups.reduce(
-        (acc: PriceRange, currentGroup: LineItemGroup) => {
-          return {
-            lowPriceInDollars:
-              acc.lowPriceInDollars +
-              currentGroup.totalSalePrice.lowPriceInDollars,
-            highPriceInDollars:
-              acc.highPriceInDollars +
-              currentGroup.totalSalePrice.highPriceInDollars,
-          };
-        },
-        { lowPriceInDollars: 0, highPriceInDollars: 0 } as PriceRange
-      );
 
       return {
         ...data,
         lineItemGroups: updatedGroups,
-        totalSalePrice: totalAreaPrice,
       };
     },
   });
@@ -107,6 +94,11 @@ export default function ProjectAreaProposal({
     },
   });
 
+  const areaCostQuery = useQuery({
+    queryKey: ["area-cost", areaId],
+    queryFn: () => getAreaCostRange(areaId || ""),
+    enabled: !!areaId
+  });
 
   const changeGroupIndexInCategoryMutation = useMutation({
     mutationFn: async ({ categoryId, groupId, newIndex, }: { categoryId: string, groupId: string, newIndex: number }) => {
@@ -193,22 +185,30 @@ export default function ProjectAreaProposal({
     },
   });
 
-  function getAreasTotalSalePrice() {
-    if (projectAreaQuery.data?.totalSalePrice) {
-      if (
-        projectAreaQuery.data.totalSalePrice?.lowPriceInDollars <= 0 &&
-        projectAreaQuery.data.totalSalePrice?.highPriceInDollars <= 0
-      )
-        return "-";
-      const lowPrice = formatNumberWithCommas(
-        projectAreaQuery.data.totalSalePrice?.lowPriceInDollars
-      );
-      const highPrice = formatNumberWithCommas(
-        projectAreaQuery.data.totalSalePrice?.highPriceInDollars
-      );
-      return `$${lowPrice} - $${highPrice}`;
+  const updateOptionMutation = useMutation({
+    mutationFn: updateOptionSelection,
+    onSuccess: () => {
+      // Invalidate both the area cost and project cost queries
+      queryClient.invalidateQueries({ queryKey: ["area-cost", areaId] });
+      // Also invalidate the project cost since it depends on area costs
+      if (projectAreaQuery.data?.projectId) {
+        queryClient.invalidateQueries({ 
+          queryKey: ["project-cost", projectAreaQuery.data.projectId] 
+        });
+      }
     }
-    return "-";
+  });
+
+  function getAreasTotalSalePrice() {
+    if (!areaCostQuery.data) return "-";
+    
+    if (areaCostQuery.data.lowPriceInDollars <= 0 && areaCostQuery.data.highPriceInDollars <= 0) {
+      return "-";
+    }
+
+    const lowPrice = formatNumberWithCommas(areaCostQuery.data.lowPriceInDollars);
+    const highPrice = formatNumberWithCommas(areaCostQuery.data.highPriceInDollars);
+    return `$${lowPrice} - $${highPrice}`;
   }
 
   async function handleCreateGroup() {
@@ -312,6 +312,8 @@ export default function ProjectAreaProposal({
             key={group.id}
             group={group}
             index={index}
+            projectId={projectAreaQuery.data?.projectId || ""}
+            projectAreaId={areaId || ""}
           />
         );
       }

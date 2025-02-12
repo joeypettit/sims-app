@@ -13,4 +13,6 @@ export type LineItem = {
   lineItemGroup: LineItemGroup;
   lineItemGroupId: string;
   lineItemOptions: LineItemOption[];
+  projectId: string;
+  projectAreaId: string;
 };

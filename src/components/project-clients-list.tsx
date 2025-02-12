@@ -20,7 +20,7 @@ export default function ProjectClientsList({
   isRemoveLoading
 }: ProjectClientsListProps) {
   return (
-    <div className="border border-gray-300 p-4 rounded">
+    <div className="border border-gray-300 p-4 rounded shadow">
       <div className="flex flex-row mb-4 justify-between items-center">
         <h2 className="font-bold">Clients</h2>
         <Button

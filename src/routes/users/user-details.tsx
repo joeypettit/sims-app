@@ -123,7 +123,7 @@ export default function UserDetails() {
       <PanelHeaderBar title={`User: ${user.firstName} ${user.lastName}`} />
       <div className="flex flex-col items-center gap-6 mt-20">
         <div className="w-full max-w-4xl mx-4">
-          <div className="border border-gray-300 p-4 rounded mb-6">
+          <div className="border border-gray-300 p-4 rounded shadow mb-6">
             <div className="flex justify-between mb-4">
               <h2 className="font-bold">User Details</h2>
               <div className="space-x-2">

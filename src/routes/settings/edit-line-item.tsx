@@ -12,6 +12,7 @@ import OptionForm from "./option-form";
 import { updateLineItem } from "../../api/api";
 import Button from "../../components/button";
 import { NumericFormat } from "react-number-format";
+import { ProjectArea } from "../../app/types/project-area";
 
 import PanelHeaderBar from "../../components/page-header-bar";
 // type LineItemFormData = {
@@ -62,6 +63,20 @@ export default function EditLineItem() {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["line-item", lineItemId] });
       queryClient.invalidateQueries({ queryKey: ["area-template"] });
+      // Also invalidate cost queries since margin affects pricing
+      const projectAreaId = lineItemQuery.data?.projectAreaId;
+      if (projectAreaId) {
+        queryClient.invalidateQueries({ 
+          queryKey: ["area-cost", projectAreaId] 
+        });
+        // Get the project area to find the project ID
+        const projectArea = queryClient.getQueryData(["area", projectAreaId]) as ProjectArea;
+        if (projectArea?.projectId) {
+          queryClient.invalidateQueries({ 
+            queryKey: ["project-cost", projectArea.projectId] 
+          });
+        }
+      }
     },
   });
 

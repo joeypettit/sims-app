@@ -15,7 +15,7 @@ export default function ClientProjectsList({
   const navigate = useNavigate();
 
   return (
-    <div className="border border-gray-300 p-4 rounded">
+    <div className="border border-gray-300 p-4 rounded shadow">
       <div className="flex flex-row justify-between">
         <h2 className="font-bold mb-4">Projects</h2>
       </div>

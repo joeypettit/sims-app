@@ -12,10 +12,14 @@ import { useNavigate } from "react-router-dom";
 
 type LineItemActionButtonProps = {
   lineItem: LineItem;
+  projectId: string;
+  projectAreaId: string;
 };
 
 export default function LineItemActionsButton({
   lineItem,
+  projectId,
+  projectAreaId
 }: LineItemActionButtonProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -53,10 +57,11 @@ export default function LineItemActionsButton({
       );
       setModalButtonsDisabled(false);
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["area"] });
+      queryClient.invalidateQueries({ queryKey: ["area-cost", projectAreaId] });
+      queryClient.invalidateQueries({ queryKey: ["project-cost", projectId] });
       setIsDeleteModalOpen(false);
-      setModalButtonsDisabled(false);
     },
   });
 

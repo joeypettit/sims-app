@@ -15,11 +15,15 @@ import { Draggable } from "@hello-pangea/dnd";
 export type LineItemDisplayProps = {
   lineItem: LineItem;
   index: number;
+  projectId: string;
+  projectAreaId: string;
 };
 
 export default function LineItemDisplay({
   lineItem,
-  index
+  index,
+  projectId,
+  projectAreaId
 }: LineItemDisplayProps) {
   const queryClient = useQueryClient();
   const quantity = lineItem.quantity ? lineItem.quantity : 0;
@@ -43,7 +47,7 @@ export default function LineItemDisplay({
         return {
           ...oldData,
           lineItemGroups: oldData.lineItemGroups.map((group) => {
-            if (group.id !== lineItem.lineItemGroupId) return group; // Not the target group, keep it the same
+            if (group.id !== lineItem.lineItemGroupId) return group;
             return {
               ...group,
               lineItems: group.lineItems.map((item: LineItem) => {
@@ -57,20 +61,14 @@ export default function LineItemDisplay({
           }),
         };
       });
-      return { previousProjectArea };
+
+      return previousProjectArea;
     },
-    onError: (error, variables, context) => {
-      console.log("There was an ERROR:", error);
-      if (context?.previousProjectArea) {
-        queryClient.setQueryData(["area"], context.previousProjectArea);
-      }
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["area"] });
-      queryClient.invalidateQueries({
-        queryKey: ["area-template"],
-      });
-    },
+    onSuccess: () => {
+      // Invalidate both the area cost and project cost queries using passed props
+      queryClient.invalidateQueries({ queryKey: ["area-cost", projectAreaId] });
+      queryClient.invalidateQueries({ queryKey: ["project-cost", projectId] });
+    }
   });
 
   function getCurrentLineTotal() {
@@ -133,6 +131,8 @@ export default function LineItemDisplay({
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["area"] });
+      queryClient.invalidateQueries({ queryKey: ["area-cost", projectAreaId] });
+      queryClient.invalidateQueries({ queryKey: ["project-cost", projectId] });
     },
   });
   function getSortedOptions() {
@@ -166,7 +166,7 @@ export default function LineItemDisplay({
             <div className="flex flex-col text-center items-center pr-4">
               <div className="flex flex-row justify-between w-full">
                 <h1 className="text-left">{lineItem.name}</h1>
-                <LineItemActionsButton lineItem={lineItem} />
+                <LineItemActionsButton lineItem={lineItem} projectId={projectId} projectAreaId={projectAreaId} />
               </div>
               <QuantityInput value={quantity} onChange={onQuantityChange} />
               <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>

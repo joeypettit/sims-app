@@ -14,11 +14,15 @@ import { ProjectArea } from "../../app/types/project-area";
 export type LineItemGroupDisplayProps = {
   group: LineItemGroup;
   index: number;
+  projectId: string;
+  projectAreaId: string;
 };
 
 export default function LineItemGroupDisplay({
   group,
-  index
+  index,
+  projectId,
+  projectAreaId
 }: LineItemGroupDisplayProps) {
   const queryClient = useQueryClient();
 
@@ -149,6 +153,8 @@ export default function LineItemGroupDisplay({
                         key={lineItem.id}
                         lineItem={lineItem}
                         index={index}
+                        projectId={projectId}
+                        projectAreaId={projectAreaId}
                       />
                     );
                   })}

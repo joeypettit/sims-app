@@ -9,6 +9,7 @@ import type { AreaTemplate } from "../app/types/area-template";
 import { LineItemGroup } from "../app/types/line-item-group";
 import { User, LoginCredentials, UserRole } from "../app/types/user";
 import { Client } from "../app/types/client";
+import { PriceRange } from "../app/types/price-range";
 
 // Add response interceptor to handle unauthorized responses
 axios.interceptors.response.use(
@@ -734,5 +735,32 @@ export async function removeClientFromProject(projectId: string, clientId: strin
     return response.data;
   } catch (error) {
     throw new Error(`Failed to remove client from project: ${error}`);
+  }
+}
+
+export async function deleteProjectArea(areaId: string) {
+  try {
+    const response = await axios.delete(`/api/project-areas/${areaId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error deleting project area: ${error}`);
+  }
+}
+
+export async function getProjectCostRange(projectId: string): Promise<PriceRange> {
+  try {
+    const response = await axios.get<PriceRange>(`/api/projects/${projectId}/cost-range`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get project cost range');
+  }
+}
+
+export async function getAreaCostRange(areaId: string): Promise<PriceRange> {
+  try {
+    const response = await axios.get<PriceRange>(`/api/project-areas/${areaId}/cost-range`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to get area cost range');
   }
 }

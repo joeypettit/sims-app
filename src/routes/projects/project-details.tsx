@@ -1,16 +1,19 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProjectById, removeUserFromProject, removeClientFromProject } from "../../api/api";
+import { getProjectById, removeUserFromProject, removeClientFromProject, getProjectCostRange } from "../../api/api";
 import Button from "../../components/button";
 import AddProjectManagerModal from "../../components/add-project-manager-modal";
 import AddProjectClientModal from "../../components/add-project-client-modal";
 import PanelHeaderBar from "../../components/page-header-bar";
 import AddProjectAreaModal from "../../components/add-project-area-modal";
+import DeleteProjectAreaModal from "../../components/delete-project-area-modal";
 import { useState } from "react";
 import { Project } from "../../app/types/project";
 import ProjectManagersList from "../../components/project-managers-list";
 import ProjectClientsList from "../../components/project-clients-list";
 import { FaPlus } from "react-icons/fa6";
+import { IoMdCloseCircle } from "react-icons/io";
+import { formatNumberWithCommas } from "../../util/utils";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -18,12 +21,20 @@ export default function ProjectDetails() {
   const [showAddAreaModal, setShowAddAreaModal] = useState(false);
   const [showAddManagerModal, setShowAddManagerModal] = useState(false);
   const [showAddClientModal, setShowAddClientModal] = useState(false);
+  const [showDeleteAreaModal, setShowDeleteAreaModal] = useState(false);
+  const [selectedAreaToDelete, setSelectedAreaToDelete] = useState<{ id: string; name: string | null } | null>(null);
   const [managerErrorMessage, setManagerErrorMessage] = useState<string | null>(null);
   const [clientErrorMessage, setClientErrorMessage] = useState<string | null>(null);
 
   const projectQuery = useQuery({
     queryKey: ["project", id],
     queryFn: () => getProjectById(id || ""),
+    enabled: !!id,
+  });
+
+  const projectCostQuery = useQuery({
+    queryKey: ["project-cost", id],
+    queryFn: () => getProjectCostRange(id || ""),
     enabled: !!id,
   });
 
@@ -73,12 +84,39 @@ export default function ProjectDetails() {
     setShowAddClientModal(true);
   }
 
-  if (projectQuery.isLoading) {
+  function handleDeleteAreaClick(areaId: string, areaName: string | null, e: React.MouseEvent) {
+    e.stopPropagation();
+    setSelectedAreaToDelete({ id: areaId, name: areaName });
+    setShowDeleteAreaModal(true);
+  }
+
+  function handleDeleteModalClose() {
+    setShowDeleteAreaModal(false);
+    setSelectedAreaToDelete(null);
+  }
+
+  function getProjectTotalCost() {
+    if (!projectCostQuery.data) return "-";
+    
+    if (projectCostQuery.data.lowPriceInDollars <= 0 && projectCostQuery.data.highPriceInDollars <= 0) {
+      return "-";
+    }
+
+    const lowPrice = formatNumberWithCommas(projectCostQuery.data.lowPriceInDollars);
+    const highPrice = formatNumberWithCommas(projectCostQuery.data.highPriceInDollars);
+    return `$${lowPrice} - $${highPrice}`;
+  }
+
+  if (projectQuery.isLoading || projectCostQuery.isLoading) {
     return <p>Loading...</p>;
   }
 
   if (projectQuery.isError) {
     return <p>Error: {projectQuery.error.message}</p>;
+  }
+
+  if (projectCostQuery.isError) {
+    console.error("Error loading project cost:", projectCostQuery.error);
   }
 
   return (
@@ -107,7 +145,7 @@ export default function ProjectDetails() {
         </div>
 
         {/* Project Areas Section */}
-        <div className="border border-gray-300 p-4 rounded w-full max-w-4xl mx-4">
+        <div className="border border-gray-300 p-4 rounded shadow w-full max-w-4xl mx-4">
           <div className="flex flex-row mb-4 justify-between items-center">
             <h2 className="font-bold">Project Areas</h2>
             <Button
@@ -125,15 +163,26 @@ export default function ProjectDetails() {
                 return (
                   <li
                     key={area.id}
-                    className="p-2 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner rounded"
+                    className="group p-2 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner rounded flex justify-between items-center"
                     onClick={() => navigate(`area/${area.id}`)}
                   >
-                    {area.name}
+                    <span>{area.name}</span>
+                    <button
+                      onClick={(e) => handleDeleteAreaClick(area.id, area.name, e)}
+                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <IoMdCloseCircle size={20} />
+                    </button>
                   </li>
                 );
               })}
             </ul>
           </div>
+        </div>
+
+        {/* Project Total Cost */}
+        <div className="p-8 border border-gray-300 font-bold rounded shadow">
+          Project Total: {getProjectTotalCost()}
         </div>
       </div>
       <AddProjectAreaModal
@@ -153,6 +202,15 @@ export default function ProjectDetails() {
         projectId={id || ''}
         currentClients={projectQuery.data?.clients || []}
       />
+      {selectedAreaToDelete && (
+        <DeleteProjectAreaModal
+          isOpen={showDeleteAreaModal}
+          setIsOpen={handleDeleteModalClose}
+          areaId={selectedAreaToDelete.id}
+          projectId={id || ''}
+          areaName={selectedAreaToDelete.name || ''}
+        />
+      )}
     </>
   );
 }

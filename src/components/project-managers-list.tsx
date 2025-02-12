@@ -20,7 +20,7 @@ export default function ProjectManagersList({
   isRemoveLoading
 }: ProjectManagersListProps) {
   return (
-    <div className="border border-gray-300 p-4 rounded">
+    <div className="border border-gray-300 p-4 rounded shadow">
       <div className="flex flex-row mb-4 justify-between items-center">
         <h2 className="font-bold">Project Managers</h2>
         <Button
