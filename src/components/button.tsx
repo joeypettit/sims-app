@@ -40,25 +40,25 @@ export default function Button({
   const getButtonClasses = () => {
     switch (variant) {
       case "primary":
-        return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-800";
+        return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-800 text-white border border-transparent";
       case "secondary":
-        return "bg-gray-400 hover:bg-gray-600 active:bg-gray-700";
+        return "bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white border border-transparent";
       case "success":
-        return "bg-emerald-600 hover:bg-emerald-700 active:bg-green-900";
+        return "bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white border border-transparent";
       case "danger":
-        return "bg-red-700 hover:bg-red-800 active:bg-red-900";
+        return "bg-red-500 hover:bg-red-600 active:bg-red-700 text-white border border-transparent";
       case "warning":
-        return "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700";
+        return "bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white border border-transparent";
       case "white":
-        return "text-black bg-white hover:bg-slate-100 active:bg-slate-100 active:shadow-inner";
+        return "text-gray-700 bg-white hover:bg-gray-100 active:bg-gray-200 active:shadow-inner";
       case "outline-danger":
-        return "text-red-700 border-2 border-red-700 bg-transparent hover:bg-red-50 active:bg-red-100";
+        return "text-red-500 border border-red-200 bg-transparent hover:bg-red-50 active:bg-red-100";
       case "outline-primary":
-        return "text-sims-green-600 border-2 border-sims-green-600 bg-transparent hover:bg-sims-green-50 active:bg-sims-green-100";
+        return "text-sims-green-600 border border-sims-green-200 bg-transparent hover:bg-sims-green-50 active:bg-sims-green-100";
       case "outline-success":
-        return "text-emerald-700 border-2 border-emerald-700 bg-transparent hover:bg-green-50 active:bg-green-100";
+        return "text-emerald-600 border border-emerald-200 bg-transparent hover:bg-emerald-50 active:bg-emerald-100";
       default:
-        return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-900";
+        return "bg-sims-green-600 hover:bg-sims-green-700 active:bg-sims-green-800 text-white border border-transparent";
     }
   };
 

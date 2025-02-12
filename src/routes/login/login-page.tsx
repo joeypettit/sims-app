@@ -12,8 +12,12 @@ export default function LoginPage() {
 
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: () => {
-      navigate('/projects');
+    onSuccess: (data) => {
+      if (data.userAccount?.isTemporaryPassword) {
+        navigate('/change-password');
+      } else {
+        navigate('/projects');
+      }
     },
     onError: (error: Error) => {
       setError(error.message);

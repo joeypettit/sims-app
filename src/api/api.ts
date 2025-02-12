@@ -581,6 +581,20 @@ export async function toggleUserBlocked(userAccountId: string): Promise<User> {
   }
 }
 
+export async function resetUserPassword(userAccountId: string): Promise<{ message: string, temporaryPassword: string }> {
+  try {
+    const response = await axios.post<{ message: string, temporaryPassword: string }>(
+      `/api/auth/users/${userAccountId}/reset-password`
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to reset user password');
+    }
+    throw new Error('Failed to reset user password');
+  }
+}
+
 export async function searchUsers({ 
   query = "", 
   page = "1", 
@@ -762,5 +776,26 @@ export async function getAreaCostRange(areaId: string): Promise<PriceRange> {
     return response.data;
   } catch (error) {
     throw new Error('Failed to get area cost range');
+  }
+}
+
+export async function changePassword({
+  currentPassword,
+  newPassword,
+}: {
+  currentPassword: string;
+  newPassword: string;
+}) {
+  try {
+    const response = await axios.post('/api/auth/change-password', {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.data?.error === 'Current password is incorrect') {
+      throw new Error('The current password you entered is incorrect. Please try again.');
+    }
+    throw new Error('Failed to change password. Please try again.');
   }
 }

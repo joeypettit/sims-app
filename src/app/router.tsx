@@ -14,6 +14,7 @@ import UsersPanel from '../routes/users/users-panel';
 import UserDetails from '../routes/users/user-details';
 import ClientsPanel from "../routes/clients/clients-panel";
 import ClientDetails from "../routes/clients/client-details";
+import ChangePasswordPage from '../routes/change-password/change-password-page';
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />
+  },
+  {
+    path: '/change-password',
+    element: <ChangePasswordPage />
   },
   {
     path: '/',

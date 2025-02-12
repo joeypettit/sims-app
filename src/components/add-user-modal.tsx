@@ -9,6 +9,17 @@ type AddUserModalProps = {
   setIsOpen: (isOpen: boolean) => void;
 };
 
+// Function to generate a random password
+function generateTemporaryPassword() {
+  const length = 8;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return password;
+}
+
 export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
   const queryClient = useQueryClient();
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -16,34 +27,40 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
     firstName: '',
     lastName: '',
     email: '',
-    password: '',
     role: 'USER' as UserRole
   });
+  const [temporaryPassword, setTemporaryPassword] = useState('');
 
   useEffect(() => {
-    if (isOpen && firstNameRef.current) {
-      firstNameRef.current.focus();
-    }
-  }, [isOpen]);
-
-  const createUserMutation = useMutation({
-    mutationFn: createUser,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] });
-      setIsOpen(false);
+    if (isOpen) {
+      // Generate a new password when the modal opens
+      setTemporaryPassword(generateTemporaryPassword());
+      if (firstNameRef.current) {
+        firstNameRef.current.focus();
+      }
+    } else {
+      // Reset form and password when modal closes
       setFormData({
         firstName: '',
         lastName: '',
         email: '',
-        password: '',
         role: 'USER' as UserRole
       });
+      setTemporaryPassword('');
+    }
+  }, [isOpen]);
+
+  const createUserMutation = useMutation({
+    mutationFn: (data: typeof formData & { password: string }) => createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setIsOpen(false);
     }
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createUserMutation.mutate(formData);
+    createUserMutation.mutate({ ...formData, password: temporaryPassword });
   };
 
   const actionButtons = [
@@ -104,17 +121,6 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
-              required
-            />
-          </div>
-          
-          <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select
               value={formData.role}
@@ -125,6 +131,16 @@ export default function AddUserModal({ isOpen, setIsOpen }: AddUserModalProps) {
               <option value="ADMIN">Admin</option>
             </select>
           </div>
+        </div>
+
+        <div className="mt-4 p-4 bg-gray-50 rounded-md">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Temporary Password</h3>
+          <div className="bg-white p-3 rounded border border-gray-300 font-mono text-center">
+            {temporaryPassword}
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Please save this password and share it with the user. They will be required to change it upon their first login.
+          </p>
         </div>
 
         {createUserMutation.isError && (
