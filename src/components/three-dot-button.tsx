@@ -13,8 +13,8 @@ export default function ThreeDotButton({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center space-y-1 p-1 rounded  hover:bg-slate-100 ${
-        menuIsOpen && "bg-slate-100 shadow-inner"
+      className={`flex flex-col items-center justify-center space-y-1 p-1 rounded  hover:bg-gray-100 ${
+        menuIsOpen && "bg-gray-100 shadow-inner"
       }`}
       aria-label="More options"
     >

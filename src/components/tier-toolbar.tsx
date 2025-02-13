@@ -16,7 +16,7 @@ export default function StickyTierToolbar({ handleSetIsOpen,
   },
 }: StickyTierToolbarProps) {
   return (
-    <div className="flex flex-col bg-white pt-1 pb-1 sticky -top-4 z-50 border-b">
+    <div className="flex flex-col bg-white pt-1 pb-1 sticky -top-4 z-50 border-b-2">
       <div className="flex flex-row justify-start">
         <Button variant="white" onClick={backButtonCallback}>
           <IoChevronBackOutline />
@@ -25,7 +25,7 @@ export default function StickyTierToolbar({ handleSetIsOpen,
           {title}
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-4 py-2 pl-4 ">
+      <div className="grid grid-cols-5 gap-2 py-2 pl-4 ">
         <div>
           <Button size={"xs"} variant="white" onClick={() => handleSetIsOpen(true)}>
             <span className="text-gray-500 text-sm">Open All</span>

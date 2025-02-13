@@ -160,10 +160,11 @@ export default function LineItemDisplay({
   return (
     <Draggable index={index} draggableId={lineItem.id}>
       {(provided) => (
-        <div className="grid grid-cols-5 gap-4 py-2 pl-4 " ref={provided.innerRef} {...provided.draggableProps}>
-          <div className="flex flex-row">
-            <div className="flex justify-center items-center"{...provided.dragHandleProps}><RiDraggable /></div>
-            <div className="flex flex-col text-center items-center pr-4">
+        <>
+        <div className="grid grid-cols-5 gap-2 py-4 px-1" ref={provided.innerRef} {...provided.draggableProps}>
+          <div className="flex flex-row border-e border-gray-100">
+            <div className="flex justify-center items-center px-1"{...provided.dragHandleProps}><RiDraggable /></div>
+            <div className="flex flex-col text-center justify-between px-2 pb-2">
               <div className="flex flex-row justify-between w-full">
                 <h1 className="text-left">{lineItem.name}</h1>
                 <LineItemActionsButton lineItem={lineItem} projectId={projectId} projectAreaId={projectAreaId} />
@@ -184,10 +185,14 @@ export default function LineItemDisplay({
               />
             );
           })}
-          <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6">
+          <div className="flex justify-end items-center text-sm font-bold pr-4 col-end-6 border-l border-gray-100">
             {getCurrentLineTotal()}
           </div>
+          {/* <hr className="border border-gray-100 mx-4" /> */}
+
         </div>
+        <hr className="border-gray-100 mx-4" />
+        </>
       )}
 
     </Draggable>

@@ -328,10 +328,14 @@ export default function ProjectAreaProposal({
         console.log("projectAreaQuery.data?.lineItemGroups",projectAreaQuery.data?.lineItemGroups)
         const groupsInCategory = filterGroupsByCategory({ groups: projectAreaQuery.data?.lineItemGroups, categoryId: category.id })
         return (
-          <div key={category.id} className="py-4">
-            <h2 className="text-md font-bold text-center border  border-b-slate-200 border-r-0 border-l-0 border-t-0">
-              {category.name}
-            </h2>
+          <div key={category.id} className="py-4 px-2">
+            <div className="flex justify-center">
+              <div className=""/> 
+                <h2 className="text-lg font-bold text-center px-10 border-b-2 border-gray-100 ">
+                  {category.name}
+                </h2>
+            <div/>
+            </div>
             <DragDropContext onDragEnd={onDragEnd}>
               <Droppable
                 droppableId={category.id}>
@@ -345,6 +349,7 @@ export default function ProjectAreaProposal({
               </Droppable>
             </DragDropContext>
             <Button
+              className="border-b-2 border-gray-100"
               size="sm"
               variant="white"
               onClick={() => handleOpenCreateGroupModal(category.id)}
