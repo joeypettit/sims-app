@@ -165,7 +165,7 @@ export default function LineItemGroupDisplay({
           </DragDropContext>
             <div className="grid grid-cols-5 gap-4 py-2 pl-4">
               <div>
-                <Button size={"xs"} variant="white" onClick={handleCreateLineItem}>
+                <Button className="border-b-2 border-gray-100" size={"xs"} variant="white" onClick={handleCreateLineItem}>
                   + Add Line
                 </Button>
               </div>

@@ -48,7 +48,7 @@ export default function LineItemOptionDisplay({
         props.lineItemOption.isSelected ? "bg-sims-green-50 shadow-inner" : ""
       }`}
     >
-      <div className="absolute right-1">
+      <div className="absolute right-1 top-1">
         <IsCheckedIcon
           isChecked={props.lineItemOption.isSelected}
           iconSize="1rem"

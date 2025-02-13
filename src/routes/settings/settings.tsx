@@ -4,10 +4,11 @@ import Button from "../../components/button";
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/modal";
 import { validateTemplateName } from "../../util/form-validation";
-import { createAreaTemplate } from "../../api/api";
+import { createAreaTemplate, logout } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getAllAreaTemplates } from "../../api/api";
 import { AreaTemplate } from "../../app/types/area-template";
+import { FaSignOutAlt } from "react-icons/fa";
 
 export default function SettingsPanel() {
   const navigate = useNavigate();
@@ -24,6 +25,14 @@ export default function SettingsPanel() {
       inputRef.current.focus();
     }
   }, [isCreateTemplateModalOpen]);
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      navigate('/login');
+    }
+  });
 
   // Fetch the details for the specific item using the ID from the route params
   const allTemplatesQuery = useQuery({
@@ -63,6 +72,10 @@ export default function SettingsPanel() {
     setIsCreateTemplateModalOpen(false);
     setTemplateNameInput("");
     setTemplateModalErrorMessage("");
+  }
+
+  function handleLogout() {
+    logoutMutation.mutate();
   }
 
   if (allTemplatesQuery.isLoading || createAreaTemplateMutation.isPending) {
@@ -117,7 +130,7 @@ export default function SettingsPanel() {
   return (
     <>
       <h1 className="font-bold">Settings</h1>
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-6">
         <div className="border border-gray-300 p-1 my-20 rounded w-1/2">
           <div className="flex flex-row justify-between">
             <h2 className="font-bold my-4">Templates</h2>
@@ -146,6 +159,13 @@ export default function SettingsPanel() {
             })}
           </ul>
         </div>
+        <Button
+          variant="outline-danger"
+          onClick={handleLogout}
+          className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50"
+        >
+          <FaSignOutAlt /> Logout
+        </Button>
       </div>
       {renderTemplateModal()}
     </>

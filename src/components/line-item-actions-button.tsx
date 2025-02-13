@@ -104,7 +104,7 @@ export default function LineItemActionsButton({
             {actions.map((action, index) => (
               <li
                 key={index}
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-slate-200  cursor-pointer"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100  cursor-pointer active:bg-gray-200 active:shadow-inner"
                 onClick={() => {
                   action.action();
                   setIsDropdownOpen(false); // Close the dropdown after clicking

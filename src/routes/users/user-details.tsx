@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUser, updateUser, deleteUser, toggleUserBlocked } from "../../api/api";
+import { getUser, updateUser, deleteUser, toggleUserBlocked, resetUserPassword } from "../../api/api";
 import { useState, useEffect } from "react";
 import Button from "../../components/button";
 import IconButton from "../../components/icon-button";
@@ -9,9 +9,8 @@ import Modal from "../../components/modal";
 import { UserRole } from "../../app/types/user";
 import ProjectsList from "../../components/projects-list";
 import StatusPill from "../../components/status-pill";
-import { FaTrash } from "react-icons/fa6";
+import { FaTrash, FaUserCheck, FaUserTimes, FaKey } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { FaUserTimes, FaUserCheck } from "react-icons/fa";
 
 const roleOptions = [
   { value: "USER", label: "User" },
@@ -29,6 +28,8 @@ export default function UserDetails() {
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -63,6 +64,13 @@ export default function UserDetails() {
     mutationFn: () => toggleUserBlocked(user?.userAccount?.id || ''),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user", userId] });
+    }
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: resetUserPassword,
+    onSuccess: (data) => {
+      setTemporaryPassword(data.temporaryPassword);
     }
   });
 
@@ -108,6 +116,12 @@ export default function UserDetails() {
     setShowDeleteModal(true);
   };
 
+  const handleResetPassword = () => {
+    if (user?.userAccount?.id) {
+      resetPasswordMutation.mutate(user.userAccount.id);
+    }
+  };
+
   const canModifyUser = user?.userAccount?.role !== 'SUPER_ADMIN';
 
   if (isLoading) {
@@ -131,7 +145,7 @@ export default function UserDetails() {
                   <>
                     <IconButton
                       icon={<FaTrash size={18} />}
-                      onClick={handleDelete}
+                      onClick={() => setShowDeleteModal(true)}
                       color="text-gray-600 hover:text-gray-800"
                       title="Delete User"
                     />
@@ -141,6 +155,12 @@ export default function UserDetails() {
                       disabled={toggleBlockedMutation.isPending || !user?.userAccount?.id}
                       color="text-gray-600 hover:text-gray-800"
                       title={user.userAccount?.isBlocked ? "Unblock User" : "Block User"}
+                    />
+                    <IconButton
+                      icon={<FaKey size={18} />}
+                      onClick={() => setShowResetPasswordModal(true)}
+                      color="text-gray-600 hover:text-gray-800"
+                      title="Reset Password"
                     />
                     <IconButton
                       icon={<MdEdit size={20} />}
@@ -295,6 +315,32 @@ export default function UserDetails() {
             </p>
           )}
         </div>
+      </Modal>
+
+      {/* Reset Password Modal */}
+      <Modal
+        isOpen={showResetPasswordModal}
+        title="Reset User Password"
+        onCancel={() => {
+          setShowResetPasswordModal(false);
+          setTemporaryPassword(null);
+        }}
+        onConfirm={temporaryPassword ? undefined : handleResetPassword}
+        disableConfirm={resetPasswordMutation.isPending}
+      >
+        {temporaryPassword ? (
+          <div className="space-y-4">
+            <p>The user's password has been reset. Their temporary password is:</p>
+            <div className="bg-gray-100 p-3 rounded font-mono text-center">
+              {temporaryPassword}
+            </div>
+            <p className="text-sm text-gray-600">
+              Please provide this password to the user. They will be required to change it upon their next login.
+            </p>
+          </div>
+        ) : (
+          <p>Are you sure you want to reset this user's password? They will be required to change it upon their next login.</p>
+        )}
       </Modal>
     </>
   );

@@ -13,6 +13,7 @@ export type User = {
     email: string;
     role: UserRole;
     isBlocked: boolean;
+    isTemporaryPassword: boolean;
   };
 };
 
