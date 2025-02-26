@@ -6,34 +6,50 @@ import Modal from "./modal";
 
 type AddUnitModalProps = {
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onConfirm: (unitName: string) => void;
+  onCancel: () => void;
+  errorMessage?: string;
 };
 
-export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
+export default function AddUnitModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+  errorMessage
+}: AddUnitModalProps) {
   const queryClient = useQueryClient();
   const [unitNameInput, setUnitNameInput] = useState("");
-  const [modalErrorMessage, setModalErrorMessage] = useState<string>("");
-  async function handleModalConfirm() {
-    setModalErrorMessage("");
-    const errorMessage = validateUnitName(unitNameInput);
-    if (errorMessage) {
-      setModalErrorMessage(errorMessage);
+  const [validationError, setValidationError] = useState<string>("");
+  const unitInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen && unitInputRef.current) {
+      unitInputRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const handleConfirm = () => {
+    setValidationError("");
+    const error = validateUnitName(unitNameInput);
+    if (error) {
+      setValidationError(error);
       return;
     }
     const trimmedName = unitNameInput.trim();
-    createUnitMutation.mutate({ unitName: trimmedName });
-  }
-
-  function handleModalCancel() {
-    setIsOpen(false);
+    onConfirm(trimmedName);
     setUnitNameInput("");
-    setModalErrorMessage("");
-  }
+  };
+
+  const handleCancel = () => {
+    setUnitNameInput("");
+    setValidationError("");
+    onCancel();
+  };
 
   const createUnitMutation = useMutation({
     mutationFn: createUnit,
     onError: () => {
-      setModalErrorMessage(
+      setValidationError(
         "There has been an error creating a new unit. Please try again."
       );
     },
@@ -41,45 +57,37 @@ export default function AddUnitModal({ isOpen, setIsOpen }: AddUnitModalProps) {
       console.log("Unit Created with id", data.id);
       queryClient.invalidateQueries({ queryKey: ["units"] });
       setUnitNameInput("");
-      setIsOpen(false);
+      onCancel();
     },
   });
-
-  // Set focus on the input element when the modal opens
-  const inputRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
 
   return (
     <Modal
       isOpen={isOpen}
-      title="Create New Unit"
-      onConfirm={() => handleModalConfirm()}
-      onCancel={() => handleModalCancel()}
+      title="Add New Unit"
+      onConfirm={handleConfirm}
+      onCancel={handleCancel}
     >
       <div className="flex flex-col justify-center items-center">
         <p className="text-sm text-gray-500 pb-4">
-          Create a new unit that can be used across the application.
+          Enter a name for the new unit (e.g., "Square Feet", "Hours", "Each").
         </p>
-        <label htmlFor="unitName" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="unitName" className="block mb-2">
           Unit Name:
         </label>
         <input
           type="text"
+          autoComplete="off"
           id="unit-name"
           name="unit-name"
-          autoComplete="off"
-          ref={inputRef}
+          ref={unitInputRef}
           value={unitNameInput}
           onChange={(e) => setUnitNameInput(e.target.value)}
           required
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
         />
-        {modalErrorMessage && (
-          <div className="text-rose-700">{modalErrorMessage}</div>
+        {(validationError || errorMessage) && (
+          <div className="mt-2 text-rose-700">{validationError || errorMessage}</div>
         )}
       </div>
     </Modal>

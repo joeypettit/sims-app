@@ -15,22 +15,6 @@ import { NumericFormat } from "react-number-format";
 import { ProjectArea } from "../../app/types/project-area";
 
 import PanelHeaderBar from "../../components/page-header-bar";
-// type LineItemFormData = {
-//   name: string;
-//   quantity: number;
-//   unitId: string;
-//   marginDecimal: number;
-//   lineItemOptions: OptionFormData[];
-// };
-
-// export type OptionFormData = {
-//   description: string;
-//   highCostInDollarsPerUnit: number;
-//   lowCostInDollarsPerUnit: number;
-//   exactCostInDollarsPerUnit: number;
-//   priceAdjustmentDecimal: number;
-//   tier: { name: string; tierLevel: number };
-// };
 
 export default function EditLineItem() {
   const queryClient = useQueryClient();
@@ -66,14 +50,17 @@ export default function EditLineItem() {
       // Also invalidate cost queries since margin affects pricing
       const projectAreaId = lineItemQuery.data?.projectAreaId;
       if (projectAreaId) {
-        queryClient.invalidateQueries({ 
-          queryKey: ["area-cost", projectAreaId] 
+        queryClient.invalidateQueries({
+          queryKey: ["area-cost", projectAreaId],
         });
         // Get the project area to find the project ID
-        const projectArea = queryClient.getQueryData(["area", projectAreaId]) as ProjectArea;
+        const projectArea = queryClient.getQueryData([
+          "area",
+          projectAreaId,
+        ]) as ProjectArea;
         if (projectArea?.projectId) {
-          queryClient.invalidateQueries({ 
-            queryKey: ["project-cost", projectArea.projectId] 
+          queryClient.invalidateQueries({
+            queryKey: ["project-cost", projectArea.projectId],
           });
         }
       }
@@ -185,93 +172,131 @@ export default function EditLineItem() {
       <PanelHeaderBar
         title={`Editing Line Item: ${lineItemQuery.data?.name}`}
       />
-      <form onSubmit={handleSubmit} className="p-2">
-        <div className="flex flex-col gap-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-              <input
-                type="text"
-                autoComplete="off"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={onNameInputChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
-              />
-            </div>
-            <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="marginDecimal" className="block text-sm font-medium text-gray-700 mb-1">Margin</label>
-              <NumericFormat
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
-                autoComplete="off"
-                id="priceAdjustmentMultiplier"
-                name="priceAdjustmentMultiplier"
-                suffix="%"
-                value={getMarginPercentage()}
-                allowNegative={false}
-                decimalScale={2}
-                placeholder="Percent Margin"
-                onValueChange={(values) => {
-                  onMarginInputChange(values.floatValue);
-                }}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-2 rounded bg-slate-50">
-              <label htmlFor="quantity" className="block mb-1">
-                Quantity
-              </label>
-              <QuantityInput
-                value={formData.quantity || 0}
-                onChange={onQuantityChange}
-              />
-            </div>
-            <div className="p-2 rounded bg-slate-50">
-              <label htmlFor={"unit"} className="block mb-1">
-                Unit
-              </label>
-              <UnitSelector
-                value={formData?.unit?.id || ""}
-                onChange={onUnitSelection}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="py-6">
-          <h1 className="font-bold">Options:</h1>
-          {formData.lineItemOptions
-            .sort((a: LineItemOption, b: LineItemOption) => {
-              if (a.optionTier.tierLevel > b.optionTier.tierLevel) return 1;
-              if (a.optionTier.tierLevel < b.optionTier.tierLevel) return -1;
-              return 0;
-            })
-            .map((option) => {
-              return (
-                <div key={option.id}>
-                  <hr />
-                  <OptionForm
-                    key={option.id}
-                    option={option}
-                    lineItem={formData}
-                    onChange={onOptionChange}
-                  />
+      <div className="flex flex-col items-center gap-6 mt-8 ">
+        <div className="w-full max-w-4xl ">
+          <div className="p-4 mb-6">
+            <form onSubmit={handleSubmit} className="space-y-4 px-2">
+              <div className="border border-gray-300 p-4 rounded shadow">
+                <div className="flex justify-between">
+                  <h2 className="font-bold">Line Item Details</h2>
                 </div>
-              );
-            })}
-          <hr />
+                <div className="grid grid-cols-2 gap-4 p-4">
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      autoComplete="off"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={onNameInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="marginDecimal"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Margin
+                    </label>
+                    <NumericFormat
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600"
+                      autoComplete="off"
+                      id="priceAdjustmentMultiplier"
+                      name="priceAdjustmentMultiplier"
+                      suffix="%"
+                      value={getMarginPercentage()}
+                      allowNegative={false}
+                      decimalScale={2}
+                      placeholder="Percent Margin"
+                      onValueChange={(values) => {
+                        onMarginInputChange(values.floatValue);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="quantity"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Quantity
+                    </label>
+                    <QuantityInput
+                      value={formData.quantity || 0}
+                      onChange={onQuantityChange}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={"unit"}
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Unit
+                    </label>
+                    <UnitSelector
+                      value={formData?.unit?.id || ""}
+                      onChange={onUnitSelection}
+                    />
+                  </div>
+                </div>
+                </div>
+
+
+                <div className="pt-4 border border-gray-300 p-4 rounded shadow">
+                  <h2 className="font-bold text-gray-700">
+                    Options
+                  </h2>
+                  <div className="">
+                    {formData.lineItemOptions
+                      .sort((a: LineItemOption, b: LineItemOption) => {
+                        if (a.optionTier.tierLevel > b.optionTier.tierLevel)
+                          return 1;
+                        if (a.optionTier.tierLevel < b.optionTier.tierLevel)
+                          return -1;
+                        return 0;
+                      })
+                      .map((option, index, array) => {
+                        return (
+                          <div
+                            key={option.id}
+                            className={`pt-4 ${index < array.length - 1 ? "border-b-2 border-gray-200" : ""}`}
+                          >
+                            <OptionForm
+                              key={option.id}
+                              option={option}
+                              lineItem={formData}
+                              onChange={onOptionChange}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              <div className="flex justify-end gap-2 pt-4">
+                <Button variant="white" type="button" onClick={handleCancel}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={updateLineItemMutation.isPending}
+                >
+                  {updateLineItemMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div className="flex flex-row gap-4 justify-end">
-          <Button variant="white" type="button" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button variant="primary" type="submit">
-            Save
-          </Button>
-        </div>
-      </form>
+      </div>
     </>
   );
 }

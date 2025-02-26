@@ -14,7 +14,7 @@ export default function AddButton({ onClick, size = 20 }: AddButtonProps) {
       style={{ width: size, height: size, fontSize: size / 2 }}
       aria-label="Add"
     >
-      <GoPlus />
+      <GoPlus size={size} />
     </button>
   );
 }

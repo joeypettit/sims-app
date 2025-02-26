@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProjectById, removeUserFromProject, removeClientFromProject, getProjectCostRange } from "../../api/api";
+import { getProjectById, removeUserFromProject, removeClientFromProject, getProjectCostRange, updateProjectDates, deleteProject } from "../../api/api";
 import Button from "../../components/button";
 import AddProjectManagerModal from "../../components/add-project-manager-modal";
 import AddProjectClientModal from "../../components/add-project-client-modal";
@@ -11,9 +11,11 @@ import { useState } from "react";
 import { Project } from "../../app/types/project";
 import ProjectManagersList from "../../components/project-managers-list";
 import ProjectClientsList from "../../components/project-clients-list";
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus, FaPen, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import { formatNumberWithCommas } from "../../util/utils";
+import IconButton from "../../components/icon-button";
+import Modal from "../../components/modal";
 
 export default function ProjectDetails() {
   const { id } = useParams();
@@ -25,6 +27,8 @@ export default function ProjectDetails() {
   const [selectedAreaToDelete, setSelectedAreaToDelete] = useState<{ id: string; name: string | null } | null>(null);
   const [managerErrorMessage, setManagerErrorMessage] = useState<string | null>(null);
   const [clientErrorMessage, setClientErrorMessage] = useState<string | null>(null);
+  const [isEditingDates, setIsEditingDates] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const projectQuery = useQuery({
     queryKey: ["project", id],
@@ -72,6 +76,23 @@ export default function ProjectDetails() {
     }
   });
 
+  const updateDatesMutation = useMutation({
+    mutationFn: ({ startDate, endDate }: { startDate: Date | null, endDate: Date | null }) =>
+      updateProjectDates(id || '', startDate, endDate),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project', id] });
+      setIsEditingDates(false);
+    }
+  });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: () => deleteProject(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
+      navigate('/projects');
+    }
+  });
+
   function handleAddAreaClick() {
     setShowAddAreaModal(true);
   }
@@ -106,6 +127,27 @@ export default function ProjectDetails() {
     const highPrice = formatNumberWithCommas(projectCostQuery.data.highPriceInDollars);
     return `$${lowPrice} - $${highPrice}`;
   }
+
+  const handleDateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const startDate = formData.get('startDate') as string;
+    const endDate = formData.get('endDate') as string;
+
+    updateDatesMutation.mutate({
+      startDate: startDate ? new Date(startDate) : null,
+      endDate: endDate ? new Date(endDate) : null
+    });
+  };
+
+  const handleCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const form = e.currentTarget.closest('form');
+    if (form) {
+      form.reset();  // Reset form to default values
+    }
+    setIsEditingDates(false);
+  };
 
   if (projectQuery.isLoading || projectCostQuery.isLoading) {
     return <p>Loading...</p>;
@@ -144,6 +186,71 @@ export default function ProjectDetails() {
           />
         </div>
 
+        {/* Project Dates Section */}
+        <div className="border border-gray-300 p-4 rounded shadow w-full max-w-4xl mx-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="font-bold">Project Dates</h2>
+            {!isEditingDates && (
+              <IconButton
+                icon={<FaPen />}
+                onClick={() => setIsEditingDates(true)}
+                color="text-gray-600 hover:text-gray-800"
+                title="Edit dates"
+              />
+            )}
+          </div>
+
+          <form onSubmit={handleDateSubmit}>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <input
+                  type="date"
+                  id="startDate"
+                  name="startDate"
+                  defaultValue={projectQuery.data?.startDate?.split('T')[0]}
+                  disabled={!isEditingDates}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600 disabled:bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date
+                </label>
+                <input
+                  type="date"
+                  id="endDate"
+                  name="endDate"
+                  defaultValue={projectQuery.data?.endDate?.split('T')[0]}
+                  disabled={!isEditingDates}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-sims-green-600 focus:border-sims-green-600 disabled:bg-gray-100"
+                />
+              </div>
+            </div>
+
+            {isEditingDates && (
+              <div className="flex justify-center gap-2 mt-4">
+                <Button 
+                  variant="white" 
+                  onClick={handleCancel}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="primary"
+                  type="submit"
+                  disabled={updateDatesMutation.isPending}
+                >
+                  {updateDatesMutation.isPending ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+            )}
+          </form>
+        </div>
+
         {/* Project Areas Section */}
         <div className="border border-gray-300 p-4 rounded shadow w-full max-w-4xl mx-4">
           <div className="flex flex-row mb-4 justify-between items-center">
@@ -167,12 +274,12 @@ export default function ProjectDetails() {
                     onClick={() => navigate(`area/${area.id}`)}
                   >
                     <span>{area.name}</span>
-                    <button
+                    <IconButton
+                      icon={<FaTrash />}
                       onClick={(e) => handleDeleteAreaClick(area.id, area.name, e)}
-                      className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      <IoMdCloseCircle size={20} />
-                    </button>
+                      className="opacity-0 group-hover:opacity-100"
+                      title="Delete area"
+                    />
                   </li>
                 );
               })}
@@ -184,6 +291,15 @@ export default function ProjectDetails() {
         <div className="p-8 border border-gray-300 font-bold rounded shadow">
           Project Total: {getProjectTotalCost()}
         </div>
+
+        {/* Delete Project Button */}
+        <Button
+          variant="outline-danger"
+          onClick={() => setShowDeleteModal(true)}
+          className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50 mb-8"
+        >
+          <FaTrash /> Delete Project
+        </Button>
       </div>
       <AddProjectAreaModal
         isOpen={showAddAreaModal}
@@ -211,6 +327,40 @@ export default function ProjectDetails() {
           areaName={selectedAreaToDelete.name || ''}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={showDeleteModal}
+        title="Delete Project"
+        actionButtons={[
+          {
+            variant: "white",
+            onClick: () => setShowDeleteModal(false),
+            children: "Cancel"
+          },
+          {
+            variant: "danger",
+            onClick: () => deleteProjectMutation.mutate(),
+            disabled: deleteProjectMutation.isPending,
+            children: deleteProjectMutation.isPending ? "Deleting..." : "Delete"
+          }
+        ]}
+      >
+        <div className="space-y-4 text-left">
+          <p className="text-red-600 font-medium">Warning: This action cannot be undone!</p>
+          <p>Deleting this project will:</p>
+          <ul className="list-disc pl-5 text-gray-600">
+            <li>Permanently remove all project information</li>
+            <li>Delete all areas and line items</li>
+            <li>Remove all client and user associations</li>
+          </ul>
+          {deleteProjectMutation.isError && (
+            <p className="text-red-600 mt-2">
+              {deleteProjectMutation.error.message || "Error deleting project"}
+            </p>
+          )}
+        </div>
+      </Modal>
     </>
   );
 }

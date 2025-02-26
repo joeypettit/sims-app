@@ -169,8 +169,10 @@ export default function LineItemDisplay({
                 <h1 className="text-left">{lineItem.name}</h1>
                 <LineItemActionsButton lineItem={lineItem} projectId={projectId} projectAreaId={projectAreaId} />
               </div>
-              <QuantityInput value={quantity} onChange={onQuantityChange} />
-              <h6 className="text-gray-500">{lineItem?.unit?.name}</h6>
+              <div className="flex flex-col items-center gap-1">
+                <QuantityInput value={quantity} onChange={onQuantityChange} />
+                <span className="text-sm text-gray-600 pl-1">{lineItem?.unit?.name || '-'}</span>
+              </div>
             </div>
           </div>
           {getSortedOptions().map((option, index) => {

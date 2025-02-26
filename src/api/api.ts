@@ -206,6 +206,17 @@ export async function createUnit({ unitName }: { unitName: string }) {
   }
 }
 
+export async function deleteUnit(unitId: string): Promise<void> {
+  try {
+    await axios.delete(`/api/units/${unitId}`);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 400) {
+      throw new Error(error.response.data.error || 'Failed to delete unit');
+    }
+    throw new Error('Failed to delete unit');
+  }
+}
+
 export async function createBlankLineItem({ groupId }: { groupId: string }) {
   try {
     const response = await axios.post(`/api/line-items/create-blank`, {
@@ -797,5 +808,33 @@ export async function changePassword({
       throw new Error('The current password you entered is incorrect. Please try again.');
     }
     throw new Error('Failed to change password. Please try again.');
+  }
+}
+
+export async function updateProjectDates(projectId: string, startDate: Date | null, endDate: Date | null) {
+  try {
+    const response = await axios.patch(`/api/projects/${projectId}/dates`, {
+      startDate,
+      endDate
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to update project dates');
+  }
+}
+
+export async function deleteProject(projectId: string): Promise<void> {
+  try {
+    await axios.delete(`/api/projects/${projectId}`);
+  } catch (error) {
+    throw new Error('Failed to delete project');
+  }
+}
+
+export async function deleteTemplate(templateId: string): Promise<void> {
+  try {
+    await axios.delete(`/api/templates/area/${templateId}`);
+  } catch (error) {
+    throw new Error('Failed to delete template');
   }
 }

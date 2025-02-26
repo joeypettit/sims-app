@@ -1,6 +1,5 @@
 import { DraggableProvided } from "@hello-pangea/dnd";
-import { MdDragHandle } from "react-icons/md";
-
+import { RiDraggable } from "react-icons/ri";
 import { ReactNode } from "react";
 import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
 
@@ -25,13 +24,13 @@ export default function CollapsibleDiv({
   };
 
   return (
-    <div className="py-2 border-2 border-gray-200 border-l-0 border-t-0 border-r-0 rounded">
+    <div className="py-2 border border-gray-200 border-t-gray-100  border-l-0 border-t-1 border-b-2 border-r-0 rounded-lg">
       <div
         className="flex justify-start items-center cursor-pointer"
       >
-        <div {...provided.dragHandleProps} className="p-1 hover:bg-sims-green-50 rounded-e"><MdDragHandle /></div>
+        <div {...provided.dragHandleProps} className="p-1 hover:bg-sims-green-50 rounded-e"><RiDraggable /></div>
         <div onClick={toggleCollapse} className="w-full flex justify-between">
-          <div className="ps-1">
+          <div className="ps-1">                 
             <h2 className="text-md font-bold">{title}</h2>
           </div>
           <div className="flex flex-row pe-2">
@@ -50,6 +49,7 @@ export default function CollapsibleDiv({
           </div>
         </div>
       </div>
+      {/* {isOpen && <hr className=" border-gray-200" />} */}
       <div
         className={`transition-all duration-300 ease-in-out  ${isOpen ? "max-h-screen" : "max-h-0 overflow-hidden"
           }`}

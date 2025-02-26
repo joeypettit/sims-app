@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { getUnits } from "../api/api";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getUnits, createUnit } from "../api/api";
 import { LineItemUnit } from "../app/types/line-item-unit";
 import AddButton from "./add-button";
 import { useState } from "react";
@@ -11,7 +11,9 @@ type UnitSelectorProps = {
 };
 
 export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
+  const queryClient = useQueryClient();
   const [isAddUnitModalOpen, setIsAddUnitModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const {
     data: units,
@@ -21,6 +23,19 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
   } = useQuery({
     queryKey: ["units"],
     queryFn: getUnits,
+  });
+
+  const createUnitMutation = useMutation({
+    mutationFn: createUnit,
+    onError: () => {
+      setErrorMessage(
+        "There has been an error creating a new unit. Please try again."
+      );
+    },
+    onSuccess: () => {
+      setIsAddUnitModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["units"] });
+    },
   });
 
   function handleUnitSelection(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -54,7 +69,7 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
               </option>
             ))}
           </select>
-          <div className="flex items-center">
+          <div className="m-1 flex items-center">
             <AddButton
               onClick={() => {
                 setIsAddUnitModalOpen(true);
@@ -65,7 +80,12 @@ export default function UnitSelector({ value, onChange }: UnitSelectorProps) {
       )}
       <AddUnitModal
         isOpen={isAddUnitModalOpen}
-        setIsOpen={setIsAddUnitModalOpen}
+        onConfirm={(unitName) => createUnitMutation.mutate({ unitName })}
+        onCancel={() => {
+          setIsAddUnitModalOpen(false);
+          setErrorMessage("");
+        }}
+        errorMessage={errorMessage}
       />
     </div>
   );

@@ -1,8 +1,8 @@
 import { Client } from "../app/types/client";
 import Button from "./button";
-import { IoMdCloseCircle } from "react-icons/io";
+import IconButton from "./icon-button";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { FiAlertCircle } from "react-icons/fi";
-import { FaPlus } from "react-icons/fa6";
 
 type ProjectClientsListProps = {
   clients: Client[];
@@ -46,16 +46,16 @@ export default function ProjectClientsList({
               className="group p-2 bg-white odd:bg-sims-green-100 rounded flex justify-between items-center hover:bg-sims-green-200 active:shadow-inner"
             >
               <span>{client.firstName} {client.lastName}</span>
-              <button
+              <IconButton
+                icon={<FaTrash />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemoveClient(client.id);
                 }}
                 disabled={isRemoveLoading}
-                className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-gray-600 transition-colors disabled:text-gray-200"
-              >
-                <IoMdCloseCircle size={20} />
-              </button>
+                className="opacity-0 group-hover:opacity-100"
+                title="Remove client"
+              />
             </li>
           ))}
         </ul>

@@ -1,28 +1,33 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/button";
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/modal";
 import { validateTemplateName } from "../../util/form-validation";
-import { createAreaTemplate, logout } from "../../api/api";
+import { createAreaTemplate, createUnit, deleteUnit, getUnits, logout, deleteTemplate } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getAllAreaTemplates } from "../../api/api";
-import { AreaTemplate } from "../../app/types/area-template";
 import { FaSignOutAlt } from "react-icons/fa";
+import UnitsList from "../../components/units-list";
+import AddUnitModal from "../../components/add-unit-modal";
+import TemplatesList from "../../components/templates-list";
 
 export default function SettingsPanel() {
   const navigate = useNavigate();
-  const [isCreateTemplateModalOpen, setIsCreateTemplateModalOpen] =
-    useState(false);
+  const queryClient = useQueryClient();
+  const [isCreateTemplateModalOpen, setIsCreateTemplateModalOpen] = useState(false);
+  const [isCreateUnitModalOpen, setIsCreateUnitModalOpen] = useState(false);
   const [templateNameInput, setTemplateNameInput] = useState("");
-  const [templateModalErrorMessage, setTemplateModalErrorMessage] =
-    useState<String>("");
+  const [templateModalErrorMessage, setTemplateModalErrorMessage] = useState<String>("");
+  const [unitErrorMessage, setUnitErrorMessage] = useState<string | null>(null);
+  const [unitModalErrorMessage, setUnitModalErrorMessage] = useState<string>("");
+  const [templateErrorMessage, setTemplateErrorMessage] = useState<string | null>(null);
 
   // Set focus on the input element when the modal opens
-  const inputRef = useRef<HTMLInputElement>(null);
+  const templateInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    if (isCreateTemplateModalOpen && inputRef.current) {
-      inputRef.current.focus();
+    if (isCreateTemplateModalOpen && templateInputRef.current) {
+      templateInputRef.current.focus();
     }
   }, [isCreateTemplateModalOpen]);
 
@@ -34,13 +39,19 @@ export default function SettingsPanel() {
     }
   });
 
-  // Fetch the details for the specific item using the ID from the route params
+  // Fetch all templates
   const allTemplatesQuery = useQuery({
     queryKey: ["all-area-templates"],
     queryFn: async () => {
       const templates = await getAllAreaTemplates();
       return templates;
     },
+  });
+
+  // Fetch all units
+  const allUnitsQuery = useQuery({
+    queryKey: ["units"],
+    queryFn: getUnits,
   });
 
   const createAreaTemplateMutation = useMutation({
@@ -55,6 +66,44 @@ export default function SettingsPanel() {
       setIsCreateTemplateModalOpen(false);
       navigate(`/settings/edit-template/${data.id}`);
     },
+  });
+
+  const createUnitMutation = useMutation({
+    mutationFn: createUnit,
+    onError: () => {
+      setUnitModalErrorMessage(
+        "There has been an error creating a new unit. Please try again."
+      );
+    },
+    onSuccess: () => {
+      setIsCreateUnitModalOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["units"] });
+    },
+  });
+
+  const deleteUnitMutation = useMutation({
+    mutationFn: deleteUnit,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["units"] });
+      setUnitErrorMessage(null);
+    },
+    onError: (error: Error) => {
+      setUnitErrorMessage(error.message);
+      // Clear error message after 3 seconds
+      setTimeout(() => setUnitErrorMessage(null), 3000);
+    }
+  });
+
+  const deleteTemplateMutation = useMutation({
+    mutationFn: deleteTemplate,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-area-templates"] });
+      setTemplateErrorMessage(null);
+    },
+    onError: (error: Error) => {
+      setTemplateErrorMessage(error.message);
+      setTimeout(() => setTemplateErrorMessage(null), 3000);
+    }
   });
 
   async function handleTemplateModalConfirm() {
@@ -78,7 +127,7 @@ export default function SettingsPanel() {
     logoutMutation.mutate();
   }
 
-  if (allTemplatesQuery.isLoading || createAreaTemplateMutation.isPending) {
+  if (allTemplatesQuery.isLoading || createAreaTemplateMutation.isPending || allUnitsQuery.isLoading) {
     return (
       <>
         <div className="flex justify-center items-center w-full h-full">
@@ -90,6 +139,10 @@ export default function SettingsPanel() {
 
   if (allTemplatesQuery.isError) {
     return <p>Error: {allTemplatesQuery.error.message}</p>;
+  }
+
+  if (allUnitsQuery.isError) {
+    return <p>Error: {allUnitsQuery.error.message}</p>;
   }
 
   function renderTemplateModal() {
@@ -113,7 +166,7 @@ export default function SettingsPanel() {
             autoComplete="off"
             id="template-name"
             name="template-name"
-            ref={inputRef}
+            ref={templateInputRef}
             value={templateNameInput}
             onChange={(e) => setTemplateNameInput(e.target.value)}
             required
@@ -130,35 +183,27 @@ export default function SettingsPanel() {
   return (
     <>
       <h1 className="font-bold">Settings</h1>
-      <div className="flex flex-col items-center gap-6">
-        <div className="border border-gray-300 p-1 my-20 rounded w-1/2">
-          <div className="flex flex-row justify-between">
-            <h2 className="font-bold my-4">Templates</h2>
-            <Button
-              className="my-4"
-              size="xs"
-              variant="white"
-              onClick={() => setIsCreateTemplateModalOpen(true)}
-            >
-              +
-            </Button>
-          </div>
-          <ul>
-            {allTemplatesQuery.data?.map((template) => {
-              return (
-                <li
-                  key={template.id}
-                  className="p-1 cursor-pointer bg-white odd:bg-sims-green-100 hover:bg-sims-green-200 active:shadow-inner"
-                  onClick={() => {
-                    navigate(`/settings/edit-template/${template.id}`);
-                  }}
-                >
-                  {template.name}
-                </li>
-              );
-            })}
-          </ul>
+      <div className="flex flex-col items-center gap-6 my-20">
+        <div className="w-1/2">
+          <TemplatesList
+            templates={allTemplatesQuery.data || []}
+            onRemoveTemplate={(templateId) => deleteTemplateMutation.mutate(templateId)}
+            onAddTemplate={() => setIsCreateTemplateModalOpen(true)}
+            errorMessage={templateErrorMessage}
+            isRemoveLoading={deleteTemplateMutation.isPending}
+          />
         </div>
+
+        <div className="w-1/2">
+          <UnitsList
+            units={allUnitsQuery.data || []}
+            onRemoveUnit={(unitId) => deleteUnitMutation.mutate(unitId)}
+            onAddUnit={() => setIsCreateUnitModalOpen(true)}
+            errorMessage={unitErrorMessage}
+            isRemoveLoading={deleteUnitMutation.isPending}
+          />
+        </div>
+
         <Button
           variant="outline-danger"
           onClick={handleLogout}
@@ -168,6 +213,15 @@ export default function SettingsPanel() {
         </Button>
       </div>
       {renderTemplateModal()}
+      <AddUnitModal
+        isOpen={isCreateUnitModalOpen}
+        onConfirm={(unitName) => createUnitMutation.mutate({ unitName })}
+        onCancel={() => {
+          setIsCreateUnitModalOpen(false);
+          setUnitModalErrorMessage("");
+        }}
+        errorMessage={unitModalErrorMessage}
+      />
     </>
   );
 }

@@ -1,32 +1,32 @@
-import { User } from "../app/types/user";
+import { LineItemUnit } from "../app/types/line-item-unit";
 import Button from "./button";
 import IconButton from "./icon-button";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { FiAlertCircle } from "react-icons/fi";
 
-type ProjectManagersListProps = {
-  users: User[];
-  onRemoveUser: (userId: string) => void;
-  onAddManager: () => void;
+type UnitsListProps = {
+  units: LineItemUnit[];
+  onRemoveUnit: (unitId: string) => void;
+  onAddUnit: () => void;
   errorMessage: string | null;
   isRemoveLoading: boolean;
 };
 
-export default function ProjectManagersList({
-  users,
-  onRemoveUser,
-  onAddManager,
+export default function UnitsList({
+  units,
+  onRemoveUnit,
+  onAddUnit,
   errorMessage,
   isRemoveLoading
-}: ProjectManagersListProps) {
+}: UnitsListProps) {
   return (
     <div className="border border-gray-300 p-4 rounded shadow">
       <div className="flex flex-row mb-4 justify-between items-center">
-        <h2 className="font-bold">Project Managers</h2>
+        <h2 className="font-bold">Line Item Units</h2>
         <Button
           size="xs"
           variant="white"
-          onClick={onAddManager}
+          onClick={onAddUnit}
           className="py-1"
         >
           <FaPlus />
@@ -40,21 +40,21 @@ export default function ProjectManagersList({
           </div>
         )}
         <ul>
-          {users.map((user) => (
+          {units.map((unit) => (
             <li
-              key={user.id}
+              key={unit.id}
               className="group p-2 bg-white odd:bg-sims-green-100 rounded flex justify-between items-center hover:bg-sims-green-200 active:shadow-inner"
             >
-              <span>{user.firstName} {user.lastName}</span>
+              <span>{unit.name}</span>
               <IconButton
                 icon={<FaTrash />}
                 onClick={(e) => {
                   e.stopPropagation();
-                  onRemoveUser(user.id);
+                  onRemoveUnit(unit.id);
                 }}
                 disabled={isRemoveLoading}
                 className="opacity-0 group-hover:opacity-100"
-                title="Remove manager"
+                title="Delete unit"
               />
             </li>
           ))}
