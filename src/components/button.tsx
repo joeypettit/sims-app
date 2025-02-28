@@ -17,7 +17,7 @@ type ButtonTypes = "submit" | "reset" | "button" | undefined;
 // Define the props type
 export type ButtonProps = {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent) => void;
   className?: string;
   disabled?: boolean;
   variant?: ButtonVariant;

@@ -131,7 +131,15 @@ export default function ChangePasswordPage() {
             </div>
           </div>
 
-          <div>
+          <div className="flex gap-4">
+            <Button
+              type="button"
+              variant="white"
+              className="w-full"
+              onClick={() => navigate(-1)}
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               className="w-full"

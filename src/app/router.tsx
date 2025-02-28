@@ -14,6 +14,8 @@ import UserDetails from '../routes/users/user-details';
 import ClientsPanel from "../routes/clients/clients-panel";
 import ClientDetails from "../routes/clients/client-details";
 import ChangePasswordPage from '../routes/change-password/change-password-page';
+import ProfilePage from '../routes/profile/profile-page';
+import ProtectedRoute from '../components/protected-route';
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +32,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/',
-    element: <NavBar />,
+    element: (
+      <ProtectedRoute>
+        <NavBar />
+      </ProtectedRoute>
+    ),
     errorElement: <PanelWindow><ErrorPage /></PanelWindow>,
     children: [
       {
@@ -47,7 +53,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'users',
-        element: <PanelWindow><UsersPanel /></PanelWindow>
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <PanelWindow><UsersPanel /></PanelWindow>
+          </ProtectedRoute>
+        )
       },
       {
         path: 'users/:userId',
@@ -55,7 +65,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
-        element: <PanelWindow><SettingsPanel /></PanelWindow>
+        element: (
+          <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+            <PanelWindow><SettingsPanel /></PanelWindow>
+          </ProtectedRoute>
+        )
       },
       {
         path: 'settings/edit-template/:templateId',
@@ -72,6 +86,10 @@ export const router = createBrowserRouter([
       {
         path: 'clients/:clientId',
         element: <PanelWindow><ClientDetails /></PanelWindow>
+      },
+      {
+        path: 'profile',
+        element: <PanelWindow><ProfilePage /></PanelWindow>
       }
     ]
   }

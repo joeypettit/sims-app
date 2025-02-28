@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import ProfileCircle from "./profile-circle";
 import { Link, Outlet } from "react-router-dom";
-import { BsChevronDoubleLeft } from "react-icons/bs";
-import { BsChevronDoubleRight } from "react-icons/bs";
+import { BsChevronDoubleLeft, BsChevronDoubleRight, BsHousesFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
-import { BsHousesFill } from "react-icons/bs";
-import { FaUsers } from "react-icons/fa";
-import { FaUserTie } from "react-icons/fa";
+import { FaUsers, FaUserTie, FaUserCircle } from "react-icons/fa";
+import { useUserRole } from "../../hooks/useUserRole";
 
 const iconSize = "1.8rem";
 
@@ -15,21 +13,31 @@ const links = [
     to: "/projects",
     label: "Projects",
     icon: <BsHousesFill size={iconSize} />,
+    roles: ["USER", "ADMIN", "SUPER_ADMIN"],
   },
   {
     to: "/clients",
     label: "Clients",
     icon: <FaUserTie size={iconSize} />,
+    roles: ["USER", "ADMIN", "SUPER_ADMIN"],
+  },
+  {
+    to: "/profile",
+    label: "Profile",
+    icon: <FaUserCircle size={iconSize} />,
+    roles: ["USER", "ADMIN", "SUPER_ADMIN"],
   },
   {
     to: "/users",
     label: "Users",
     icon: <FaUsers size={iconSize} />,
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
     to: "/settings",
     label: "Settings",
     icon: <IoMdSettings size={iconSize} />,
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
 ];
 
@@ -61,10 +69,16 @@ function NavBar() {
 
 function LargeScreenNavBar() {
   const [isOpen, setIsOpen] = useState(true);
+  const userRole = useUserRole();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
+  // Filter links based on user role
+  const filteredLinks = links.filter(link => 
+    link.roles.includes(userRole || 'USER')
+  );
 
   return (
     <div className="flex flex-row justify-start h-screen relative bg-sims-beige">
@@ -86,7 +100,7 @@ function LargeScreenNavBar() {
         </div>
         <nav>
           <ul>
-            {links.map((link, index) => {
+            {filteredLinks.map((link, index) => {
               return (
                 <div key={`nav-list-${index}`}>
                   <hr className="mx-2" />

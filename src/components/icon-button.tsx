@@ -2,7 +2,7 @@ import React from "react";
 
 type IconButtonProps = {
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick: (e: React.MouseEvent) => void;
   color?: string;
   disabled?: boolean;
   className?: string;
