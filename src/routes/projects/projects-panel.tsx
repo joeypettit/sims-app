@@ -47,7 +47,6 @@ export default function ProjectsPanel() {
   const handleRowClick = (project: Project) => {
     navigate(`/project/${project.id}`);
   };
-console.log(data?.projects)
   const columns: PanelTableColumn<Project>[] = [
     {
       columnName: "",
