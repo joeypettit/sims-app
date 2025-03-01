@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useUserRole } from '../hooks/useUserRole';
+import { useQuery } from '@tanstack/react-query';
+import { getCurrentUser } from '../api/api';
 
 type ProtectedRouteProps = {
   children: React.ReactNode;
@@ -7,15 +8,25 @@ type ProtectedRouteProps = {
 };
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const userRole = useUserRole();
   const location = useLocation();
+  
+  const { data: user, isLoading } = useQuery({
+    queryKey: ['user'],
+    queryFn: getCurrentUser,
+    retry: false
+  });
 
-  if (!userRole) {
-    // Redirect to login if not authenticated
+  // Show loading state while checking auth
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    // Only redirect to login if we're sure there's no user
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(userRole)) {
+  if (allowedRoles && !allowedRoles.includes(user?.userAccount?.role || 'USER')) {
     // Redirect to projects page if not authorized
     return <Navigate to="/projects" replace />;
   }

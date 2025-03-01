@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProfileCircle from "./profile-circle";
 import { Link, Outlet } from "react-router-dom";
-import { BsChevronDoubleLeft, BsChevronDoubleRight, BsHousesFill } from "react-icons/bs";
+import { BsChevronDoubleLeft, BsChevronDoubleRight, BsHousesFill, BsStarFill } from "react-icons/bs";
 import { IoMdSettings } from "react-icons/io";
 import { FaUsers, FaUserTie, FaUserCircle } from "react-icons/fa";
 import { useUserRole } from "../../hooks/useUserRole";
@@ -9,6 +9,12 @@ import { useUserRole } from "../../hooks/useUserRole";
 const iconSize = "1.8rem";
 
 const links = [
+  {
+    to: "/my-projects",
+    label: "My Projects",
+    icon: <BsStarFill size={iconSize} />,
+    roles: ["USER", "ADMIN", "SUPER_ADMIN"],
+  },
   {
     to: "/projects",
     label: "Projects",

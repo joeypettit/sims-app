@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getCurrentUser, updateUser } from "../../api/api";
+import { getCurrentUser, updateUser, logout } from "../../api/api";
 import { useState, useEffect } from "react";
 import Button from "../../components/button";
 import IconButton from "../../components/icon-button";
@@ -7,7 +7,7 @@ import PanelHeaderBar from "../../components/page-header-bar";
 import { MdEdit } from "react-icons/md";
 import { UserRole } from "../../app/types/user";
 import { useNavigate } from "react-router-dom";
-import { FaKey } from "react-icons/fa";
+import { FaKey, FaSignOutAlt } from "react-icons/fa";
 
 export default function ProfilePage() {
   const queryClient = useQueryClient();
@@ -30,6 +30,14 @@ export default function ProfilePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       setIsEditing(false);
+    }
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => {
+      queryClient.clear();
+      navigate('/login');
     }
   });
 
@@ -63,6 +71,10 @@ export default function ProfilePage() {
         email: user.userAccount?.email || '',
       });
     }
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   if (isLoading) {
@@ -180,6 +192,16 @@ export default function ProfilePage() {
               )}
             </form>
           </div>
+        </div>
+
+        <div className="flex justify-center w-full">
+          <Button
+            variant="outline-danger"
+            onClick={handleLogout}
+            className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50"
+          >
+            <FaSignOutAlt /> Logout
+          </Button>
         </div>
       </div>
     </>

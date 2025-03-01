@@ -16,6 +16,7 @@ import ClientDetails from "../routes/clients/client-details";
 import ChangePasswordPage from '../routes/change-password/change-password-page';
 import ProfilePage from '../routes/profile/profile-page';
 import ProtectedRoute from '../components/protected-route';
+import MyProjectsPanel from "../routes/projects/my-projects";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +40,10 @@ export const router = createBrowserRouter([
     ),
     errorElement: <PanelWindow><ErrorPage /></PanelWindow>,
     children: [
+      {
+        path: 'my-projects',
+        element: <PanelWindow><MyProjectsPanel /></PanelWindow>
+      },
       {
         path: 'projects',
         element: <PanelWindow><ProjectsPanel /></PanelWindow>

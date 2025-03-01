@@ -1,39 +1,29 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import type { PanelTableColumn } from "../../components/panel-table";
 import PanelTable from "../../components/panel-table";
 import { useNavigate } from "react-router-dom";
 import { Project } from "../../app/types/project";
-import { createBlankProject, getCurrentUser, searchProjects } from "../../api/api";
-import Button from "../../components/button";
-import { FaPlus, FaChevronLeft, FaChevronRight, FaStar } from "react-icons/fa6";
-import { useEffect, useRef, useState } from "react";
-import Modal from "../../components/modal";
-import AddProjectModal from "../../components/add-project-modal";
+import { searchMyProjects } from "../../api/api";
+import { FaStar, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useState } from "react";
 import { useDebounce } from "../../hooks/useDebounce";
-import { useUserRole } from "../../hooks/useUserRole";
 
-export default function ProjectsPanel() {
+export default function MyProjectsPanel() {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState("1");
-  const [addProjectModalIsOpen, setAddProjectModalIsOpen] = useState(false);
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Queries
   const { data, isLoading } = useQuery({
-    queryKey: ["projects", debouncedSearch, currentPage],
+    queryKey: ["my-projects", debouncedSearch, currentPage],
     queryFn: async () => {
-      const response = await searchProjects({
+      return searchMyProjects({
         query: debouncedSearch,
         page: currentPage,
         limit: "10"
       });
-      return response;
-    },
-    staleTime: 10000 // Cache results for 10 seconds
+    }
   });
-
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -47,7 +37,7 @@ export default function ProjectsPanel() {
   const handleRowClick = (project: Project) => {
     navigate(`/project/${project.id}`);
   };
-console.log(data?.projects)
+
   const columns: PanelTableColumn<Project>[] = [
     {
       columnName: "",
@@ -96,14 +86,11 @@ console.log(data?.projects)
       <div className="flex justify-between items-center">
         <input
           type="text"
-          placeholder="Search projects..."
+          placeholder="Search my projects..."
           value={searchQuery}
           onChange={handleSearch}
           className="px-4 py-2 border rounded-lg"
         />
-        <Button variant="white" onClick={() => setAddProjectModalIsOpen(true)}>
-          <FaPlus />
-        </Button>
       </div>
 
       {isLoading ? (
@@ -123,34 +110,27 @@ console.log(data?.projects)
           />
           {data.pagination.pages > 1 && (
             <div className="flex justify-center items-center gap-4">
-              <Button
-                variant="white"
+              <button
                 onClick={() => handlePageChange(Number(currentPage) - 1)}
                 disabled={currentPage === "1"}
-                className="disabled:bg-white disabled:border-gray-200"
+                className="disabled:opacity-50"
               >
                 <FaChevronLeft className="disabled:text-gray-300" />
-              </Button>
+              </button>
               <span className="text-sm text-gray-600">
-                Page {currentPage} of {data.pagination.pages} 
+                Page {currentPage} of {data.pagination.pages}
               </span>
-              <Button
-                variant="white"
+              <button
                 onClick={() => handlePageChange(Number(currentPage) + 1)}
                 disabled={currentPage === data.pagination.pages.toString()}
-                className="disabled:bg-white disabled:border-gray-200"
+                className="disabled:opacity-50"
               >
                 <FaChevronRight className="disabled:text-gray-300" />
-              </Button>
+              </button>
             </div>
           )}
         </>
       )}
-
-      <AddProjectModal
-        isOpen={addProjectModalIsOpen}
-        setIsOpen={setAddProjectModalIsOpen}
-      />
     </div>
   );
-}
+} 

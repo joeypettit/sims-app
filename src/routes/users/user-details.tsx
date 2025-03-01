@@ -321,12 +321,22 @@ export default function UserDetails() {
       <Modal
         isOpen={showResetPasswordModal}
         title="Reset User Password"
-        onCancel={() => {
+        onCancel={temporaryPassword ? undefined : () => {
           setShowResetPasswordModal(false);
           setTemporaryPassword(null);
         }}
         onConfirm={temporaryPassword ? undefined : handleResetPassword}
         disableConfirm={resetPasswordMutation.isPending}
+        actionButtons={temporaryPassword ? [
+          {
+            variant: "white",
+            onClick: () => {
+              setShowResetPasswordModal(false);
+              setTemporaryPassword(null);
+            },
+            children: "Close"
+          }
+        ] : undefined}
       >
         {temporaryPassword ? (
           <div className="space-y-4">

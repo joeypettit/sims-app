@@ -10,17 +10,7 @@ import { LineItemGroup } from "../app/types/line-item-group";
 import { User, LoginCredentials, UserRole } from "../app/types/user";
 import { Client } from "../app/types/client";
 import { PriceRange } from "../app/types/price-range";
-
-// Add response interceptor to handle unauthorized responses
-axios.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+import { QueryClient } from "@tanstack/react-query";
 
 type SearchProjectsResponse = {
   projects: Project[];
@@ -445,24 +435,23 @@ export async function searchProjects({
   }
 }
 
-export async function login({ email, password }: LoginCredentials) {
+export async function login(credentials: LoginCredentials) {
   try {
-    const response = await axios.post('/api/auth/login', { email, password });
+    const response = await axios.post<User>('/api/auth/login', credentials);
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response) {
-      throw new Error(error.response.data.error || 'Login failed');
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      throw new Error('Invalid email or password');
     }
-    throw new Error('Login failed');
+    throw new Error('Failed to login. Please try again.');
   }
 }
 
 export async function logout() {
   try {
-    const response = await axios.post('/api/auth/logout');
-    return response.data;
+    await axios.post('/api/auth/logout');
   } catch (error) {
-    throw new Error('Logout failed');
+    throw new Error('Failed to logout');
   }
 }
 
@@ -836,5 +825,50 @@ export async function deleteTemplate(templateId: string): Promise<void> {
     await axios.delete(`/api/templates/area/${templateId}`);
   } catch (error) {
     throw new Error('Failed to delete template');
+  }
+}
+
+export async function starProject(projectId: string) {
+  try {
+    const response = await axios.post(`/api/projects/${projectId}/star`);
+    return response.data;
+  } catch (error) {
+    throw new Error('Failed to star project');
+  }
+}
+
+export async function unstarProject(projectId: string) {
+  try {
+    await axios.delete(`/api/projects/${projectId}/star`);
+  } catch (error) {
+    throw new Error('Failed to unstar project');
+  }
+}
+
+export async function isProjectStarred(projectId: string) {
+  try {
+    const response = await axios.get(`/api/projects/${projectId}/star`);
+    return response.data.isStarred;
+  } catch (error) {
+    throw new Error('Failed to check project star status');
+  }
+}
+
+export async function searchMyProjects({ 
+  query = "", 
+  page = "1", 
+  limit = "10" 
+}: { 
+  query?: string, 
+  page?: string, 
+  limit?: string 
+}) {
+  try {
+    const response = await axios.get<SearchProjectsResponse>(`/api/projects/my-projects`, {
+      params: { query, page, limit }
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error searching my projects: ${error}`);
   }
 }

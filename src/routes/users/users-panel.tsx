@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { PanelTableColumn } from "../../components/panel-table";
 import PanelTable from "../../components/panel-table";
-import { searchUsers } from "../../api/api";
+import { searchUsers, getCurrentUser } from "../../api/api";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../app/types/user";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { FaChevronLeft, FaChevronRight, FaPlus } from "react-icons/fa6";
 import AddUserModal from "../../components/add-user-modal";
 import StatusPill from "../../components/status-pill";
 import { useDebounce } from "../../hooks/useDebounce";
+import { useUserRole } from "../../hooks/useUserRole";
 
 const formatRole = (role: string) => {
   if (role === 'SUPER_ADMIN') return 'Super Admin';
@@ -24,13 +25,23 @@ export default function UsersPanel() {
   const debouncedSearch = useDebounce(searchQuery, 300);
   const limit = "10";
   
-  // Query for users with search
+  // Add query for current user
+  const { data: currentUser } = useQuery({
+    queryKey: ["user"],
+    queryFn: getCurrentUser
+  });
+  
+  // Query for users with search and filter out current user
   const { data, isLoading } = useQuery({
     queryKey: ["users", "search", debouncedSearch, currentPage],
     queryFn: () => searchUsers({ 
       query: debouncedSearch, 
       page: currentPage, 
       limit 
+    }),
+    select: (data) => ({
+      ...data,
+      users: data.users.filter(user => user.id !== currentUser?.id)
     })
   });
 

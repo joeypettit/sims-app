@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getProjectById, removeUserFromProject, removeClientFromProject, getProjectCostRange, updateProjectDates, deleteProject } from "../../api/api";
+import { getProjectById, removeUserFromProject, removeClientFromProject, getProjectCostRange, updateProjectDates, deleteProject, starProject, unstarProject, isProjectStarred } from "../../api/api";
 import Button from "../../components/button";
 import AddProjectManagerModal from "../../components/add-project-manager-modal";
 import AddProjectClientModal from "../../components/add-project-client-modal";
@@ -11,7 +11,7 @@ import { useState } from "react";
 import { Project } from "../../app/types/project";
 import ProjectManagersList from "../../components/project-managers-list";
 import ProjectClientsList from "../../components/project-clients-list";
-import { FaPlus, FaPen, FaCheck, FaTimes, FaTrash } from "react-icons/fa";
+import { FaPlus, FaPen, FaCheck, FaTimes, FaTrash, FaStar, FaRegStar } from "react-icons/fa";
 import { IoMdCloseCircle } from "react-icons/io";
 import { formatNumberWithCommas } from "../../util/utils";
 import IconButton from "../../components/icon-button";
@@ -43,6 +43,28 @@ export default function ProjectDetails() {
   });
 
   const queryClient = useQueryClient();
+
+  const { data: isStarred } = useQuery({
+    queryKey: ["project", id, "starred"],
+    queryFn: () => isProjectStarred(id!),
+    enabled: !!id
+  });
+
+  const starMutation = useMutation({
+    mutationFn: starProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", id, "starred"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    }
+  });
+
+  const unstarMutation = useMutation({
+    mutationFn: unstarProject,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", id, "starred"] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    }
+  });
 
   const removeUserMutation = useMutation({
     mutationFn: (userId: string) => {
@@ -149,6 +171,14 @@ export default function ProjectDetails() {
     setIsEditingDates(false);
   };
 
+  const handleStarClick = () => {
+    if (isStarred) {
+      unstarMutation.mutate(id!);
+    } else {
+      starMutation.mutate(id!);
+    }
+  };
+
   if (projectQuery.isLoading || projectCostQuery.isLoading) {
     return <p>Loading...</p>;
   }
@@ -163,8 +193,24 @@ export default function ProjectDetails() {
 
   return (
     <>
-      <PanelHeaderBar title={`Project: ${projectQuery.data?.name}`} />
+      <PanelHeaderBar title={`Project: ${projectQuery.data?.name}`}>
+        <div className="flex items-center gap-2">
+          <IconButton
+            icon={isStarred ? <FaStar size={18} /> : <FaRegStar size={18} />}
+            onClick={handleStarClick}
+            color={isStarred ? "text-yellow-500" : "text-gray-400"}
+            title={isStarred ? "Unstar Project" : "Star Project"}
+          />
+          <IconButton
+            icon={<FaTrash size={16} />}
+            onClick={() => setShowDeleteModal(true)}
+            color="text-gray-400 hover:text-red-500"
+            title="Delete Project"
+          />
+        </div>
+      </PanelHeaderBar>
       <div className="flex flex-col items-center gap-6 mt-20">
+
         {/* Project Managers and Clients Grid */}
         <div className="grid grid-cols-2 gap-4 w-full max-w-4xl mx-4">
           {/* Clients Section */}
@@ -291,15 +337,6 @@ export default function ProjectDetails() {
         <div className="p-8 border border-gray-300 font-bold rounded shadow">
           Project Total: {getProjectTotalCost()}
         </div>
-
-        {/* Delete Project Button */}
-        <Button
-          variant="outline-danger"
-          onClick={() => setShowDeleteModal(true)}
-          className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50 mb-8"
-        >
-          <FaTrash /> Delete Project
-        </Button>
       </div>
       <AddProjectAreaModal
         isOpen={showAddAreaModal}

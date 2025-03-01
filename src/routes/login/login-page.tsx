@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { login } from '../../api/api';
 import Button from '../../components/button';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const loginMutation = useMutation({
     mutationFn: login,
-    onSuccess: (data) => {
-      if (data.userAccount?.isTemporaryPassword) {
+    onSuccess: (user) => {
+      // Pre-populate the user query cache
+      queryClient.setQueryData(["user"], user);
+      
+      if (user.userAccount?.isTemporaryPassword) {
         navigate('/change-password');
       } else {
         navigate('/projects');

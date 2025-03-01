@@ -4,10 +4,9 @@ import Button from "../../components/button";
 import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/modal";
 import { validateTemplateName } from "../../util/form-validation";
-import { createAreaTemplate, createUnit, deleteUnit, getUnits, logout, deleteTemplate } from "../../api/api";
+import { createAreaTemplate, createUnit, deleteUnit, getUnits, deleteTemplate } from "../../api/api";
 import SimsSpinner from "../../components/sims-spinner/sims-spinner";
 import { getAllAreaTemplates } from "../../api/api";
-import { FaSignOutAlt } from "react-icons/fa";
 import UnitsList from "../../components/units-list";
 import AddUnitModal from "../../components/add-unit-modal";
 import TemplatesList from "../../components/templates-list";
@@ -30,14 +29,6 @@ export default function SettingsPanel() {
       templateInputRef.current.focus();
     }
   }, [isCreateTemplateModalOpen]);
-
-  // Logout mutation
-  const logoutMutation = useMutation({
-    mutationFn: logout,
-    onSuccess: () => {
-      navigate('/login');
-    }
-  });
 
   // Fetch all templates
   const allTemplatesQuery = useQuery({
@@ -123,10 +114,6 @@ export default function SettingsPanel() {
     setTemplateModalErrorMessage("");
   }
 
-  function handleLogout() {
-    logoutMutation.mutate();
-  }
-
   if (allTemplatesQuery.isLoading || createAreaTemplateMutation.isPending || allUnitsQuery.isLoading) {
     return (
       <>
@@ -203,14 +190,6 @@ export default function SettingsPanel() {
             isRemoveLoading={deleteUnitMutation.isPending}
           />
         </div>
-
-        <Button
-          variant="outline-danger"
-          onClick={handleLogout}
-          className="flex items-center gap-2 border-red-200 text-red-500 hover:bg-red-50"
-        >
-          <FaSignOutAlt /> Logout
-        </Button>
       </div>
       {renderTemplateModal()}
       <AddUnitModal
